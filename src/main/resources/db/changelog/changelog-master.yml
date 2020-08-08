@@ -1,0 +1,86 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Pawel
+      runInTransaction: true
+      changes:
+        - createTable:
+            tableName: games
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: creator
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar
+              - column:
+                  name: started_at
+                  type: timestamptz
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: game_players
+            columns:
+              - column:
+                  name: game_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_players_game
+                    deleteCascade: true
+                    references: games(id)
+              - column:
+                  name: player_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nickname
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar
+              - column:
+                  name: player_order
+                  type: tinyint
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            columnNames: game_id, player_id
+            constraintName: pk_game_players
+            tableName: game_players
+
+        - addUniqueConstraint:
+            columnNames:  game_id, player_order
+            constraintName:  game_id_order_unique
+            tableName:  game_players
+
+        - sql:
+            dbms: postgresql
+            sql: "ALTER TABLE game_players ADD CONSTRAINT role_check CHECK (role IN ('Player', 'Observer'))"
+
+        - createIndex:
+            columns:
+              - column:
+                  name:  game_id
+            indexName:  players_game_index
+            tableName:  game_players
