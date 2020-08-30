@@ -5,6 +5,8 @@ import com.github.pawelj_pl.eoponline.game.GameRoutes
 import com.github.pawelj_pl.eoponline.game.GameRoutes.GameRoutes
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes.WebSocketRoutes
+import com.github.pawelj_pl.eoponline.session.UserRoutes
+import com.github.pawelj_pl.eoponline.session.UserRoutes.UserRoutes
 import org.http4s.implicits._
 import org.http4s.server.{Router, Server}
 import org.http4s.server.blaze.BlazeServerBuilder
@@ -18,7 +20,7 @@ object Http {
 
   def server(
     implicit runtime: Runtime[Environments.HttpServerEnvironment]
-  ): ZManaged[GameRoutes with ZConfig[AppConfig.Server] with WebSocketRoutes, Throwable, Server[Task]] =
+  ): ZManaged[GameRoutes with ZConfig[AppConfig.Server] with WebSocketRoutes with UserRoutes, Throwable, Server[Task]] =
     for {
       apiRoutes <- routes.map(r => Router("/api/v1" -> r)).toManaged_
       config    <- config[AppConfig.Server].toManaged_
@@ -32,9 +34,11 @@ object Http {
   private val routes = for {
     games     <- GameRoutes.routes
     webSocket <- WebSocketRoutes.routes
+    users     <- UserRoutes.routes
   } yield Router(
     "/games" -> games,
-    "/ws" -> webSocket
+    "/ws" -> webSocket,
+    "/users" -> users
   )
 
 }

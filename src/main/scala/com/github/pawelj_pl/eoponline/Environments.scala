@@ -12,7 +12,8 @@ import com.github.pawelj_pl.eoponline.game.GameRoutes.GameRoutes
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
 import com.github.pawelj_pl.eoponline.http.websocket.{WebSocketRoutes, WebSocketTopicLayer}
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes.WebSocketRoutes
-import com.github.pawelj_pl.eoponline.session.{Authentication, Jwt}
+import com.github.pawelj_pl.eoponline.session.UserRoutes.UserRoutes
+import com.github.pawelj_pl.eoponline.session.{Authentication, Jwt, UserRoutes}
 import com.github.pawelj_pl.eoponline.utils.RandomUtils
 import zio.ZLayer
 import zio.blocking.Blocking
@@ -24,7 +25,7 @@ import zio.random.Random
 
 object Environments {
 
-  type HttpServerEnvironment = Database with GameRoutes with ZConfig[AppConfig.Server] with WebSocketHandler with WebSocketRoutes
+  type HttpServerEnvironment = Database with GameRoutes with ZConfig[AppConfig.Server] with WebSocketHandler with WebSocketRoutes with UserRoutes
 
   val httpServerEnvironment: ZLayer[Any, Throwable, HttpServerEnvironment] = {
     val dbConfig = AppConfig.live.narrow(_.database)
@@ -47,7 +48,8 @@ object Environments {
     val gameRoutes = games ++ authentication ++ logging >>> GameRoutes.live
     val webSocketHandler = logging ++ messageTopic ++ webSocketTopic ++ db ++ gamesRepo >>> WebSocketHandler.live
     val webSocketRoutes = webSocketTopic ++ authentication ++ logging >>> WebSocketRoutes.live
-    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes
+    val userRoutes = authentication >>> UserRoutes.live
+    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes
   }
 
 }
