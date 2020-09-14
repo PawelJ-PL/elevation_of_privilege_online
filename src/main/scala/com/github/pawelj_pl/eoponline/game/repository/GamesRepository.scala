@@ -8,6 +8,7 @@ import com.github.pawelj_pl.eoponline.database.BasePostgresRepository
 import com.github.pawelj_pl.eoponline.game.{Game, Player, PlayerRole}
 import doobie.util.transactor
 import io.chrisdavenport.fuuid.FUUID
+import io.getquill.Ord
 import io.github.gaelrenoux.tranzactio.doobie._
 import io.scalaland.chimney.dsl._
 import zio.{Has, Task, ZIO, ZLayer}

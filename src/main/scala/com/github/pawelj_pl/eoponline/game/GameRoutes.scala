@@ -60,6 +60,13 @@ object GameRoutes extends Http4sDsl[Task] {
                     .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
                     .resurrect
 
+                case DELETE -> Root / FUUIDVar(gameId) / "members" / FUUIDVar(participantId) as session                                 =>
+                  games
+                    .kickUserAs(gameId, participantId, session.userId)
+                    .map(_ => Response[Task](status = Status.NoContent))
+                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                    .resurrect
+
                 case PUT -> Root / FUUIDVar(gameId) / "members" / FUUIDVar(participantId) / "roles" / PlayerRoleVar(newRole) as session =>
                   games
                     .assignRoleAs(gameId, participantId, newRole, session.userId)

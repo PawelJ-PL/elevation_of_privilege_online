@@ -1,16 +1,19 @@
 package com.github.pawelj_pl.eoponline
 
 import com.github.pawelj_pl.eoponline.config.AppConfig
+import com.github.pawelj_pl.eoponline.config.AppConfig.MessageBroker
 import io.github.gaelrenoux.tranzactio.doobie.{Database => DoobieDb}
 import com.github.pawelj_pl.eoponline.database.{DataSourceLayers, Database}
 import com.github.pawelj_pl.eoponline.database.Database.Database
 import com.github.pawelj_pl.eoponline.eventbus.TopicLayer
+import com.github.pawelj_pl.eoponline.eventbus.broker.MessageTopic
+import com.github.pawelj_pl.eoponline.eventbus.broker.MessageTopic.MessageTopic
 import com.github.pawelj_pl.eoponline.eventbus.handlers.WebSocketHandler
 import com.github.pawelj_pl.eoponline.eventbus.handlers.WebSocketHandler.WebSocketHandler
 import com.github.pawelj_pl.eoponline.game.{GameRoutes, Games}
 import com.github.pawelj_pl.eoponline.game.GameRoutes.GameRoutes
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
-import com.github.pawelj_pl.eoponline.http.websocket.{WebSocketRoutes, WebSocketTopicLayer}
+import com.github.pawelj_pl.eoponline.http.websocket.{WebSocketMessage, WebSocketRoutes}
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes.WebSocketRoutes
 import com.github.pawelj_pl.eoponline.session.UserRoutes.UserRoutes
 import com.github.pawelj_pl.eoponline.session.{Authentication, Jwt, UserRoutes}
@@ -18,14 +21,28 @@ import com.github.pawelj_pl.eoponline.utils.RandomUtils
 import zio.ZLayer
 import zio.blocking.Blocking
 import zio.clock.Clock
-import zio.config.ZConfig
+import zio.config.{ZConfig, getConfig}
 import zio.config.syntax._
 import zio.logging.slf4j.Slf4jLogger
 import zio.random.Random
 
 object Environments {
 
-  type HttpServerEnvironment = Database with GameRoutes with ZConfig[AppConfig.Server] with WebSocketHandler with WebSocketRoutes with UserRoutes
+  type HttpServerEnvironment = Database
+    with GameRoutes
+    with ZConfig[AppConfig.Server]
+    with WebSocketHandler
+    with WebSocketRoutes
+    with UserRoutes
+
+  private val provideWebSocketTopic: ZLayer[ZConfig[MessageBroker], Throwable, MessageTopic[WebSocketMessage[_]]] =
+    ZLayer
+      .fromManaged(
+        getConfig[AppConfig.MessageBroker].toManaged_.flatMap {
+          case MessageBroker.InMemory => MessageTopic.inMemory[WebSocketMessage[_]](WebSocketMessage.TopicStarted).build
+        }
+      )
+      .map(_.get)
 
   val httpServerEnvironment: ZLayer[Any, Throwable, HttpServerEnvironment] = {
     val dbConfig = AppConfig.live.narrow(_.database)
@@ -34,7 +51,8 @@ object Environments {
     val serverConfig = AppConfig.live.narrow(_.server)
     val authConfig = AppConfig.live.narrow(_.auth)
     val messageTopic = TopicLayer.live
-    val webSocketTopic = WebSocketTopicLayer.live
+    val brokerConfig = AppConfig.live.narrow(_.messageBroker)
+    val webSocketTopic = brokerConfig >>> provideWebSocketTopic
     val clock = Clock.live
     val blocking = Blocking.live
     val random = Random.live

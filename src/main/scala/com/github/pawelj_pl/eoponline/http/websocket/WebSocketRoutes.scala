@@ -1,20 +1,23 @@
 package com.github.pawelj_pl.eoponline.http.websocket
 
 import cats.syntax.eq._
+import com.github.pawelj_pl.eoponline.eventbus.broker.MessageTopic
+import com.github.pawelj_pl.eoponline.eventbus.broker.MessageTopic.MessageTopic
 import com.github.pawelj_pl.eoponline.http.websocket.WsFrameEncoder.instances._
 import com.github.pawelj_pl.eoponline.session.Authentication.Authentication
 import com.github.pawelj_pl.eoponline.session.{Authentication, Session}
 import fs2.Pipe
-import fs2.concurrent.Topic
 import io.chrisdavenport.fuuid.FUUID
 import io.chrisdavenport.fuuid.http4s.FUUIDVar
 import org.http4s.{AuthedRoutes, HttpRoutes}
+import org.http4s.blaze.pipeline.Command.{EOF => EOFCommand}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.websocket.WebSocketBuilder
 import org.http4s.websocket.WebSocketFrame
 import zio.interop.catz._
 import zio.logging.{Logger, Logging}
 import zio.{Has, Task, UIO, ZIO, ZLayer}
+import zio.stream.interop.fs2z._
 
 object WebSocketRoutes {
 
@@ -28,8 +31,8 @@ object WebSocketRoutes {
 
   val routes: ZIO[WebSocketRoutes, Nothing, HttpRoutes[Task]] = ZIO.accessM[WebSocketRoutes](_.get.routes)
 
-  val live: ZLayer[Has[Topic[Task, WebSocketMessage[_]]] with Authentication with Logging, Nothing, WebSocketRoutes] =
-    ZLayer.fromServices[Topic[Task, WebSocketMessage[_]], Authentication.Service, Logger[String], WebSocketRoutes.Service] {
+  val live: ZLayer[MessageTopic[WebSocketMessage[_]] with Authentication with Logging, Nothing, WebSocketRoutes] =
+    ZLayer.fromServices[MessageTopic.Service[WebSocketMessage[_]], Authentication.Service, Logger[String], WebSocketRoutes.Service] {
       (wsTopic, auth, logger) =>
         new Service with Http4sDsl[Task] {
 
@@ -47,11 +50,15 @@ object WebSocketRoutes {
             _.evalMap {
               case WebSocketFrame.Text(text, _) => logger.info(s"Received frame $text")
               case f                            => logger.info(s"Unknown frame type: $f")
+            }.handleErrorWith {
+              case EOFCommand => fs2.Stream.eval_(logger.debug(s"client $userId unexpectedly left the game $gameId anteroom"))
+              case err        => fs2.Stream.eval_(logger.throwable("Unexpected error during processing input WS queue", err))
             }
 
           private def anteroomToClient(gameId: FUUID, userId: FUUID): fs2.Stream[Task, WebSocketFrame] =
             wsTopic
-              .subscribe(10)
+              .subscribe(16)
+              .toFs2Stream
               .filter(m => verifyRecipient(m.recipient, gameId, userId))
               .collect {
                 case m: WebSocketMessage.NewParticipant     => m.toFrame

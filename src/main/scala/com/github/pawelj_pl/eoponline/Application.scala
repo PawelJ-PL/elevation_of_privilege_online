@@ -7,13 +7,16 @@ import zio.console.putStrLn
 
 object Application extends ZioApp {
 
-  private val app: ZIO[ZEnv, Throwable, Nothing] = (for {
-    implicit0(runtime: Runtime[Environments.HttpServerEnvironment]) <- ZIO.runtime[Environments.HttpServerEnvironment].toManaged_
-    _                                                               <- Database.migrate.toManaged_
-    server = Http.server
-    wsHandler = WebSocketHandler.handle.toManaged_
-    _                                                               <- server <&> wsHandler
-  } yield ()).useForever.provideSomeLayer(Environments.httpServerEnvironment)
+  private val app: ZIO[ZEnv, Throwable, Nothing] =
+    (for {
+      implicit0(runtime: Runtime[Environments.HttpServerEnvironment]) <- ZIO.runtime[Environments.HttpServerEnvironment].toManaged_
+      _                                                               <- Database.migrate.toManaged_
+      server = Http.server
+      wsHandler = WebSocketHandler.handle.toManaged_
+      _                                                               <- server <&> wsHandler
+    } yield ())
+      .useForever
+      .provideSomeLayer(Environments.httpServerEnvironment)
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     app.foldCauseM(

@@ -1,6 +1,8 @@
 package com.github.pawelj_pl.eoponline.eventbus.handlers
 
 import com.github.pawelj_pl.eoponline.eventbus.InternalMessage
+import com.github.pawelj_pl.eoponline.eventbus.broker.MessageTopic
+import com.github.pawelj_pl.eoponline.eventbus.broker.MessageTopic.MessageTopic
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository.GamesRepository
 import com.github.pawelj_pl.eoponline.http.websocket.{MessageRecipient, WebSocketMessage}
@@ -23,11 +25,10 @@ object WebSocketHandler {
 
   def handle: ZIO[WebSocketHandler, Nothing, Unit] = ZIO.accessM[WebSocketHandler](_.get.handle)
 
-  val live: ZLayer[Has[Topic[Task, InternalMessage]] with Logging with Has[Topic[Task, WebSocketMessage[_]]] with Has[
+  val live: ZLayer[Has[Topic[Task, InternalMessage]] with Logging with MessageTopic[WebSocketMessage[_]] with Has[
     Database.Service
   ] with GamesRepository, Nothing, WebSocketHandler] =
-    ZLayer.fromServices[Topic[Task, InternalMessage], Logger[String], Topic[
-      Task,
+    ZLayer.fromServices[Topic[Task, InternalMessage], Logger[String], MessageTopic.Service[
       WebSocketMessage[_]
     ], Database.Service, GamesRepository.Service, WebSocketHandler.Service] { (messageTopic, logger, wsTopic, db, gamesRepo) =>
       new Service {
@@ -39,17 +40,19 @@ object WebSocketHandler {
             .compile
             .drain
             .resurrect
-            .catchAll(err => logger.throwable("Web socket handler dies", err))
+            .catchAll(err => logger.throwable("Web socket handler died", err))
 
         private def handleMessage(message: InternalMessage): ZIO[Any, Nothing, Unit] = {
           message match {
-            case m @ InternalMessage.ParticipantJoined(gameId, _, _) =>
-              allAccepted(gameId).flatMap(recipients => wsTopic.publish1(WebSocketMessage.NewParticipant(recipients, m)))
-            case m @ InternalMessage.ParticipantKicked(gameId, _)    =>
-              allAccepted(gameId).flatMap(recipients => wsTopic.publish1(WebSocketMessage.ParticipantRemoved(recipients, m)))
-            case m @ InternalMessage.RoleAssigned(gameId, _, _)      =>
-              allAccepted(gameId).flatMap(recipients => wsTopic.publish1(WebSocketMessage.UserRoleChanged(recipients, m)))
-            case m                                                   => logger.trace(s"Message $m ignored")
+            case m @ InternalMessage.ParticipantJoined(gameId, _, _)          =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.NewParticipant(recipients, m)))
+            case m @ InternalMessage.ParticipantKicked(gameId, removedUserId) =>
+              allAcceptedWith(gameId, removedUserId).flatMap(recipients =>
+                wsTopic.publish(WebSocketMessage.ParticipantRemoved(recipients, m))
+              )
+            case m @ InternalMessage.RoleAssigned(gameId, _, _)               =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.UserRoleChanged(recipients, m)))
+            case m                                                            => logger.trace(s"Message $m ignored")
           }
         }.resurrect.catchAll(error => logger.throwable("Unable to process message", error))
 
@@ -58,6 +61,9 @@ object WebSocketHandler {
 
         private def allAccepted(gameId: FUUID): ZIO[Any, Nothing, MessageRecipient.MultipleGameParticipants] =
           acceptedParticipants(gameId).map(ids => MessageRecipient.MultipleGameParticipants(gameId, ids))
+
+        private def allAcceptedWith(gameId: FUUID, userId: FUUID): ZIO[Any, Nothing, MessageRecipient.MultipleGameParticipants] =
+          allAccepted(gameId).map(recipients => recipients.copy(userIds = recipients.userIds.appended(userId)))
       }
     }
 

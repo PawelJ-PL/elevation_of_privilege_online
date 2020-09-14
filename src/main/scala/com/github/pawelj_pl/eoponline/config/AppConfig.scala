@@ -1,11 +1,12 @@
 package com.github.pawelj_pl.eoponline.config
 
+import com.github.pawelj_pl.eoponline.config.AppConfig.MessageBroker
 import zio.Layer
 import zio.config._
 import zio.config.magnolia.DeriveConfigDescriptor.descriptor
 import zio.config.typesafe.TypesafeConfig.fromDefaultLoader
 
-final case class AppConfig(server: AppConfig.Server, auth: AppConfig.Auth, database: AppConfig.Database)
+final case class AppConfig(server: AppConfig.Server, auth: AppConfig.Auth, database: AppConfig.Database, messageBroker: MessageBroker)
 
 object AppConfig {
 
@@ -14,6 +15,14 @@ object AppConfig {
   final case class Auth(secretKey: String)
 
   final case class Database(url: String, userName: String, password: String, maxPoolSize: Int)
+
+  sealed trait MessageBroker
+
+  object MessageBroker {
+
+    case object InMemory extends MessageBroker
+
+  }
 
   private val configDescriptor = descriptor[AppConfig].mapKey(toKebabCase)
 
