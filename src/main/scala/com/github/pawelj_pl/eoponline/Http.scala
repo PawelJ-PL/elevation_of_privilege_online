@@ -14,7 +14,7 @@ import zio.config.ZConfig
 import zio.interop.catz._
 import zio.interop.catz.implicits.ioTimer
 import zio.{Runtime, Task, ZManaged}
-import zio.config.config
+import zio.config.getConfig
 
 object Http {
 
@@ -23,7 +23,7 @@ object Http {
   ): ZManaged[GameRoutes with ZConfig[AppConfig.Server] with WebSocketRoutes with UserRoutes, Throwable, Server[Task]] =
     for {
       apiRoutes <- routes.map(r => Router("/api/v1" -> r)).toManaged_
-      config    <- config[AppConfig.Server].toManaged_
+      config    <- getConfig[AppConfig.Server].toManaged_
       srv       <- BlazeServerBuilder[Task](runtime.platform.executor.asEC)
                      .bindHttp(config.port, config.host)
                      .withHttpApp(apiRoutes.orNotFound)

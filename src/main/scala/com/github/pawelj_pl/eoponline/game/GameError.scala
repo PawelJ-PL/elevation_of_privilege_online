@@ -18,16 +18,16 @@ sealed trait KickUserError extends GameError
 
 sealed trait AssignRoleError extends GameError
 
-case class GameNotFound(gameId: FUUID) extends GameInfoError with JoinGameError with KickUserError with AssignRoleError
+final case class GameNotFound(gameId: FUUID) extends GameInfoError with JoinGameError with KickUserError with AssignRoleError
 
-case class ParticipantIsNotAMember(playerId: FUUID, gameId: FUUID) extends GameInfoError with GetParticipantsError
+final case class ParticipantIsNotAMember(playerId: FUUID, gameId: FUUID) extends GameInfoError with GetParticipantsError
 
-case class ParticipantNotAccepted(gameId: FUUID, playerId: Player) extends GameInfoError with GetParticipantsError
+final case class ParticipantNotAccepted(gameId: FUUID, playerId: Player) extends GameInfoError with GetParticipantsError
 
-case class ParticipantAlreadyJoined(gameId: FUUID, player: Player) extends JoinGameError
+final case class ParticipantAlreadyJoined(gameId: FUUID, player: Player) extends JoinGameError
 
-case class GameAlreadyStarted(gameId: FUUID) extends JoinGameError with KickUserError with AssignRoleError
+final case class GameAlreadyStarted(gameId: FUUID) extends JoinGameError with KickUserError with AssignRoleError
 
-case class UserIsNotGameOwner(gameId: FUUID, userId: FUUID) extends KickUserError with AssignRoleError
+final case class UserIsNotGameOwner(gameId: FUUID, userId: FUUID) extends KickUserError with AssignRoleError
 
-case class KickSelfForbidden(gameId: FUUID, userId: FUUID) extends KickUserError
+final case class KickSelfForbidden(gameId: FUUID, userId: FUUID) extends KickUserError
