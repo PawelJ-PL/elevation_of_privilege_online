@@ -6,7 +6,7 @@ import cats.syntax.eq._
 import com.github.pawelj_pl.eoponline.session.Jwt.Jwt
 import com.github.pawelj_pl.eoponline.utils.RandomUtils
 import com.github.pawelj_pl.eoponline.utils.RandomUtils.RandomUtils
-import org.http4s.{ContextRequest, Request, Response, Status}
+import org.http4s.{ContextRequest, Request, Response, ResponseCookie, Status}
 import org.http4s.server.{AuthMiddleware, Middleware}
 import zio.clock.Clock
 import zio.interop.catz._
@@ -64,7 +64,7 @@ object Authentication {
             } yield Session(userId, now)
 
           def responseWithCookie(resp: Response[Task], session: Session): Task[Response[Task]] =
-            jwt.encode(session).map(token => resp.addCookie(CookieName, token))
+            jwt.encode(session).map(token => resp.addCookie(ResponseCookie(CookieName, token, path = Some("/"))))
 
           override def sessionMiddleware: UIO[SessionMiddleware] = {
             val middleware: SessionMiddleware = { service =>
