@@ -22,7 +22,7 @@ object HttpErrorMapping {
       case ParticipantIsNotAMember(_, _) =>
         ZIO.succeed(Response[Task](status = Status.Forbidden).withEntity(ResponseData("User is not a games member", Some("NotAMember"))))
       case ParticipantNotAccepted(_, _)  =>
-        ZIO.succeed(Response[Task](status = Status.Forbidden).withEntity(ResponseData("User not accepted", Some("Not accepted"))))
+        ZIO.succeed(Response[Task](status = Status.Forbidden).withEntity(ResponseData("User not accepted", Some("NotAccepted"))))
     }
 
   private def mapJoinGameError(error: JoinGameError): UIO[Response[Task]] =
