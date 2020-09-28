@@ -39,6 +39,8 @@ object Authentication {
         new Service {
           private final val CookieName = "session"
 
+          private final val YearSeconds: Long = 60 * 60 * 24 * 365
+
           private def reqToSession(req: Request[Task]): OptionT[Task, Session] =
             for {
               cookie  <- OptionT.fromOption[Task](req.cookies.find(_.name === CookieName))
@@ -64,7 +66,11 @@ object Authentication {
             } yield Session(userId, now)
 
           def responseWithCookie(resp: Response[Task], session: Session): Task[Response[Task]] =
-            jwt.encode(session).map(token => resp.addCookie(ResponseCookie(CookieName, token, path = Some("/"))))
+            jwt
+              .encode(session)
+              .map(token =>
+                resp.addCookie(ResponseCookie(name = CookieName, content = token, path = Some("/"), maxAge = Some(20 * YearSeconds)))
+              )
 
           override def sessionMiddleware: UIO[SessionMiddleware] = {
             val middleware: SessionMiddleware = { service =>
