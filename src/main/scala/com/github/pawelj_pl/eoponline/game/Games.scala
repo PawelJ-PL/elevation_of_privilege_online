@@ -13,7 +13,6 @@ import fs2.concurrent.Topic
 import io.chrisdavenport.fuuid.FUUID
 import io.github.gaelrenoux.tranzactio.doobie.Database
 import zio.{Has, Task, ZIO, ZLayer}
-import zio.interop.catz._
 import zio.logging.{Logger, Logging}
 
 object Games {

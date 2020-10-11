@@ -10,9 +10,9 @@ val dependencies = {
   )
 
   val zio = Seq(
-    "dev.zio" %% "zio" % "1.0.1",
-    "dev.zio" %% "zio-streams" % "1.0.1",
-    "dev.zio" %% "zio-interop-cats" % "2.1.4.0+4-05a4920e-SNAPSHOT" //FIXME
+    "dev.zio" %% "zio" % "1.0.3",
+    "dev.zio" %% "zio-streams" % "1.0.3",
+    "dev.zio" %% "zio-interop-cats" % "2.2.0.1"
   ) ++ Seq(
     "dev.zio" %% "zio-config",
     "dev.zio" %% "zio-config-magnolia",
@@ -20,19 +20,21 @@ val dependencies = {
   ).map(_ % "1.0.0-RC27") ++ Seq(
     "dev.zio" %% "zio-logging",
     "dev.zio" %% "zio-logging-slf4j"
-  ).map(_ % "0.5.1") ++ Seq(
+  ).map(_ % "0.5.3") ++ Seq(
     "io.github.gaelrenoux" %% "tranzactio"
   ).map(_ % "1.0.0") ++ Seq(
+    "com.gh.dobrynya" %% "zio-jms" % "0.1"
+  ) ++ Seq(
     "dev.zio" %% "zio-test",
     "dev.zio" %% "zio-test-sbt",
     "dev.zio" %% "zio-test-magnolia"
-  ).map(_ % "1.0.1" % "test")
+  ).map(_ % "1.0.3" % "test")
 
   val circe = Seq(
     "io.circe" %% "circe-core",
-    "io.circe" %% "circe-generic"
+    "io.circe" %% "circe-generic",
+    "io.circe" %% "circe-parser"
   ).map(_ % "0.13.0") ++ Seq(
-    "io.circe" %% "circe-parser",
     "io.circe" %% "circe-literal"
   ).map(_ % "0.13.0" % "test")
 
@@ -58,8 +60,8 @@ val dependencies = {
   )
 
   val database = Seq(
-    "org.postgresql" % "postgresql" % "42.2.16",
-    "org.liquibase" % "liquibase-core" % "4.0.0"
+    "org.postgresql" % "postgresql" % "42.2.17",
+    "org.liquibase" % "liquibase-core" % "4.1.0"
   )
 
   val doobie = Seq(
@@ -82,7 +84,11 @@ val dependencies = {
     "co.fs2" %% "fs2-core" % "2.4.4"
   )
 
-  libraryDependencies ++= plugins ++ logger ++ zio ++ circe ++ http4s ++ fuuid ++ tsec ++ snakeyaml ++ database ++ doobie ++ chimney ++ enumeratum ++ fs2
+  val artemis = Seq(
+    "org.apache.activemq" % "artemis-jms-client" % "2.15.0"
+  )
+
+  libraryDependencies ++= plugins ++ logger ++ zio ++ circe ++ http4s ++ fuuid ++ tsec ++ snakeyaml ++ database ++ doobie ++ chimney ++ enumeratum ++ fs2 ++ artemis
 }
 
 val compilerOptions = scalacOptions -= "-Xfatal-warnings"
@@ -95,5 +101,5 @@ val root = (project in file("."))
     compilerOptions,
     dependencies,
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
-    resolvers += Resolver.mavenLocal //FIXME
+    resolvers += Resolver.bintrayRepo("dobrynya", "maven")
   )
