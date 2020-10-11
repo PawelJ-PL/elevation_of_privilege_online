@@ -22,6 +22,12 @@ object AppConfig {
 
     case object InMemory extends MessageBroker
 
+    case class Jms(url: String, username: String, password: String, destinations: Jms.Destinations) extends MessageBroker
+
+    object Jms {
+      final case class Destinations(websocketTopicName: String)
+    }
+
   }
 
   private val configDescriptor = descriptor[AppConfig].mapKey(toKebabCase)

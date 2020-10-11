@@ -3,8 +3,8 @@ package com.github.pawelj_pl.eoponline.eventbus
 import com.github.pawelj_pl.eoponline.game.{Game, PlayerRole}
 import io.chrisdavenport.fuuid.circe._
 import io.chrisdavenport.fuuid.FUUID
-import io.circe.Encoder
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
 
 sealed trait InternalMessage
 
@@ -22,19 +22,19 @@ object InternalMessage {
 
   object ParticipantJoined {
 
-    implicit val encoder: Encoder[ParticipantJoined] = deriveEncoder
+    implicit val codec: Codec[ParticipantJoined] = deriveCodec
 
   }
 
   object ParticipantKicked {
 
-    implicit val encoder: Encoder[ParticipantKicked] = deriveEncoder
+    implicit val codec: Codec[ParticipantKicked] = deriveCodec
 
   }
 
   object RoleAssigned {
 
-    implicit val encoder: Encoder[RoleAssigned] = deriveEncoder
+    implicit val codec: Codec[RoleAssigned] = deriveCodec
 
   }
 

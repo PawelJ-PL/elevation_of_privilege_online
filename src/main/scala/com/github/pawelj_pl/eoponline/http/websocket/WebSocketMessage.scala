@@ -1,7 +1,8 @@
 package com.github.pawelj_pl.eoponline.http.websocket
 
 import com.github.pawelj_pl.eoponline.eventbus.InternalMessage.{ParticipantJoined, ParticipantKicked, RoleAssigned}
-import io.circe.{Encoder, Json}
+import io.circe.{Decoder, DecodingFailure, Encoder, Json}
+import io.circe.syntax._
 import org.http4s.websocket.WebSocketFrame
 
 sealed trait WebSocketMessage[A] {
@@ -19,11 +20,13 @@ sealed trait WebSocketMessage[A] {
 object WebSocketMessage {
 
   case object TopicStarted extends WebSocketMessage[String] {
+
     override def recipient: MessageRecipient = MessageRecipient.Broadcast
 
     override def payload: String = "WebSocket topic has started"
 
     override def eventType: String = "WebSocketTopicStarted"
+
   }
 
   final case class NewParticipant(recipient: MessageRecipient, payload: ParticipantJoined) extends WebSocketMessage[ParticipantJoined] {
@@ -43,6 +46,42 @@ object WebSocketMessage {
     override def eventType: String = "UserRoleChanged"
 
   }
+
+  implicit val encoder: Encoder[WebSocketMessage[_]] = Encoder.instance {
+    case TopicStarted          => encodeMessage(TopicStarted)
+    case m: NewParticipant     => encodeMessage(m)
+    case m: ParticipantRemoved => encodeMessage(m)
+    case m: UserRoleChanged    => encodeMessage(m)
+  }
+
+  private def encodeMessage[A: Encoder](message: WebSocketMessage[A]): Json =
+    Json.obj(
+      ("recipient" -> message.recipient.asJson),
+      ("payload" -> message.payload.asJson),
+      ("eventType" -> Json.fromString(message.eventType))
+    )
+
+  implicit val decoder: Decoder[WebSocketMessage[_]] = Decoder.instance { cursor =>
+    for {
+      recipient <- cursor.downField("recipient").as[MessageRecipient]
+      eventType <- cursor.downField("eventType").as[String]
+      payload   <- cursor.downField("payload").as[Json]
+      result    <- decodeMessage(recipient, eventType, payload)
+    } yield result
+  }
+
+  private def decodeMessage(
+    messageRecipient: MessageRecipient,
+    eventType: String,
+    payload: Json
+  ): Either[DecodingFailure, WebSocketMessage[_]] =
+    eventType match {
+      case "WebSocketTopicStarted" => Right(TopicStarted)
+      case "NewParticipant"        => Decoder[ParticipantJoined].decodeJson(payload).map(p => NewParticipant(messageRecipient, p))
+      case "ParticipantRemoved"    => Decoder[ParticipantKicked].decodeJson(payload).map(p => ParticipantRemoved(messageRecipient, p))
+      case "UserRoleChanged"       => Decoder[RoleAssigned].decodeJson(payload).map(p => UserRoleChanged(messageRecipient, p))
+      case event                   => Left(DecodingFailure(s"Unknown event $event", List.empty))
+    }
 
 }
 

@@ -32,7 +32,9 @@ object HttpErrorMapping {
       case ParticipantAlreadyJoined(_, _) =>
         ZIO.succeed(Response[Task](status = Status.Conflict))
       case GameAlreadyStarted(_)          =>
-        ZIO.succeed(Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Game already started", Some("GameAlreadyStarted"))))
+        ZIO.succeed(
+          Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Game already started", Some("GameAlreadyStarted")))
+        )
     }
 
   private def mapKickError(error: KickUserError): UIO[Response[Task]] =
@@ -41,8 +43,10 @@ object HttpErrorMapping {
         ZIO.succeed(Response[Task](status = Status.NotFound).withEntity(ResponseData("Game not found")))
       case UserIsNotGameOwner(_, _) =>
         ZIO.succeed(Response[Task](status = Status.Forbidden).withEntity(ResponseData("User is not a game owner")))
-      case GameAlreadyStarted(_)    =>111
-        ZIO.succeed(Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Game already started", Some("GameAlreadyStarted"))))
+      case GameAlreadyStarted(_)    =>
+        ZIO.succeed(
+          Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Game already started", Some("GameAlreadyStarted")))
+        )
       case KickSelfForbidden(_, _)  =>
         ZIO.succeed(
           Response[Task](status = Status.PreconditionFailed)
