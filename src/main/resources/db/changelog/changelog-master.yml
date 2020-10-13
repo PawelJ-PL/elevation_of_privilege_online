@@ -24,6 +24,9 @@ databaseChangeLog:
                   name: started_at
                   type: timestamptz
               - column:
+                  name: finished_at
+                  type: timestamptz
+              - column:
                   name: created_at
                   type: timestamptz
                   constraints:
@@ -70,9 +73,9 @@ databaseChangeLog:
             tableName: game_players
 
         - addUniqueConstraint:
-            columnNames:  game_id, player_order
-            constraintName:  game_id_order_unique
-            tableName:  game_players
+            columnNames: game_id, player_order
+            constraintName: game_id_order_unique
+            tableName: game_players
 
         - sql:
             dbms: postgresql
@@ -81,6 +84,81 @@ databaseChangeLog:
         - createIndex:
             columns:
               - column:
-                  name:  game_id
-            indexName:  players_game_index
-            tableName:  game_players
+                  name: game_id
+            indexName: players_game_index
+            tableName: game_players
+
+        - createTable:
+            tableName: decks
+            columns:
+              - column:
+                  name: game_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_decks_game
+                    deleteCascade: true
+                    references: games(id)
+              - column:
+                  name: player_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: card_number
+                  type: smallint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: threat_linked
+                  type: boolean
+
+        - addPrimaryKey:
+            columnNames: game_id, card_number
+            constraintName: pk_game_cards
+            tableName: decks
+
+        - sql:
+            dbms: postgresql
+            sql: "ALTER TABLE decks ADD CONSTRAINT card_location_check CHECK (location IN ('Hand', 'Table', 'Out'))"
+
+        - sql:
+            dbms: postgresql
+            sql: "ALTER TABLE decks ADD CONSTRAINT card_number_check CHECK (card_number BETWEEN 1 AND 74)"
+
+        - createIndex:
+            columns:
+              - column:
+                  name: game_id
+            indexName: decks_game_index
+            tableName: decks
+
+        - createTable:
+            tableName: games_state
+            columns:
+              - column:
+                  name: game_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_players_game
+                    deleteCascade: true
+                    references: games(id)
+                    primaryKey: true
+              - column:
+                  name: current_player
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: leading_suit
+                  type: varchar
+
+        - sql:
+            dbms: postgresql
+            sql: "ALTER TABLE games_state ADD CONSTRAINT suit_check CHECK (leading_suit IN ('Spoofing', 'Tampering', 'Repudiation', 'InformationDisclosure', 'DenialOfService', 'ElevationOfPrivilege'))"

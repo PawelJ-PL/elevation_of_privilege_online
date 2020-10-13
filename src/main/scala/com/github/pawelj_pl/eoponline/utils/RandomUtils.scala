@@ -1,8 +1,11 @@
 package com.github.pawelj_pl.eoponline.utils
 
 import io.chrisdavenport.fuuid.FUUID
-import zio.{Has, Task, ULayer, ZIO, ZLayer}
+import zio.{Has, Task, UIO, ZIO, ZLayer}
 import zio.interop.catz._
+import zio.random.Random
+
+import scala.collection.compat.BuildFrom
 
 object RandomUtils {
 
@@ -12,12 +15,25 @@ object RandomUtils {
 
     def randomFuuid: ZIO[Any, Nothing, FUUID]
 
+    def shuffle[A, Collection[+Element] <: Iterable[Element]](
+      collection: Collection[A]
+    )(
+      implicit bf: BuildFrom[Collection[A], A, Collection[A]]
+    ): UIO[Collection[A]]
+
   }
 
-  val live: ULayer[RandomUtils] = ZLayer.succeed(new Service {
+  val live: ZLayer[Random, Nothing, RandomUtils] = ZLayer.fromService[Random.Service, RandomUtils.Service] { rand =>
+    new Service {
 
-    override def randomFuuid: ZIO[Any, Nothing, FUUID] = FUUID.randomFUUID[Task].orDie
+      override def randomFuuid: ZIO[Any, Nothing, FUUID] = FUUID.randomFUUID[Task].orDie
 
-  })
+      override def shuffle[A, Collection[+Element] <: Iterable[Element]](
+        collection: Collection[A]
+      )(
+        implicit bf: BuildFrom[Collection[A], A, Collection[A]]
+      ): UIO[Collection[A]] = rand.shuffle(collection)
+    }
+  }
 
 }

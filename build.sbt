@@ -77,7 +77,9 @@ val dependencies = {
 
   val enumeratum = Seq(
     "com.beachape" %% "enumeratum" % "1.6.1",
-    "com.beachape" %% "enumeratum-circe" % "1.6.1"
+    "com.beachape" %% "enumeratum-circe" % "1.6.1",
+    "com.beachape" %% "enumeratum-cats" % "1.6.1"
+
   )
 
   val fs2 = Seq(
@@ -88,7 +90,12 @@ val dependencies = {
     "org.apache.activemq" % "artemis-jms-client" % "2.15.0"
   )
 
-  libraryDependencies ++= plugins ++ logger ++ zio ++ circe ++ http4s ++ fuuid ++ tsec ++ snakeyaml ++ database ++ doobie ++ chimney ++ enumeratum ++ fs2 ++ artemis
+  val tests = Seq(
+    "org.scalatest" %% "scalatest" % "3.2.2" % Test
+
+  )
+
+  libraryDependencies ++= plugins ++ logger ++ zio ++ circe ++ http4s ++ fuuid ++ tsec ++ snakeyaml ++ database ++ doobie ++ chimney ++ enumeratum ++ fs2 ++ artemis ++ tests
 }
 
 val compilerOptions = scalacOptions -= "-Xfatal-warnings"

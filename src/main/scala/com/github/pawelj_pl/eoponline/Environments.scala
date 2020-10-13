@@ -14,6 +14,9 @@ import com.github.pawelj_pl.eoponline.eventbus.handlers.WebSocketHandler.WebSock
 import com.github.pawelj_pl.eoponline.game.{GameRoutes, Games}
 import com.github.pawelj_pl.eoponline.game.GameRoutes.GameRoutes
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
+import com.github.pawelj_pl.eoponline.`match`.{MatchRoutes, Matches}
+import com.github.pawelj_pl.eoponline.`match`.MatchRoutes.MatchRoutes
+import com.github.pawelj_pl.eoponline.`match`.repository.{CardsRepository, GameplayRepository}
 import com.github.pawelj_pl.eoponline.http.websocket.{WebSocketMessage, WebSocketRoutes}
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes.WebSocketRoutes
 import com.github.pawelj_pl.eoponline.session.UserRoutes.UserRoutes
@@ -38,6 +41,7 @@ object Environments {
     with WebSocketHandler
     with WebSocketRoutes
     with UserRoutes
+    with MatchRoutes
 
   private val provideWebSocketTopic
     : ZLayer[ZConfig[MessageBroker] with Blocking with Logging, Throwable, MessageTopic[WebSocketMessage[_]]] =
@@ -68,18 +72,22 @@ object Environments {
     val webSocketTopic = brokerConfig ++ blocking ++ logging >>> provideWebSocketTopic
     val clock = Clock.live
     val random = Random.live
-    val randomUtils = RandomUtils.live
+    val randomUtils = random >>> RandomUtils.live
     val dataSource = blocking ++ AppConfig.live.narrow(_.database) >>> DataSourceLayers.hikari
     val db = dataSource ++ blocking ++ clock >>> DoobieDb.fromDatasource
     val gamesRepo = clock >>> GamesRepository.postgres
-    val games = gamesRepo ++ db ++ logging ++ messageTopic ++ randomUtils >>> Games.live
+    val gamePlayRepo = GameplayRepository.postgres
+    val cardRepo = CardsRepository.fromJsonFile
+    val games = gamesRepo ++ db ++ logging ++ messageTopic ++ randomUtils ++ gamePlayRepo ++ cardRepo ++ clock >>> Games.live
     val jwt = clock ++ random ++ authConfig >>> Jwt.live
     val authentication = clock ++ jwt ++ logging ++ randomUtils >>> Authentication.live
     val gameRoutes = games ++ authentication ++ logging >>> GameRoutes.live
     val webSocketHandler = logging ++ messageTopic ++ webSocketTopic ++ db ++ gamesRepo >>> WebSocketHandler.live
     val webSocketRoutes = webSocketTopic ++ authentication ++ logging >>> WebSocketRoutes.live
     val userRoutes = authentication >>> UserRoutes.live
-    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes
+    val matches = db ++ gamesRepo ++ gamePlayRepo ++ cardRepo >>> Matches.live
+    val gameplayRoutes = authentication ++ matches ++ logging >>> MatchRoutes.live
+    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes ++ gameplayRoutes
   }
 
 }

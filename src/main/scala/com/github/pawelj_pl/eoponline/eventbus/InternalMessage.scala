@@ -20,6 +20,8 @@ object InternalMessage {
 
   final case class RoleAssigned(gameId: FUUID, userId: FUUID, role: PlayerRole) extends InternalMessage
 
+  final case class GameStarted(gameId: FUUID) extends InternalMessage
+
   object ParticipantJoined {
 
     implicit val codec: Codec[ParticipantJoined] = deriveCodec
@@ -35,6 +37,12 @@ object InternalMessage {
   object RoleAssigned {
 
     implicit val codec: Codec[RoleAssigned] = deriveCodec
+
+  }
+
+  object GameStarted {
+
+    implicit val codec: Codec[GameStarted] = deriveCodec
 
   }
 

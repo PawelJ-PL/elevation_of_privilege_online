@@ -64,6 +64,7 @@ object WebSocketRoutes {
                 case m: WebSocketMessage.NewParticipant     => m.toFrame
                 case m: WebSocketMessage.ParticipantRemoved => m.toFrame
                 case m: WebSocketMessage.UserRoleChanged    => m.toFrame
+                case m: WebSocketMessage.GameStarted        => m.toFrame
               }
 
           private def verifyRecipient(recipient: MessageRecipient, gameId: FUUID, userId: FUUID): Boolean =
