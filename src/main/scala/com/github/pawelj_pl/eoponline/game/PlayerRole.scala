@@ -1,5 +1,6 @@
 package com.github.pawelj_pl.eoponline.game
 
+import cats.Eq
 import enumeratum._
 
 sealed trait PlayerRole extends EnumEntry
@@ -17,5 +18,7 @@ object PlayerRole extends Enum[PlayerRole] with CirceEnum[PlayerRole] {
     def unapply(str: String): Option[PlayerRole] = PlayerRole.withNameOption(str)
 
   }
+
+  implicit val eq: Eq[PlayerRole] = Eq.fromUniversalEquals
 
 }

@@ -53,6 +53,12 @@ object GameRoutes extends Http4sDsl[Task] {
                       .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
                       .resurrect
                   }
+                case POST -> Root / FUUIDVar(gameId) as session                                                                         =>
+                  games
+                    .startGameAs(gameId, session.userId)
+                    .map(_ => Response[Task](status = Status.Ok))
+                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                    .resurrect
                 case GET -> Root / FUUIDVar(gameId) / "members" as session                                                              =>
                   games
                     .getParticipantsAs(gameId, session.userId)

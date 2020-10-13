@@ -52,6 +52,8 @@ object WebSocketHandler {
               )
             case m @ InternalMessage.RoleAssigned(gameId, _, _)               =>
               allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.UserRoleChanged(recipients, m)))
+            case m @ InternalMessage.GameStarted(gameId: FUUID)               =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.GameStarted(recipients, m)))
             case m                                                            => logger.trace(s"Message $m ignored")
           }
         }.resurrect.catchAll(error => logger.throwable("Unable to process message", error))

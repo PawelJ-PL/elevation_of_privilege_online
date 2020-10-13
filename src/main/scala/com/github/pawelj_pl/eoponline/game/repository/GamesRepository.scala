@@ -23,7 +23,11 @@ object GamesRepository {
 
     def findById(gameId: FUUID): ZIO[Connection, DbException, Option[Game]]
 
+    def getActiveGame(gameId: FUUID): ZIO[Connection, DbException, Option[Game]]
+
     def create(game: Game): ZIO[Connection, DbException, Game]
+
+    def setStartTime(gameId: FUUID, time: Instant): ZIO[Connection, DbException, Unit]
 
     def addPlayer(gameId: FUUID, player: Player): ZIO[Connection, DbException, Unit]
 
@@ -34,6 +38,8 @@ object GamesRepository {
     def getAcceptedParticipants(gameId: FUUID): ZIO[Connection, DbException, List[Player]]
 
     def removePlayer(gameId: FUUID, playerId: FUUID): ZIO[Connection, DbException, Boolean]
+
+    def removePlayers(gameId: FUUID, playerIds: List[FUUID]): ZIO[Connection, DbException, Boolean]
 
     def assignRole(gameId: FUUID, playerId: FUUID, role: PlayerRole): ZIO[Connection, DbException, Boolean]
 
@@ -57,6 +63,15 @@ object GamesRepository {
           ).map(_.headOption.map(_.transformInto[Game]))
         }
 
+      override def getActiveGame(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Option[Game]] =
+        tzio {
+          run(
+            quote(
+              games.filter(game => game.id == lift(gameId) && game.startedAt.isDefined && game.finishedAt.isEmpty)
+            )
+          ).map(_.headOption.map(_.transformInto[Game]))
+        }
+
       override def create(game: Game): ZIO[Connection, DbException, Game] =
         for {
           now <- clock.instant
@@ -67,6 +82,20 @@ object GamesRepository {
                      .transform
           _   <- tzio(run(quote(games.insert(lift(entity)))))
         } yield entity.transformInto[Game]
+
+      override def setStartTime(gameId: FUUID, time: Instant): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
+        for {
+          now <- clock.instant
+          _   <- tzio {
+                   run(
+                     quote(
+                       games
+                         .filter(_.id == lift(gameId))
+                         .update(game => game.startedAt -> lift(Option(time)), game => game.updatedAt -> lift(now))
+                     )
+                   )
+                 }
+        } yield ()
 
       override def addPlayer(gameId: FUUID, player: Player): ZIO[Connection, DbException, Unit] =
         tzio {
@@ -127,6 +156,15 @@ object GamesRepository {
           }.map(_ =!= 0L)
         }
 
+      override def removePlayers(gameId: FUUID, playerIds: List[FUUID]): ZIO[Has[transactor.Transactor[Task]], DbException, Boolean] =
+        tzio {
+          run(
+            quote(
+              gamePlayers.filter(p => liftQuery(playerIds).contains(p.playerId)).delete
+            )
+          ).map(result => result > 0)
+        }
+
       override def assignRole(
         gameId: FUUID,
         playerId: FUUID,
@@ -160,6 +198,7 @@ private final case class GameEntity(
   description: Option[String],
   creator: FUUID,
   startedAt: Option[Instant],
+  finishedAt: Option[Instant],
   createdAt: Instant,
   updatedAt: Instant)
 

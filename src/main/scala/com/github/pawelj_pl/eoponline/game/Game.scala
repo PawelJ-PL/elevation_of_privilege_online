@@ -7,7 +7,7 @@ import io.chrisdavenport.fuuid.FUUID
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder
 
-final case class Game(id: FUUID, description: Option[String], creator: FUUID, startedAt: Option[Instant])
+final case class Game(id: FUUID, description: Option[String], creator: FUUID, startedAt: Option[Instant], finishedAt: Option[Instant])
 
 object Game {
 

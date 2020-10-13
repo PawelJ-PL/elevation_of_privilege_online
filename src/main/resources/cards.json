@@ -1,0 +1,372 @@
+[
+  {
+    "cardNumber": 1,
+    "value": "Two",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 2,
+    "value": "Three",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 3,
+    "value": "Four",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 4,
+    "value": "Five",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 5,
+    "value": "Six",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 6,
+    "value": "Seven",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 7,
+    "value": "Eight",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 8,
+    "value": "Nine",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 9,
+    "value": "Ten",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 10,
+    "value": "Jack",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 11,
+    "value": "Queen",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 12,
+    "value": "King",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 13,
+    "value": "Ace",
+    "suit": "Spoofing"
+  },
+  {
+    "cardNumber": 14,
+    "value": "Three",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 15,
+    "value": "Four",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 16,
+    "value": "Five",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 17,
+    "value": "Six",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 18,
+    "value": "Seven",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 19,
+    "value": "Eight",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 20,
+    "value": "Nine",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 21,
+    "value": "Ten",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 22,
+    "value": "Jack",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 23,
+    "value": "Queen",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 24,
+    "value": "King",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 25,
+    "value": "Ace",
+    "suit": "Tampering"
+  },
+  {
+    "cardNumber": 26,
+    "value": "Two",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 27,
+    "value": "Three",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 28,
+    "value": "Four",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 29,
+    "value": "Five",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 30,
+    "value": "Six",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 31,
+    "value": "Seven",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 32,
+    "value": "Eight",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 33,
+    "value": "Nine",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 34,
+    "value": "Ten",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 35,
+    "value": "Jack",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 36,
+    "value": "Queen",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 37,
+    "value": "King",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 38,
+    "value": "Ace",
+    "suit": "Repudiation"
+  },
+  {
+    "cardNumber": 39,
+    "value": "Two",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 40,
+    "value": "Three",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 41,
+    "value": "Four",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 42,
+    "value": "Five",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 43,
+    "value": "Six",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 44,
+    "value": "Seven",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 45,
+    "value": "Eight",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 46,
+    "value": "Nine",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 47,
+    "value": "Ten",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 48,
+    "value": "Jack",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 49,
+    "value": "Queen",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 50,
+    "value": "King",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 51,
+    "value": "Ace",
+    "suit": "InformationDisclosure"
+  },
+  {
+    "cardNumber": 52,
+    "value": "Two",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 53,
+    "value": "Three",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 54,
+    "value": "Four",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 55,
+    "value": "Five",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 56,
+    "value": "Six",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 57,
+    "value": "Seven",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 58,
+    "value": "Eight",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 59,
+    "value": "Nine",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 60,
+    "value": "Ten",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 61,
+    "value": "Jack",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 62,
+    "value": "Queen",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 63,
+    "value": "King",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 64,
+    "value": "Ace",
+    "suit": "DenialOfService"
+  },
+  {
+    "cardNumber": 65,
+    "value": "Five",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 66,
+    "value": "Six",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 67,
+    "value": "Seven",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 68,
+    "value": "Eight",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 69,
+    "value": "Nine",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 70,
+    "value": "Ten",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 71,
+    "value": "Jack",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 72,
+    "value": "Queen",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 73,
+    "value": "King",
+    "suit": "ElevationOfPrivilege"
+  },
+  {
+    "cardNumber": 74,
+    "value": "Ace",
+    "suit": "ElevationOfPrivilege"
+  }
+]
