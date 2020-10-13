@@ -51,9 +51,9 @@ object MessageTopic {
             .consume(destination)
             .collect(onlyText)
             .map(decodeJsonMessage)
-            .flatMap {
-              case r @ Left(value)  => ZStream.fromEffect(logger.warn(s"Error during parsing message: $value").as(r))
-              case r @ Right(value) => ZStream.fromEffect(logger.trace(s"Decoded message $value")).as(r)
+            .tap {
+              case Left(value)  => logger.warn(s"Error during parsing message: $value")
+              case Right(value) => logger.trace(s"Decoded message $value")
             }
             .collectRight
             .provide(connection)
