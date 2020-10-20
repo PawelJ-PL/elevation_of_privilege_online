@@ -1,8 +1,32 @@
-import { GameAlreadyStarted, GameNotFound, UserAlreadyJoined, UserNotAccepted } from "./../types/Errors"
+import {
+    GameAlreadyFinished,
+    GameAlreadyStarted,
+    GameNotFound,
+    NotEnoughPlayers,
+    TooManyPlayers,
+    UserAlreadyJoined,
+    UserIsNotGameOwner,
+    UserNotAccepted,
+} from "./../types/Errors"
 import { Game } from "./../types/Game"
 import client from "../../../application/api/BaseClient"
 import { UserIsNotGameMember } from "../types/Errors"
 import { Member, MemberRole } from "../types/Member"
+
+const handlePreconditionFailed = (reason?: string, message?: string) => {
+    switch (reason) {
+        case "GameAlreadyStarted":
+            return Promise.reject(new GameAlreadyStarted(message ?? `Game already started`))
+        case "GameAlreadyFinished":
+            return Promise.reject(new GameAlreadyFinished(message ?? "Game already finished"))
+        case "NotEnoughPlayers":
+            return Promise.reject(new NotEnoughPlayers(message ?? "Not enough players"))
+        case "TooManyPlayers":
+            return Promise.reject(new TooManyPlayers(message ?? "Too many players"))
+        default:
+            return undefined
+    }
+}
 
 export default {
     createGame(ownerNickname: string, description?: string | null): Promise<Game> {
@@ -35,8 +59,11 @@ export default {
                     return Promise.reject(new GameNotFound(`Game ${gameId} not found`))
                 } else if (err.response?.status === 409) {
                     return Promise.reject(new UserAlreadyJoined())
-                } else if (err.response?.status === 412 && err.response?.data?.reason === "GameAlreadyStarted") {
-                    return Promise.reject(new GameAlreadyStarted(`Game ${gameId} already started`))
+                } else if (err.response?.status === 412) {
+                    return (
+                        handlePreconditionFailed(err.response.data?.message, err.response.data?.message) ??
+                        Promise.reject(err)
+                    )
                 } else {
                     return Promise.reject(err)
                 }
@@ -52,8 +79,11 @@ export default {
             .catch((err) => {
                 if (err.response?.status === 404) {
                     return Promise.reject(new GameNotFound(`Game ${gameId} not found`))
-                } else if (err.response?.status === 412 && err.response?.data?.reason === "GameAlreadyStarted") {
-                    return Promise.reject(new GameAlreadyStarted(`Game ${gameId} already started`))
+                } else if (err.response?.status === 412) {
+                    return (
+                        handlePreconditionFailed(err.response.data?.message, err.response.data?.message) ??
+                        Promise.reject(err)
+                    )
                 } else {
                     return Promise.reject(err)
                 }
@@ -66,8 +96,31 @@ export default {
             .catch((err) => {
                 if (err.response?.status === 404) {
                     return Promise.reject(new GameNotFound(`Game ${gameId} not found`))
-                } else if (err.response?.status === 412 && err.response?.data?.reason === "GameAlreadyStarted") {
-                    return Promise.reject(new GameAlreadyStarted(`Game ${gameId} already started`))
+                } else if (err.response?.status === 412) {
+                    return (
+                        handlePreconditionFailed(err.response.data?.message, err.response.data?.message) ??
+                        Promise.reject(err)
+                    )
+                } else {
+                    return Promise.reject(err)
+                }
+            })
+    },
+
+    startGame(gameId: string): Promise<void> {
+        return client
+            .post<void>(`/games/${gameId}`)
+            .then((resp) => resp.data)
+            .catch((err) => {
+                if (err.response?.status === 404) {
+                    return Promise.reject(new GameNotFound(`Game ${gameId} not found`))
+                } else if (err.response?.status === 403) {
+                    return Promise.reject(new UserIsNotGameOwner("User is not a game owner"))
+                } else if (err.response?.status === 412) {
+                    return (
+                        handlePreconditionFailed(err.response.data?.message, err.response.data?.message) ??
+                        Promise.reject(err)
+                    )
                 } else {
                     return Promise.reject(err)
                 }

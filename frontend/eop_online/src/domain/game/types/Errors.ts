@@ -45,3 +45,35 @@ export class UserRemoved extends Error {
         this.name = "UserRemoved"
     }
 }
+
+export class UserIsNotGameOwner extends Error {
+    constructor(message: string) {
+        super(message)
+        Object.setPrototypeOf(this, UserIsNotGameOwner.prototype)
+        this.name = "UserIsNotGameOwner"
+    }
+}
+
+export class NotEnoughPlayers extends Error {
+    constructor(message: string) {
+        super(message)
+        Object.setPrototypeOf(this, NotEnoughPlayers.prototype)
+        this.name = "NotEnoughPlayers"
+    }
+}
+
+export class TooManyPlayers extends Error {
+    constructor(message: string) {
+        super(message)
+        Object.setPrototypeOf(this, TooManyPlayers.prototype)
+        this.name = "TooManyPlayers"
+    }
+}
+
+export class GameAlreadyFinished extends Error {
+    constructor(message: string) {
+        super(message)
+        Object.setPrototypeOf(this, GameAlreadyFinished.prototype)
+        this.name = "GameAlreadyFinished"
+    }
+}

@@ -1,4 +1,4 @@
-import { newParticipantAction, userRemovedAction, userRoleChangedAction } from "./../../Actions"
+import { gameStartedAction, newParticipantAction, userRemovedAction, userRoleChangedAction } from "./../../Actions"
 import { newGameWsMessageAction } from "./../Actions"
 import { AppState } from "./../../../../../application/store/index"
 import { AnyAction } from "redux"
@@ -42,4 +42,16 @@ const newMemberEpic: Epic<AnyAction, AnyAction, AppState> = (action$) =>
         })
     )
 
-export const gameWebsocketMessageHandlerEpics = combineEpics(roleChangeMessageEpic, userKickedEpic, newMemberEpic)
+const gameStartedEpic: Epic<AnyAction, AnyAction, AppState> = (action$) =>
+    action$.pipe(
+        filter(newGameWsMessageAction.match),
+        mergeMap((message) => {
+            if (message.payload.eventType === "GameStarted") {
+                return of(gameStartedAction(message.payload.payload))
+            } else {
+                return EMPTY
+            }
+        })
+    )
+
+export const gameWebsocketMessageHandlerEpics = combineEpics(roleChangeMessageEpic, userKickedEpic, newMemberEpic, gameStartedEpic)

@@ -7,10 +7,11 @@ import AlertBox from "../../../application/components/common/AlertBox"
 import PageLoader from "../../../application/components/common/PageLoader"
 import { AppState } from "../../../application/store"
 import { OperationStatus } from "../../../application/store/async/AsyncOperationResult"
+import MatchContainer from "../../match/components/MatchContainer"
 import { fetchGameInfoAction, resetGameInfoStatusAction } from "../store/Actions"
 import { startAnteroomWsConnectionAction, stopAnteroomWsConnectionAction } from "../store/websocket/Actions"
 import { UserIsNotGameMember, UserNotAccepted, UserRemoved } from "../types/Errors"
-import AnteroomView from "./anteroom/AnteroomContainer"
+import AnteroomContainer from "./anteroom/AnteroomContainer"
 import JoinGameModal from "./JoinGameModal"
 
 type Props = ReturnType<typeof mapStateToProps> &
@@ -55,6 +56,13 @@ const SingleGamePage: React.FC<Props> = ({
     }, [gameInfo, gameId])
 
     useEffect(() => {
+        if (Boolean(gameInfo.data?.startedAt) && !gameInfo.data?.finishedAt) {
+            stopAnteroomWs(gameId)
+        }
+         // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [gameInfo, gameId])
+
+    useEffect(() => {
         return () => {
             stopAnteroomWs(gameId)
             resetGameStatus()
@@ -70,8 +78,10 @@ const SingleGamePage: React.FC<Props> = ({
         return <JoinGameModal gameId={gameId} isOpen={true} onClose={() => void 0} />
     } else if (gameInfo.error) {
         return <AlertBox status="error" title="Unable to load game data" description={gameInfo.error?.message} />
+    } else if (gameInfo.data && gameInfo.data.startedAt) {
+        return <MatchContainer game={gameInfo.data} />
     } else if (gameInfo.data && !gameInfo.data.startedAt) {
-        return <AnteroomView game={gameInfo.data} />
+        return <AnteroomContainer game={gameInfo.data} />
     } else {
         return <PageLoader text="Loading game" />
     }

@@ -1,3 +1,5 @@
+import { matchesEpics } from './../../domain/match/store/Epics';
+import { matchReducer } from './../../domain/match/store/Reducers';
 import { usersEpics } from "./../../domain/user/store/Epics"
 import { usersReducer } from "./../../domain/user/store/Reducers"
 import { gamesEpics } from "./../../domain/game/store/Epics"
@@ -13,11 +15,12 @@ const rootReducer = combineReducers({
     router: connectRouter(history),
     games: gamesReducer,
     users: usersReducer,
+    matches: matchReducer
 })
 
 export type AppState = ReturnType<typeof rootReducer>
 
-const rootEpic = combineEpics(gamesEpics, usersEpics)
+const rootEpic = combineEpics(gamesEpics, usersEpics, matchesEpics)
 
 function configure() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

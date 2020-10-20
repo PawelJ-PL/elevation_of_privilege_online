@@ -3,4 +3,5 @@ export type Game = {
     description?: string | null
     creator: string
     startedAt?: string | null
+    finishedAt?: string | null
 }

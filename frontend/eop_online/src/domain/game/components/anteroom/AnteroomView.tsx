@@ -1,4 +1,4 @@
-import { Flex, Spacer } from "@chakra-ui/core"
+import { Box, Button, Flex, Spacer } from "@chakra-ui/core"
 import React, { useEffect } from "react"
 import ContentBox from "../../../../application/components/common/ContentBox"
 import { Session } from "../../../user/types/Session"
@@ -9,7 +9,12 @@ import ElementsList from "../../../../application/components/common/ElementsList
 import { AppState } from "../../../../application/store"
 import { Dispatch } from "redux"
 import { connect } from "react-redux"
-import { resetAssignRoleStatusAsction, resetKickUserStatusAsction } from "../../store/Actions"
+import {
+    resetAssignRoleStatusAction,
+    resetKickUserStatusAction,
+    resetStartGameStatusAction,
+    startGameAction,
+} from "../../store/Actions"
 import LoadingDimmer from "../../../../application/components/common/LoadingDimmer"
 import { OperationStatus } from "../../../../application/store/async/AsyncOperationResult"
 import AlertBox from "../../../../application/components/common/AlertBox"
@@ -30,6 +35,9 @@ const AnteroomView: React.FC<Props> = ({
     assignRoleStatus,
     resetKickStatus,
     kickUserStatus,
+    startGameStatus,
+    startGame,
+    resetStartGameStatus,
 }) => {
     const playerRoles = groupBy(members, (m) => (!m.role ? "None" : m.role))
     const isAdmin = currentUser.userId === game.creator
@@ -65,6 +73,16 @@ const AnteroomView: React.FC<Props> = ({
                     status="error"
                     variant="solid"
                     onClose={() => resetKickStatus()}
+                />
+            )}
+            {startGameStatus.status === OperationStatus.FAILED && (
+                <AlertBox
+                    title="Error during starting game"
+                    containerProps={{ marginTop: "0.5em" }}
+                    description={startGameStatus.error?.message}
+                    status="error"
+                    variant="solid"
+                    onClose={resetStartGameStatus}
                 />
             )}
             <Flex direction={["column", "column", "row"]} marginTop="0.5em" marginX="0.5em">
@@ -118,6 +136,18 @@ const AnteroomView: React.FC<Props> = ({
                     title="Accepted observers"
                 />
             </Flex>
+            {isAdmin && (
+                <Box marginTop="0.5em" marginX="0.5em">
+                    <Button
+                        width="100%"
+                        colorScheme="blue"
+                        disabled={(playerRoles["Player"] ?? []).length < 2 || (playerRoles["Player"] ?? []).length > 10}
+                        onClick={() => startGame(game.id)}
+                    >
+                        Start game
+                    </Button>
+                </Box>
+            )}
         </ContentBox>
     )
 }
@@ -125,11 +155,14 @@ const AnteroomView: React.FC<Props> = ({
 const mapStateToProps = (state: AppState) => ({
     assignRoleStatus: state.games.assignRoleStatus,
     kickUserStatus: state.games.kickUserStatus,
+    startGameStatus: state.games.startGame,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    resetAssignRoleStatus: () => dispatch(resetAssignRoleStatusAsction()),
-    resetKickStatus: () => dispatch(resetKickUserStatusAsction()),
+    resetAssignRoleStatus: () => dispatch(resetAssignRoleStatusAction()),
+    resetKickStatus: () => dispatch(resetKickUserStatusAction()),
+    startGame: (gameId: string) => dispatch(startGameAction.started(gameId)),
+    resetStartGameStatus: () => dispatch(resetStartGameStatusAction()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(AnteroomView)

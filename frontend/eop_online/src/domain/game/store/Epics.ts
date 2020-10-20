@@ -6,8 +6,10 @@ import {
     createGameAction,
     fetchGameInfoAction,
     fetchMembersAction,
+    gameStartedAction,
     joinGameAction,
     kickUserAction,
+    startGameAction,
     userRemovedAction,
     userRoleChangedAction,
 } from "./Actions"
@@ -88,6 +90,20 @@ const refreshGameOnAcceptEpic: Epic<AnyAction, AnyAction, AppState> = (action$, 
         })
     )
 
+const startGameEpic = createEpic<string, void, Error>(startGameAction, (params) => GamesApi.startGame(params))
+
+const refreshGameOnStartEpic: Epic<AnyAction, AnyAction, AppState> = (action$, state$) =>
+    action$.pipe(
+        filter(gameStartedAction.match),
+        mergeMap((a) => {
+            if (state$.value.games.fetchStatus.params === a.payload.gameId) {
+                return of(fetchGameInfoAction.started(a.payload.gameId))
+            } else {
+                return EMPTY
+            }
+        })
+    )
+
 export const gamesEpics = combineEpics<Action, Action, AppState>(
     createGameEpic,
     newGameRedirectEpic,
@@ -98,5 +114,7 @@ export const gamesEpics = combineEpics<Action, Action, AppState>(
     kickUserEpic,
     gameWsEpics,
     errorOnUserKickEpic,
-    refreshGameOnAcceptEpic
+    refreshGameOnAcceptEpic,
+    startGameEpic,
+    refreshGameOnStartEpic
 )
