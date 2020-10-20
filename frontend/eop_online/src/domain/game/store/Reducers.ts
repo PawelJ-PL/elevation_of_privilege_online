@@ -6,11 +6,13 @@ import {
     joinGameAction,
     kickUserAction,
     newParticipantAction,
-    resetAssignRoleStatusAsction,
+    resetAssignRoleStatusAction,
     resetCreateGameStatusAction,
     resetGameInfoStatusAction,
     resetJoinStatusAction,
-    resetKickUserStatusAsction,
+    resetKickUserStatusAction,
+    resetStartGameStatusAction,
+    startGameAction,
     userRemovedAction,
     userRoleChangedAction,
 } from "./Actions"
@@ -64,8 +66,9 @@ const membersReducer = createReducer(fetchMembersAction)
         }
     })
     .build()
-const assignRoleReducer = createReducer(assignUserRoleAction, resetAssignRoleStatusAsction).build()
-const kickUserReducer = createReducer(kickUserAction, resetKickUserStatusAsction).build()
+const assignRoleReducer = createReducer(assignUserRoleAction, resetAssignRoleStatusAction).build()
+const kickUserReducer = createReducer(kickUserAction, resetKickUserStatusAction).build()
+const startGameReducer = createReducer(startGameAction, resetStartGameStatusAction).build()
 
 export const gamesReducer = combineReducers({
     createStatus: createGameReducer,
@@ -74,4 +77,5 @@ export const gamesReducer = combineReducers({
     members: membersReducer,
     assignRoleStatus: assignRoleReducer,
     kickUserStatus: kickUserReducer,
+    startGame: startGameReducer,
 })
