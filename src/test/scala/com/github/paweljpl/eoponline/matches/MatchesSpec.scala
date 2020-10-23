@@ -53,13 +53,13 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
                              .accessM[Matches](_.get.getCurrentStateForPlayer(ExampleGameId, ExamplePlayer.id))
                              .provideCustomLayer(createLayer(gamesRepoState, gameplayRepoState))
     } yield assert(result.state)(equalTo(GameState(ExampleGameId, ExamplePlayer.id, Some(Suit.DenialOfService)))) &&
-      assert(result.hand)(hasSameElements(List(Card(25, Value.Ace, Suit.Tampering)))) &&
+      assert(result.hand)(hasSameElements(List(Card(25, Value.Ace, Suit.Tampering, "TextQuux")))) &&
       assert(result.table)(
         hasSameElements(
           List(
-            ExtendedDeckElementDto(ExampleGameId, ExamplePlayer.id, Card(1, Value.Two, Suit.Spoofing), CardLocation.Table, None),
-            ExtendedDeckElementDto(ExampleGameId, ExampleId1, Card(3, Value.Four, Suit.Spoofing), CardLocation.Table, None),
-            ExtendedDeckElementDto(ExampleGameId, ExampleId3, Card(32, Value.Eight, Suit.Repudiation), CardLocation.Table, Some(true))
+            ExtendedDeckElementDto(ExampleGameId, ExamplePlayer.id, Card(1, Value.Two, Suit.Spoofing, "TextFoo"), CardLocation.Table, None),
+            ExtendedDeckElementDto(ExampleGameId, ExampleId1, Card(3, Value.Four, Suit.Spoofing, "TextBaz"), CardLocation.Table, None),
+            ExtendedDeckElementDto(ExampleGameId, ExampleId3, Card(32, Value.Eight, Suit.Repudiation, "TestQuuz"), CardLocation.Table, Some(true))
           )
         )
       )

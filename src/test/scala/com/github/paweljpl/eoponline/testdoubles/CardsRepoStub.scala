@@ -12,12 +12,12 @@ object CardsRepoStub {
   val instance: ULayer[CardsRepository] = ZLayer.succeed(new CardsRepository.Service {
 
     val cards: Set[Card] = Set(
-      Card(cardNumber = 1, value = Value.Two, suit = Suit.Spoofing),
-      Card(cardNumber = 2, value = Value.Three, suit = Suit.Spoofing),
-      Card(cardNumber = 3, value = Value.Four, suit = Suit.Spoofing),
-      Card(cardNumber = 14, value = Value.Three, suit = Suit.Tampering),
-      Card(cardNumber = 25, value = Value.Ace, suit = Suit.Tampering),
-      Card(cardNumber = 32, value = Value.Eight, suit = Suit.Repudiation)
+      Card(cardNumber = 1, value = Value.Two, suit = Suit.Spoofing, "TextFoo"),
+      Card(cardNumber = 2, value = Value.Three, suit = Suit.Spoofing, "TextBar"),
+      Card(cardNumber = 3, value = Value.Four, suit = Suit.Spoofing, "TextBaz"),
+      Card(cardNumber = 14, value = Value.Three, suit = Suit.Tampering, "TextQux"),
+      Card(cardNumber = 25, value = Value.Ace, suit = Suit.Tampering, "TextQuux"),
+      Card(cardNumber = 32, value = Value.Eight, suit = Suit.Repudiation, "TestQuuz")
     )
 
     override def get(value: Value, suit: Suit): ZIO[Any, Exception, Option[Card]] =

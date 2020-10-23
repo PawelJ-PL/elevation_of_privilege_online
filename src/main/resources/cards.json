@@ -2,371 +2,445 @@
   {
     "cardNumber": 1,
     "value": "Two",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker could squat on the random port or socket that the server normally uses"
   },
   {
     "cardNumber": 2,
     "value": "Three",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker could try one credential after another and there’s nothing to slow them down (online or offline)"
   },
   {
     "cardNumber": 3,
     "value": "Four",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker can anonymously connect, because we expect authentication to be done at a higher level"
   },
   {
     "cardNumber": 4,
     "value": "Five",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker can confuse a client because there are too many ways to identify a server"
   },
   {
     "cardNumber": 5,
     "value": "Six",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker can spoof a server because identifiers aren’t stored on the client and checked for consistency on re-connection (that is, there’s no key persistence)"
   },
   {
     "cardNumber": 6,
     "value": "Seven",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker can connect to a server or peer over a link that isn’t authenticated (and encrypted)"
   },
   {
     "cardNumber": 7,
     "value": "Eight",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker could steal credentials stored on the server and reuse them (for example, a key is stored in a world readable file)"
   },
   {
     "cardNumber": 8,
     "value": "Nine",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker who gets a password can reuse it (Use stronger authenticators)"
   },
   {
     "cardNumber": 9,
     "value": "Ten",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker can choose to use weaker or no authentication"
   },
   {
     "cardNumber": 10,
     "value": "Jack",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker could steal credentials stored on the client and reuse them"
   },
   {
     "cardNumber": 11,
     "value": "Queen",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "An attacker could go after the way credentials are updated or recovered (account recovery doesn’t require disclosing the old password)"
   },
   {
     "cardNumber": 12,
     "value": "King",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "Your system ships with a default admin password, and doesn’t force a change"
   },
   {
     "cardNumber": 13,
     "value": "Ace",
-    "suit": "Spoofing"
+    "suit": "Spoofing",
+    "text": "You’ve invented a new Spoofing attack"
   },
   {
     "cardNumber": 14,
     "value": "Three",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can take advantage of your custom key exchange or integrity control which you built instead of using standard crypto"
   },
   {
     "cardNumber": 15,
     "value": "Four",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "Your code makes access control decisions all over the place, rather than with a security kernel"
   },
   {
     "cardNumber": 16,
     "value": "Five",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can replay data without detection because your code doesn’t provide timestamps or sequence numbers"
   },
   {
     "cardNumber": 17,
     "value": "Six",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can write to a data store your code relies on"
   },
   {
     "cardNumber": 18,
     "value": "Seven",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can bypass permissions because you don’t make names canonical before checking access permissions"
   },
   {
     "cardNumber": 19,
     "value": "Eight",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can manipulate data because there’s no integrity protection for data on the network"
   },
   {
     "cardNumber": 20,
     "value": "Nine",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can provide or control state information"
   },
   {
     "cardNumber": 21,
     "value": "Ten",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can alter information in a data store because it has weak ACLs or includes a group which is equivalent to everyone (“all Live ID holders”)"
   },
   {
     "cardNumber": 22,
     "value": "Jack",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can write to some resource because permissions are granted to the world or there are no ACLs"
   },
   {
     "cardNumber": 23,
     "value": "Queen",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can change parameters over a trust boundary and after validation (for example, important parameters in a hidden field in HTML, or passing a pointer to critical memory)"
   },
   {
     "cardNumber": 24,
     "value": "King",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "An attacker can load code inside your process via an extension point"
   },
   {
     "cardNumber": 25,
     "value": "Ace",
-    "suit": "Tampering"
+    "suit": "Tampering",
+    "text": "You’ve invented a new Tampering attack"
   },
   {
     "cardNumber": 26,
     "value": "Two",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can pass data through the log to attack a log reader, and there’s no documentation of what sorts of validation are done"
   },
   {
     "cardNumber": 27,
     "value": "Three",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "A low privilege attacker can read interesting security information in the logs"
   },
   {
     "cardNumber": 28,
     "value": "Four",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can alter digital signatures because the digital signature system you’re implementing is weak, or uses MACs where it should use a signature"
   },
   {
     "cardNumber": 29,
     "value": "Five",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can alter log messages on a network because they lack strong integrity controls"
   },
   {
     "cardNumber": 30,
     "value": "Six",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can create a log entry without a timestamp (or no log entry is timestamped)"
   },
   {
     "cardNumber": 31,
     "value": "Seven",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can make the logs wrap around and lose data"
   },
   {
     "cardNumber": 32,
     "value": "Eight",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can make a log lose or confuse security information"
   },
   {
     "cardNumber": 33,
     "value": "Nine",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can use a shared key to authenticate as different principals, confusing the information in the logs"
   },
   {
     "cardNumber": 34,
     "value": "Ten",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can get arbitrary data into logs from unauthenticated (or weakly authenticated) outsiders without validation"
   },
   {
     "cardNumber": 35,
     "value": "Jack",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can edit logs and there’s no way to tell (perhaps because there’s no heartbeat option for the logging system)"
   },
   {
     "cardNumber": 36,
     "value": "Queen",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "An attacker can say “I didn’t do that,” and you’d have no way to prove them wrong"
   },
   {
     "cardNumber": 37,
     "value": "King",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "The system has no logs"
   },
   {
     "cardNumber": 38,
     "value": "Ace",
-    "suit": "Repudiation"
+    "suit": "Repudiation",
+    "text": "You’ve invented a new Repudiation attack"
   },
   {
     "cardNumber": 39,
     "value": "Two",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can brute-force file encryption because there’s no defense in place (example defense: password stretching)"
   },
   {
     "cardNumber": 40,
     "value": "Three",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can see error messages with security sensitive content"
   },
   {
     "cardNumber": 41,
     "value": "Four",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can read content because messages (say, an email or HTTP cookie) aren’t encrypted even if the channel is encrypted"
   },
   {
     "cardNumber": 42,
     "value": "Five",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker may be able to read a document or data because it’s encrypted with a non-standard algorithm"
   },
   {
     "cardNumber": 43,
     "value": "Six",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can read data because it’s hidden or occluded (for undo or change tracking) and the user might forget that it’s there"
   },
   {
     "cardNumber": 44,
     "value": "Seven",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can act as a ‘man in the middle’ because you don’t authenticate endpoints of a network connection"
   },
   {
     "cardNumber": 45,
     "value": "Eight",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can access information through a search indexer, logger, or other such mechanism"
   },
   {
     "cardNumber": 46,
     "value": "Nine",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can read sensitive information in a file with bad ACLs"
   },
   {
     "cardNumber": 47,
     "value": "Ten",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can read information in files with no ACLs"
   },
   {
     "cardNumber": 48,
     "value": "Jack",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can discover the fixed key being used to encrypt"
   },
   {
     "cardNumber": 49,
     "value": "Queen",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can read the entire channel because the channel (say, HTTP or SMTP) isn’t encrypted"
   },
   {
     "cardNumber": 50,
     "value": "King",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "An attacker can read network information because there’s no cryptography used"
   },
   {
     "cardNumber": 51,
     "value": "Ace",
-    "suit": "InformationDisclosure"
+    "suit": "InformationDisclosure",
+    "text": "You’ve invented a new Information Disclosure attack"
   },
   {
     "cardNumber": 52,
     "value": "Two",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make your authentication system unusable or unavailable"
   },
   {
     "cardNumber": 53,
     "value": "Three",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a client unavailable or unusable but the problem goes away when the attacker stops"
   },
   {
     "cardNumber": 54,
     "value": "Four",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a server unavailable or unusable but the problem goes away when the attacker stops"
   },
   {
     "cardNumber": 55,
     "value": "Five",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a client unavailable or unusable without ever authenticating but the problem goes away when the attacker stops"
   },
   {
     "cardNumber": 56,
     "value": "Six",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a server unavailable or unusable without ever authenticating but the problem goes away when the attacker stops"
   },
   {
     "cardNumber": 57,
     "value": "Seven",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a client unavailable or unusable and the problem persists after the attacker goes away"
   },
   {
     "cardNumber": 58,
     "value": "Eight",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a server unavailable or unusable and the problem persists after the attacker goes away"
   },
   {
     "cardNumber": 59,
     "value": "Nine",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a client unavailable or unusable without ever authenticating and the problem persists after the attacker goes away"
   },
   {
     "cardNumber": 60,
     "value": "Ten",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can make a server unavailable or unusable without ever authenticating and the problem persists after the attacker goes away"
   },
   {
     "cardNumber": 61,
     "value": "Jack",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can cause the logging subsystem to stop working"
   },
   {
     "cardNumber": 62,
     "value": "Queen",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can amplify a Denial of Service attack through this component with amplification on the order of 10:1"
   },
   {
     "cardNumber": 63,
     "value": "King",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "An attacker can amplify a Denial of Service attack through this component with amplification on the order of 100:1"
   },
   {
     "cardNumber": 64,
     "value": "Ace",
-    "suit": "DenialOfService"
+    "suit": "DenialOfService",
+    "text": "You’ve invented a new Denial of Service attack"
   },
   {
     "cardNumber": 65,
     "value": "Five",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "An attacker can force data through different validation paths which give different results"
   },
   {
     "cardNumber": 66,
     "value": "Six",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "An attacker could take advantage of .NET permissions you ask for, but don’t use"
   },
   {
     "cardNumber": 67,
     "value": "Seven",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "An attacker can provide a pointer across a trust boundary, rather than data which can be validated"
   },
   {
     "cardNumber": 68,
     "value": "Eight",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "An attacker can enter data that is checked while still under their control and used later on the other side of a trust boundary"
   },
   {
     "cardNumber": 69,
     "value": "Nine",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "There’s no reasonable way for a caller to figure out what validation of tainted data you perform before passing it to them"
   },
   {
     "cardNumber": 70,
     "value": "Ten",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "There’s no reasonable way for a caller to figure out what security assumptions you make"
   },
   {
     "cardNumber": 71,
     "value": "Jack",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "An attacker can reflect input back to a user, like cross site scripting"
   },
   {
     "cardNumber": 72,
     "value": "Queen",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "You include user-generated content within your page, possibly including the content of random URLs"
   },
   {
     "cardNumber": 73,
     "value": "King",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "An attacker can inject a command that the system will run at a higher privilege level"
   },
   {
     "cardNumber": 74,
     "value": "Ace",
-    "suit": "ElevationOfPrivilege"
+    "suit": "ElevationOfPrivilege",
+    "text": "You’ve invented a new Elevation of Privilege attack"
   }
 ]
