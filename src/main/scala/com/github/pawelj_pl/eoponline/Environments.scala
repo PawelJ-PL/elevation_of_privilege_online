@@ -17,6 +17,8 @@ import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
 import com.github.pawelj_pl.eoponline.`match`.{MatchRoutes, Matches}
 import com.github.pawelj_pl.eoponline.`match`.MatchRoutes.MatchRoutes
 import com.github.pawelj_pl.eoponline.`match`.repository.{CardsRepository, GameplayRepository}
+import com.github.pawelj_pl.eoponline.http.web.StaticRoutes
+import com.github.pawelj_pl.eoponline.http.web.StaticRoutes.StaticRoutes
 import com.github.pawelj_pl.eoponline.http.websocket.{WebSocketMessage, WebSocketRoutes}
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes.WebSocketRoutes
 import com.github.pawelj_pl.eoponline.session.UserRoutes.UserRoutes
@@ -42,6 +44,7 @@ object Environments {
     with WebSocketRoutes
     with UserRoutes
     with MatchRoutes
+    with StaticRoutes
 
   private val provideWebSocketTopic
     : ZLayer[ZConfig[MessageBroker] with Blocking with Logging, Throwable, MessageTopic[WebSocketMessage[_]]] =
@@ -87,7 +90,8 @@ object Environments {
     val userRoutes = authentication >>> UserRoutes.live
     val matches = db ++ gamesRepo ++ gamePlayRepo ++ cardRepo >>> Matches.live
     val gameplayRoutes = authentication ++ matches ++ logging >>> MatchRoutes.live
-    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes ++ gameplayRoutes
+    val staticRoutes = blocking >>> StaticRoutes.live
+    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes ++ gameplayRoutes ++ staticRoutes
   }
 
 }

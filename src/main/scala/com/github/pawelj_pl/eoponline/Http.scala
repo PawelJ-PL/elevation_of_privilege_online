@@ -1,10 +1,13 @@
 package com.github.pawelj_pl.eoponline
 
+import cats.syntax.semigroupk._
 import com.github.pawelj_pl.eoponline.config.AppConfig
 import com.github.pawelj_pl.eoponline.game.GameRoutes
 import com.github.pawelj_pl.eoponline.game.GameRoutes.GameRoutes
 import com.github.pawelj_pl.eoponline.`match`.MatchRoutes
 import com.github.pawelj_pl.eoponline.`match`.MatchRoutes.MatchRoutes
+import com.github.pawelj_pl.eoponline.http.web.StaticRoutes
+import com.github.pawelj_pl.eoponline.http.web.StaticRoutes.StaticRoutes
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes.WebSocketRoutes
 import com.github.pawelj_pl.eoponline.session.UserRoutes
@@ -24,13 +27,14 @@ object Http {
 
   def server(
     implicit runtime: Runtime[Environments.HttpServerEnvironment]
-  ): ZManaged[GameRoutes with ZConfig[AppConfig.Server] with WebSocketRoutes with UserRoutes with MatchRoutes, Throwable, Server[Task]] =
+  ): ZManaged[GameRoutes with ZConfig[AppConfig.Server] with WebSocketRoutes with UserRoutes with MatchRoutes with StaticRoutes, Throwable, Server[Task]] =
     for {
+      webRoutes <- StaticRoutes.routes.toManaged_
       apiRoutes <- routes.map(r => Router("/api/v1" -> r)).toManaged_
       config    <- getConfig[AppConfig.Server].toManaged_
       srv       <- BlazeServerBuilder[Task](runtime.platform.executor.asEC)
                      .bindHttp(config.port, config.host)
-                     .withHttpApp(apiRoutes.orNotFound)
+                     .withHttpApp((webRoutes <+> apiRoutes).orNotFound)
                      .resource
                      .toManagedZIO
     } yield srv
