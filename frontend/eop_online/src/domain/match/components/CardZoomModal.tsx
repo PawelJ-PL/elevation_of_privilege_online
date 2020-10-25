@@ -22,6 +22,7 @@ import React from "react"
 import { HiThumbDown, HiThumbUp } from "react-icons/hi"
 import { loadCardImage } from "../../../application/utils/ResourceLoader"
 import { Card } from "../types/Card"
+import UnknownCard from "../../../resources/unknown-card.png"
 
 type Props = {
     visible: boolean
@@ -62,7 +63,6 @@ const CardZoomModal: React.FC<Props> = ({ visible, onClose, card, closable, canP
                     fontSize="1em"
                     colorScheme="green"
                     aria-label="Linked"
-
                 />
             </Box>
         </Flex>
@@ -88,7 +88,7 @@ const CardZoomModal: React.FC<Props> = ({ visible, onClose, card, closable, canP
                                     </TabList>
                                     <TabPanels>
                                         <TabPanel>
-                                            <Image src={loadCardImage(card)} />
+                                            <Image src={loadCardImage(card)} fallbackSrc={UnknownCard} />
                                         </TabPanel>
                                         <TabPanel>
                                             <Box width="270px">{card.text}</Box>

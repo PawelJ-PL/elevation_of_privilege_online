@@ -9,6 +9,7 @@ import CardZoomModal from "./CardZoomModal"
 import { GiSandsOfTime } from "react-icons/gi"
 import { HiThumbDown } from "react-icons/hi"
 import { HiThumbUp } from "react-icons/hi"
+import UnknownCard from "../../../resources/unknown-card.png"
 
 type Props = {
     cards: UsersCard[]
@@ -49,6 +50,7 @@ const TableView: React.FC<Props> = ({ cards, players }) => {
                 src={loadCardImage(card.card)}
                 maxWidth={cardWidths}
                 onClick={() => setZoomedCard(card.card)}
+                fallbackSrc={UnknownCard}
             />
         </Center>
     )
