@@ -28,6 +28,7 @@ import { loadCardImage } from "../../../application/utils/ResourceLoader"
 import CardZoomModal from "./CardZoomModal"
 import { Round } from "../types/Round"
 import { Session } from "../../user/types/Session"
+import UnknownCard from "../../../resources/unknown-card.png"
 
 type Props = {
     round: Round
@@ -101,6 +102,7 @@ const HandView: React.FC<Props> = ({ round, currentUser }) => {
                             src={loadCardImage(c)}
                             maxWidth={cardWidths}
                             onClick={() => setZoomedCard(c)}
+                            fallbackSrc={UnknownCard}
                         />
                     </Box>
                 ))}

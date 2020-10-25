@@ -12,11 +12,5 @@ export function loadSuitLogo(suit: Suit): string | undefined {
 
 export function loadCardImage(card: Card): string | undefined {
     const filename = kebabCase(card.suit + card.value)
-    const context = require.context("../../resources/cards", false, /\.png$/)
-
-    try {
-        return context(`./${filename}.png`)
-    } catch (_) {
-        return undefined
-    }
+    return process.env.PUBLIC_URL + `/cards/${filename}.png`
 }
