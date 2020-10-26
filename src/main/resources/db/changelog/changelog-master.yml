@@ -66,6 +66,12 @@ databaseChangeLog:
                   type: tinyint
                   constraints:
                     nullable: false
+              - column:
+                  name: taken_tricks
+                  type: smallint
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
 
         - addPrimaryKey:
             columnNames: game_id, player_id

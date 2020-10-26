@@ -22,6 +22,16 @@ object InternalMessage {
 
   final case class GameStarted(gameId: FUUID) extends InternalMessage
 
+  final case class ThreatLinkedStatusChanged(gameId: FUUID, cardNumber: Int, newStatus: Boolean) extends InternalMessage
+
+  final case class NextPlayer(gameId: FUUID, newPlayer: FUUID) extends InternalMessage
+
+  final case class NextRound(gameId: FUUID, player: FUUID) extends InternalMessage
+
+  final case class GameFinished(gameId: FUUID) extends InternalMessage
+
+  final case class CardPlayed(gameId: FUUID, player: FUUID, cardNumber: Int) extends InternalMessage
+
   object ParticipantJoined {
 
     implicit val codec: Codec[ParticipantJoined] = deriveCodec
@@ -44,6 +54,34 @@ object InternalMessage {
 
     implicit val codec: Codec[GameStarted] = deriveCodec
 
+  }
+
+  object ThreatLinkedStatusChanged {
+
+    implicit val codec: Codec[ThreatLinkedStatusChanged] = deriveCodec
+
+  }
+
+  object NextPlayer {
+
+    implicit val codec: Codec[NextPlayer] = deriveCodec
+
+  }
+
+  object NextRound {
+
+    implicit val codec: Codec[NextRound] = deriveCodec
+
+  }
+
+  object GameFinished {
+
+    implicit val codec: Codec[GameFinished] = deriveCodec
+
+  }
+
+  object CardPlayed {
+    implicit val codec: Codec[CardPlayed] = deriveCodec
   }
 
 }

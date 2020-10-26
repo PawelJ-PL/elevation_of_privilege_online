@@ -86,11 +86,11 @@ object Environments {
     val authentication = clock ++ jwt ++ logging ++ randomUtils >>> Authentication.live
     val gameRoutes = games ++ authentication ++ logging >>> GameRoutes.live
     val webSocketHandler = logging ++ messageTopic ++ webSocketTopic ++ db ++ gamesRepo >>> WebSocketHandler.live
-    val webSocketRoutes = webSocketTopic ++ authentication ++ logging >>> WebSocketRoutes.live
     val userRoutes = authentication >>> UserRoutes.live
-    val matches = db ++ gamesRepo ++ gamePlayRepo ++ cardRepo >>> Matches.live
+    val matches = db ++ gamesRepo ++ gamePlayRepo ++ cardRepo ++ messageTopic ++ randomUtils ++ clock >>> Matches.live
     val gameplayRoutes = authentication ++ matches ++ logging >>> MatchRoutes.live
     val staticRoutes = blocking >>> StaticRoutes.live
+    val webSocketRoutes = webSocketTopic ++ authentication ++ logging ++ matches >>> WebSocketRoutes.live
     serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes ++ gameplayRoutes ++ staticRoutes
   }
 

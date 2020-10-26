@@ -1,8 +1,6 @@
 package com.github.pawelj_pl.eoponline.game
 
 import com.github.pawelj_pl.eoponline.ResponseData
-import io.circe.Encoder
-import io.circe.generic.semiauto.deriveEncoder
 import org.http4s.{Response, Status}
 import org.http4s.circe.CirceEntityEncoder._
 import zio.{Task, UIO, ZIO}

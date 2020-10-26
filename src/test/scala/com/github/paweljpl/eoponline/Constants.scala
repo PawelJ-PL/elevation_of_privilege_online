@@ -47,6 +47,8 @@ trait Constants {
 
   final val InitClockMillis = 1602714542868L
 
+  final val FirstRandomTime = Instant.ofEpochMilli(InitClockMillis)
+
   final val Now = Instant.ofEpochMilli(1602795725091L)
 
 }
