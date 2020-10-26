@@ -17,7 +17,8 @@ object CardsRepoStub {
       Card(cardNumber = 3, value = Value.Four, suit = Suit.Spoofing, "TextBaz"),
       Card(cardNumber = 14, value = Value.Three, suit = Suit.Tampering, "TextQux"),
       Card(cardNumber = 25, value = Value.Ace, suit = Suit.Tampering, "TextQuux"),
-      Card(cardNumber = 32, value = Value.Eight, suit = Suit.Repudiation, "TestQuuz")
+      Card(cardNumber = 32, value = Value.Eight, suit = Suit.Repudiation, "TestQuuz"),
+      Card(cardNumber = 70, value = Value.Ten, suit = Suit.ElevationOfPrivilege, "TestCorge")
     )
 
     override def get(value: Value, suit: Suit): ZIO[Any, Exception, Option[Card]] =

@@ -20,11 +20,19 @@ object GameplayRepository {
 
     def getCardsOf(gameId: FUUID): ZIO[Connection, DbException, List[DeckElement]]
 
+    def getSingleCardOf(gameId: FUUID, cardNumber: Int): ZIO[Connection, DbException, Option[DeckElement]]
+
     def updateCardLocation(gameId: FUUID, cardNumber: Int, location: CardLocation): ZIO[Connection, DbException, Unit]
+
+    def updateCardsLocation(gameId: FUUID, cardNumbers: List[Int], location: CardLocation): ZIO[Connection, DbException, Unit]
+
+    def updateThreatStatus(gameId: FUUID, cardNumber: Int, threatLinked: Boolean): ZIO[Connection, DbException, Unit]
 
     def updateState(gameId: FUUID, currentPlayer: FUUID, leadingSuit: Option[Suit]): ZIO[Connection, DbException, Unit]
 
     def getState(gameId: FUUID): ZIO[Connection, DbException, Option[GameState]]
+
+    def removeState(gameId: FUUID): ZIO[Connection, DbException, Unit]
 
   }
 
@@ -69,11 +77,53 @@ object GameplayRepository {
           ).map(_.transformInto[List[DeckElement]])
         }
 
+      override def getSingleCardOf(
+        gameId: FUUID,
+        cardNumber: Int
+      ): ZIO[Has[transactor.Transactor[Task]], DbException, Option[DeckElement]] =
+        tzio {
+          run(
+            quote(
+              decks.filter(d => d.gameId == lift(gameId) && d.cardNumber == lift(cardNumber))
+            )
+          ).map(_.headOption.transformInto[Option[DeckElement]])
+        }
+
       override def updateCardLocation(gameId: FUUID, cardNumber: Int, location: CardLocation): ZIO[Connection, DbException, Unit] =
         tzio {
           run(
             quote(
               decks.filter(deck => deck.gameId == lift(gameId) && deck.cardNumber == lift(cardNumber)).update(_.location -> lift(location))
+            )
+          )
+        }.unit
+
+      override def updateCardsLocation(
+        gameId: FUUID,
+        cardNumbers: List[Int],
+        location: CardLocation
+      ): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
+        tzio {
+          run(
+            quote(
+              decks
+                .filter(deck => deck.gameId == lift(gameId) && liftQuery(cardNumbers).contains(deck.cardNumber))
+                .update(_.location -> lift(location))
+            )
+          )
+        }.unit
+
+      override def updateThreatStatus(
+        gameId: FUUID,
+        cardNumber: Index,
+        threatLinked: Boolean
+      ): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
+        tzio {
+          run(
+            quote(
+              decks
+                .filter(deck => deck.gameId == lift(gameId) && deck.cardNumber == lift(cardNumber))
+                .update(_.threatLinked -> lift(Option(threatLinked)))
             )
           )
         }.unit
@@ -105,6 +155,15 @@ object GameplayRepository {
             )
           ).map(_.headOption).map(_.transformInto[Option[GameState]])
         }
+
+      override def removeState(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
+        tzio {
+          run(
+            quote(
+              gamesState.filter(_.gameId == lift(gameId)).delete
+            )
+          )
+        }.unit
 
       private val decks = quote {
         querySchema[DeckEntity]("decks")

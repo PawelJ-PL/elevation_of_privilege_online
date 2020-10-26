@@ -29,6 +29,8 @@ object GamesRepository {
 
     def setStartTime(gameId: FUUID, time: Instant): ZIO[Connection, DbException, Unit]
 
+    def setFinishTime(gameId: FUUID, time: Instant): ZIO[Connection, DbException, Unit]
+
     def addPlayer(gameId: FUUID, player: Player): ZIO[Connection, DbException, Unit]
 
     def getParticipantInfo(gameId: FUUID, playerId: FUUID): ZIO[Connection, DbException, Option[Player]]
@@ -37,11 +39,15 @@ object GamesRepository {
 
     def getAcceptedParticipants(gameId: FUUID): ZIO[Connection, DbException, List[Player]]
 
+    def getPlayers(gameId: FUUID): ZIO[Connection, DbException, List[Player]]
+
     def removePlayer(gameId: FUUID, playerId: FUUID): ZIO[Connection, DbException, Boolean]
 
     def removePlayers(gameId: FUUID, playerIds: List[FUUID]): ZIO[Connection, DbException, Boolean]
 
     def assignRole(gameId: FUUID, playerId: FUUID, role: PlayerRole): ZIO[Connection, DbException, Boolean]
+
+    def increaseTricksTaken(gameId: FUUID, playerId: FUUID, increaseBy: Int = 1): ZIO[Connection, DbException, Unit]
 
   }
 
@@ -97,6 +103,20 @@ object GamesRepository {
                  }
         } yield ()
 
+      override def setFinishTime(gameId: FUUID, time: Instant): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
+        for {
+          now <- clock.instant
+          _   <- tzio {
+                   run(
+                     quote(
+                       games
+                         .filter(_.id == lift(gameId))
+                         .update(game => game.finishedAt -> lift(Option(time)), game => game.updatedAt -> lift(now))
+                     )
+                   )
+                 }
+        } yield ()
+
       override def addPlayer(gameId: FUUID, player: Player): ZIO[Connection, DbException, Unit] =
         tzio {
           for {
@@ -147,6 +167,18 @@ object GamesRepository {
           ).map(_.map(_.into[Player].withFieldRenamed(_.playerId, _.id).transform))
         }
 
+      override def getPlayers(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, List[Player]] =
+        tzio {
+          run(
+            quote(
+              gamePlayers
+                .filter(player => player.gameId == lift(gameId) && player.role.getOrNull == lift(PlayerRole.Player: PlayerRole))
+                .sortBy(_.playerOrder)(Ord.asc)
+            )
+          )
+
+        }.map(_.map(_.into[Player].withFieldRenamed(_.playerId, _.id).transform))
+
       override def removePlayer(gameId: FUUID, playerId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Boolean] =
         tzio {
           run {
@@ -180,6 +212,21 @@ object GamesRepository {
           ).map(_ =!= 0L)
         }
 
+      override def increaseTricksTaken(
+        gameId: FUUID,
+        playerId: FUUID,
+        increaseBy: Index
+      ): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
+        tzio {
+          run(
+            quote(
+              gamePlayers
+                .filter(p => p.gameId == lift(gameId) && p.playerId == lift(playerId))
+                .update(p => p.takenTricks -> (p.takenTricks + lift(increaseBy)))
+            )
+          )
+        }.unit
+
       private val games = quote {
         querySchema[GameEntity]("games")
       }
@@ -202,4 +249,10 @@ private final case class GameEntity(
   createdAt: Instant,
   updatedAt: Instant)
 
-private final case class GamePlayerEntity(gameId: FUUID, playerId: FUUID, nickname: String, role: Option[PlayerRole], playerOrder: Int)
+private final case class GamePlayerEntity(
+  gameId: FUUID,
+  playerId: FUUID,
+  nickname: String,
+  role: Option[PlayerRole],
+  playerOrder: Int,
+  takenTricks: Int = 0)

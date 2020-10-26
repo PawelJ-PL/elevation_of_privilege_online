@@ -115,13 +115,13 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
         val expectedGame = ExampleNotStartedGame.copy(id = FirstRandomFuuid)
         val expectedEvent = InternalMessage.GameCreated(expectedGame)
         assert(game)(equalTo(expectedGame)) &&
-        assert(updatedRep)(equalTo(GamesRepoState(Set(expectedGame), Map(FirstRandomFuuid -> Set(ExamplePlayer))))) &&
+        assert(updatedRep)(equalTo(GamesRepoState(Set(expectedGame), Map(FirstRandomFuuid -> List(ExamplePlayer))))) &&
         assert(updatedEvents)(equalTo(List(expectedEvent)))
       }
     )
 
   private val readGame = testM("Read game info with success") {
-    val initialRepoState = GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleNotStartedGame.id -> Set(ExamplePlayer)))
+    val initialRepoState = GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleNotStartedGame.id -> List(ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -137,7 +137,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   }
 
   private val readMissingGame = testM("Read game info with Game not found error") {
-    val initialRepoState = GamesRepoState(games = Set.empty, players = Map(ExampleNotStartedGame.id -> Set(ExamplePlayer)))
+    val initialRepoState = GamesRepoState(games = Set.empty, players = Map(ExampleNotStartedGame.id -> List(ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -172,7 +172,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
 
   private val readGameWhenNotAccepted = testM("Read game info with participant not accepted error") {
     val initialRepoState =
-      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleNotStartedGame.id -> Set(ExamplePlayer.copy(role = None))))
+      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleNotStartedGame.id -> List(ExamplePlayer.copy(role = None))))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -202,7 +202,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     } yield {
       val expectedPlayer = ExamplePlayer.copy(role = None)
       assert(result)(isUnit) &&
-      assert(updatedRep)(equalTo(initialRepoState.copy(players = Map(ExampleGameId -> Set(expectedPlayer))))) &&
+      assert(updatedRep)(equalTo(initialRepoState.copy(players = Map(ExampleGameId -> List(expectedPlayer))))) &&
       assert(updatedEvents)(equalTo(List(InternalMessage.ParticipantJoined(ExampleGameId, ExampleUserId, ExampleNickName))))
     }
   }
@@ -259,7 +259,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   }
 
   private val joinGameWhenAlreadyJoined = testM("Join game with participant already joined error") {
-    val initialRepoState = GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> Set(ExamplePlayer)))
+    val initialRepoState = GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> List(ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -278,7 +278,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   private val getParticipants = testM("Get participants with success") {
     val otherParticipant1 = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val otherParticipant2 = Player(ExampleId2, "Ben", None)
-    val initialRepoState = GamesRepoState(players = Map(ExampleGameId -> Set(otherParticipant1, otherParticipant2, ExamplePlayer)))
+    val initialRepoState = GamesRepoState(players = Map(ExampleGameId -> List(otherParticipant1, otherParticipant2, ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -292,7 +292,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   private val getParticipantsWhenNotAMember = testM("Get participants with participant is not a member error") {
     val otherParticipant1 = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val otherParticipant2 = Player(ExampleId2, "Ben", None)
-    val initialRepoState = GamesRepoState(players = Map(ExampleGameId -> Set(otherParticipant1, otherParticipant2)))
+    val initialRepoState = GamesRepoState(players = Map(ExampleGameId -> List(otherParticipant1, otherParticipant2)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -308,7 +308,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val otherParticipant1 = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val otherParticipant2 = Player(ExampleId2, "Ben", None)
     val initialRepoState =
-      GamesRepoState(players = Map(ExampleGameId -> Set(otherParticipant1, otherParticipant2, ExamplePlayer.copy(role = None))))
+      GamesRepoState(players = Map(ExampleGameId -> List(otherParticipant1, otherParticipant2, ExamplePlayer.copy(role = None))))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -323,7 +323,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   private val kickParticipant = testM("Kick participant with success") {
     val otherParticipant = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val initialRepoState =
-      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer)))
+      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -334,14 +334,14 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
       updatedRep        <- repoState.get
       updatedEvents     <- sentEvents.get
     } yield assert(result)(isUnit) &&
-      assert(updatedRep)(equalTo(initialRepoState.copy(players = Map(ExampleGameId -> Set(ExamplePlayer))))) &&
+      assert(updatedRep)(equalTo(initialRepoState.copy(players = Map(ExampleGameId -> List(ExamplePlayer))))) &&
       assert(updatedEvents)(equalTo(List(InternalMessage.ParticipantKicked(ExampleGameId, otherParticipant.id))))
   }
 
   private val kickParticipantWhenGameStarted = testM("Kick participant with game already started error") {
     val otherParticipant = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val initialRepoState =
-      GamesRepoState(games = Set(ExampleGame), players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer)))
+      GamesRepoState(games = Set(ExampleGame), players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -362,7 +362,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val initialRepoState =
       GamesRepoState(
         games = Set(ExampleNotStartedGame.copy(finishedAt = Some(Now))),
-        players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer))
+        players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer))
       )
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
@@ -384,7 +384,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val initialRepoState =
       GamesRepoState(
         games = Set(ExampleNotStartedGame.copy(creator = ExampleId2)),
-        players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer))
+        players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer))
       )
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
@@ -404,7 +404,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   private val kickParticipantSelf = testM("Kick participant with kick self forbidden") {
     val otherParticipant = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val initialRepoState =
-      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer)))
+      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -423,7 +423,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   private val assignRole = testM("Assign role with success") {
     val otherParticipant = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val initialRepoState =
-      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer)))
+      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -436,7 +436,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     } yield assert(result)(isUnit) &&
       assert(updatedRep)(
         equalTo(
-          initialRepoState.copy(players = Map(ExampleGameId -> Set(otherParticipant.copy(role = Some(PlayerRole.Player)), ExamplePlayer)))
+          initialRepoState.copy(players = Map(ExampleGameId -> List(otherParticipant.copy(role = Some(PlayerRole.Player)), ExamplePlayer)))
         )
       ) &&
       assert(updatedEvents)(equalTo(List(InternalMessage.RoleAssigned(ExampleGameId, otherParticipant.id, PlayerRole.Player))))
@@ -445,7 +445,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   private val assignRoleWhenGameStarted = testM("Assign role with game already started error") {
     val otherParticipant = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val initialRepoState =
-      GamesRepoState(games = Set(ExampleGame), players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer)))
+      GamesRepoState(games = Set(ExampleGame), players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -466,7 +466,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val initialRepoState =
       GamesRepoState(
         games = Set(ExampleNotStartedGame.copy(finishedAt = Some(Now))),
-        players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer))
+        players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer))
       )
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
@@ -486,7 +486,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
   private val assignRoleWhenGameNotFound = testM("Assign role with game not found error") {
     val otherParticipant = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val initialRepoState =
-      GamesRepoState(players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer)))
+      GamesRepoState(players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -507,7 +507,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val initialRepoState =
       GamesRepoState(
         games = Set(ExampleNotStartedGame.copy(creator = ExampleId2)),
-        players = Map(ExampleGameId -> Set(otherParticipant, ExamplePlayer))
+        players = Map(ExampleGameId -> List(otherParticipant, ExamplePlayer))
       )
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
@@ -528,7 +528,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player2 = Player(ExampleId1, "Adam", Some(PlayerRole.Player))
     val initialRepoState = GamesRepoState(
       games = Set(ExampleNotStartedGame),
-      players = Map(ExampleGameId -> Set(ExamplePlayer, player2))
+      players = Map(ExampleGameId -> List(ExamplePlayer, player2))
     )
     val initialGameplayRepoState = GameplayRepoState()
     val expectedPlayer1Cards =
@@ -564,11 +564,11 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player5 = Player(ExampleId4, "P4", None)
     val initialRepoState = GamesRepoState(
       games = Set(ExampleNotStartedGame),
-      players = Map(ExampleGameId -> Set(ExamplePlayer, player2, player3, player4, player5))
+      players = Map(ExampleGameId -> List(ExamplePlayer, player2, player3, player4, player5))
     )
     val expectedPlayers =
       Map(
-        ExampleGameId -> Set(
+        ExampleGameId -> List(
           ExamplePlayer,
           Player(ExampleId1, "P1", Some(PlayerRole.Player)),
           Player(ExampleId3, "P3", Some(PlayerRole.Observer))
@@ -605,7 +605,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player2 = Player(ExampleId1, "Adam", Some(PlayerRole.Player))
     val initialRepoState = GamesRepoState(
       games = Set.empty,
-      players = Map(ExampleGameId -> Set(ExamplePlayer, player2))
+      players = Map(ExampleGameId -> List(ExamplePlayer, player2))
     )
     val initialGameplayRepoState = GameplayRepoState()
 
@@ -630,7 +630,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player2 = Player(ExampleId1, "Adam", Some(PlayerRole.Player))
     val initialRepoState = GamesRepoState(
       games = Set(ExampleNotStartedGame),
-      players = Map(ExampleGameId -> Set(ExamplePlayer, player2))
+      players = Map(ExampleGameId -> List(ExamplePlayer, player2))
     )
     val initialGameplayRepoState = GameplayRepoState()
 
@@ -655,7 +655,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player2 = Player(ExampleId1, "Adam", Some(PlayerRole.Player))
     val initialRepoState = GamesRepoState(
       games = Set(ExampleGame),
-      players = Map(ExampleGameId -> Set(ExamplePlayer, player2))
+      players = Map(ExampleGameId -> List(ExamplePlayer, player2))
     )
     val initialGameplayRepoState = GameplayRepoState()
 
@@ -680,7 +680,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player2 = Player(ExampleId1, "Adam", Some(PlayerRole.Player))
     val initialRepoState = GamesRepoState(
       games = Set(ExampleNotStartedGame.copy(finishedAt = Some(Now))),
-      players = Map(ExampleGameId -> Set(ExamplePlayer, player2))
+      players = Map(ExampleGameId -> List(ExamplePlayer, player2))
     )
     val initialGameplayRepoState = GameplayRepoState()
 
@@ -705,7 +705,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player2 = Player(ExampleId1, "Adam", Some(PlayerRole.Observer))
     val initialRepoState = GamesRepoState(
       games = Set(ExampleNotStartedGame),
-      players = Map(ExampleGameId -> Set(ExamplePlayer, player2))
+      players = Map(ExampleGameId -> List(ExamplePlayer, player2))
     )
     val initialGameplayRepoState = GameplayRepoState()
 
@@ -740,7 +740,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val initialRepoState = GamesRepoState(
       games = Set(ExampleNotStartedGame),
       players =
-        Map(ExampleGameId -> Set(ExamplePlayer, player2, player3, player4, player5, player6, player7, player8, player9, player10, player11))
+        Map(ExampleGameId -> List(ExamplePlayer, player2, player3, player4, player5, player6, player7, player8, player9, player10, player11))
     )
     val initialGameplayRepoState = GameplayRepoState()
 

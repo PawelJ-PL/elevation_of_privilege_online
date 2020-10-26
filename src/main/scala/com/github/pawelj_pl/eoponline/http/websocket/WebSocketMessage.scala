@@ -4,7 +4,12 @@ import com.github.pawelj_pl.eoponline.eventbus.InternalMessage.{
   ParticipantJoined,
   ParticipantKicked,
   RoleAssigned,
-  GameStarted => GameStartedInternalMessage
+  ThreatLinkedStatusChanged,
+  GameStarted => GameStartedInternalMessage,
+  NextPlayer => NextPlayerInternalMessage,
+  NextRound => NextRoundInternalMessage,
+  GameFinished => GameFinishedInternalMessage,
+  CardPlayed => CardPlayedInternalMessage
 }
 import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import io.circe.syntax._
@@ -59,12 +64,52 @@ object WebSocketMessage {
 
   }
 
+  final case class ThreatStatusAssigned(recipient: MessageRecipient, payload: ThreatLinkedStatusChanged)
+      extends WebSocketMessage[ThreatLinkedStatusChanged] {
+
+    override def eventType: String = "ThreatStatusAssigned"
+
+  }
+
+  final case class NextPlayer(recipient: MessageRecipient, payload: NextPlayerInternalMessage)
+      extends WebSocketMessage[NextPlayerInternalMessage] {
+
+    override def eventType: String = "NextPlayer"
+
+  }
+
+  final case class NextRound(recipient: MessageRecipient, payload: NextRoundInternalMessage)
+      extends WebSocketMessage[NextRoundInternalMessage] {
+
+    override def eventType: String = "NextRound"
+
+  }
+
+  final case class GameFinished(recipient: MessageRecipient, payload: GameFinishedInternalMessage)
+      extends WebSocketMessage[GameFinishedInternalMessage] {
+
+    override def eventType: String = "GameFinished"
+
+  }
+
+  final case class CardPlayed(recipient: MessageRecipient, payload: CardPlayedInternalMessage)
+      extends WebSocketMessage[CardPlayedInternalMessage] {
+
+    override def eventType: String = "CardPlayed"
+
+  }
+
   implicit val encoder: Encoder[WebSocketMessage[_]] = Encoder.instance {
-    case TopicStarted          => encodeMessage(TopicStarted)
-    case m: NewParticipant     => encodeMessage(m)
-    case m: ParticipantRemoved => encodeMessage(m)
-    case m: UserRoleChanged    => encodeMessage(m)
-    case m: GameStarted        => encodeMessage(m)
+    case TopicStarted            => encodeMessage(TopicStarted)
+    case m: NewParticipant       => encodeMessage(m)
+    case m: ParticipantRemoved   => encodeMessage(m)
+    case m: UserRoleChanged      => encodeMessage(m)
+    case m: GameStarted          => encodeMessage(m)
+    case m: ThreatStatusAssigned => encodeMessage(m)
+    case m: NextPlayer           => encodeMessage(m)
+    case m: NextRound            => encodeMessage(m)
+    case m: GameFinished         => encodeMessage(m)
+    case m: CardPlayed           => encodeMessage(m)
   }
 
   private def encodeMessage[A: Encoder](message: WebSocketMessage[A]): Json =
@@ -94,6 +139,12 @@ object WebSocketMessage {
       case "ParticipantRemoved"    => Decoder[ParticipantKicked].decodeJson(payload).map(p => ParticipantRemoved(messageRecipient, p))
       case "UserRoleChanged"       => Decoder[RoleAssigned].decodeJson(payload).map(p => UserRoleChanged(messageRecipient, p))
       case "GameStarted"           => Decoder[GameStartedInternalMessage].decodeJson(payload).map(p => GameStarted(messageRecipient, p))
+      case "ThreatStatusAssigned"  =>
+        Decoder[ThreatLinkedStatusChanged].decodeJson(payload).map(p => ThreatStatusAssigned(messageRecipient, p))
+      case "NextPlayer"            => Decoder[NextPlayerInternalMessage].decodeJson(payload).map(p => NextPlayer(messageRecipient, p))
+      case "NextRound"             => Decoder[NextRoundInternalMessage].decodeJson(payload).map(p => NextRound(messageRecipient, p))
+      case "GameFinished"          => Decoder[GameFinishedInternalMessage].decodeJson(payload).map(p => GameFinished(messageRecipient, p))
+      case "CardPlayed"            => Decoder[CardPlayedInternalMessage].decodeJson(payload).map(p => CardPlayed(messageRecipient, p))
       case event                   => Left(DecodingFailure(s"Unknown event $event", List.empty))
     }
 

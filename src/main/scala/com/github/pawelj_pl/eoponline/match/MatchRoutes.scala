@@ -1,11 +1,13 @@
 package com.github.pawelj_pl.eoponline.`match`
 
-import com.github.pawelj_pl.eoponline.`match`.HttpErrorMapping.mapMatchError
+import com.github.pawelj_pl.eoponline.`match`.HttpErrorMapping.{mapMatchInfoErrors, mapPutCardError, mapUpdateTableErrors}
 import com.github.pawelj_pl.eoponline.`match`.Matches.Matches
+import com.github.pawelj_pl.eoponline.`match`.dto.TableCardReqDto
 import com.github.pawelj_pl.eoponline.session.Authentication.Authentication
 import com.github.pawelj_pl.eoponline.session.{Authentication, Session}
 import io.chrisdavenport.fuuid.http4s.FUUIDVar
 import org.http4s.{AuthedRoutes, HttpRoutes, Response, Status}
+import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.circe.CirceEntityEncoder._
 import org.http4s.dsl.Http4sDsl
 import zio.interop.catz._
@@ -30,11 +32,28 @@ object MatchRoutes {
         override def routes: UIO[HttpRoutes[Task]] =
           authMiddleware.middleware.map { middleware =>
             val authedRoutes = AuthedRoutes.of[Session, Task] {
-              case GET -> Root / FUUIDVar(gameId) as session =>
+              case GET -> Root / FUUIDVar(gameId) as session                                                      =>
                 matches
                   .getCurrentStateForPlayer(gameId, session.userId)
                   .map(Response[Task](status = Status.Ok).withEntity(_))
-                  .catchAll(error => logger.warn(error.asLogMessage) *> mapMatchError(error))
+                  .catchAll(error => logger.warn(error.asLogMessage) *> mapMatchInfoErrors(error))
+                  .resurrect
+              case authReq @ PATCH -> Root / FUUIDVar(gameId) / "table" / "cards" / IntVar(cardNumber) as session =>
+                authReq
+                  .req
+                  .as[TableCardReqDto]
+                  .flatMap(dto =>
+                    matches
+                      .updateCardOnTableAs(gameId, session.userId, cardNumber, dto)
+                      .map(_ => Response[Task](status = Status.NoContent))
+                      .catchAll(error => logger.warn(error.asLogMessage) *> mapUpdateTableErrors(error))
+                      .resurrect
+                  )
+              case PUT -> Root / FUUIDVar(gameId) / "table" / "cards" / IntVar(cardNumber) as session             =>
+                matches
+                  .putCardOnTheTableAs(gameId, session.userId, cardNumber)
+                  .map(_ => Response[Task](status = Status.NoContent))
+                  .catchAll(error => logger.warn(error.asLogMessage) *> mapPutCardError(error))
                   .resurrect
             }
             middleware(authedRoutes)

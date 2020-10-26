@@ -1,7 +1,6 @@
 package com.github.paweljpl.eoponline.testdoubles
 
-import java.time.temporal.{Temporal, TemporalAccessor, TemporalField, TemporalUnit}
-import java.time.{DateTimeException, Instant, OffsetDateTime}
+import java.time.{DateTimeException, OffsetDateTime}
 import java.util.concurrent.TimeUnit
 
 import com.github.paweljpl.eoponline.Constants

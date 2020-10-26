@@ -54,6 +54,16 @@ object WebSocketHandler {
               allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.UserRoleChanged(recipients, m)))
             case m @ InternalMessage.GameStarted(gameId: FUUID)               =>
               allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.GameStarted(recipients, m)))
+            case m @ InternalMessage.ThreatLinkedStatusChanged(gameId, _, _)  =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.ThreatStatusAssigned(recipients, m)))
+            case m @ InternalMessage.NextPlayer(gameId, _)                    =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.NextPlayer(recipients, m)))
+            case m @ InternalMessage.NextRound(gameId, _)                     =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.NextRound(recipients, m)))
+            case m @ InternalMessage.GameFinished(gameId)                     =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.GameFinished(recipients, m)))
+            case m @ InternalMessage.CardPlayed(gameId, _, _)                 =>
+              allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.CardPlayed(recipients, m)))
             case m                                                            => logger.trace(s"Message $m ignored")
           }
         }.resurrect.catchAll(error => logger.throwable("Unable to process message", error))
