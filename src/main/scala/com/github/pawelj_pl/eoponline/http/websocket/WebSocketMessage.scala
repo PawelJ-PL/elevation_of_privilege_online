@@ -1,15 +1,16 @@
 package com.github.pawelj_pl.eoponline.http.websocket
 
+import com.github.pawelj_pl.eoponline.`match`.dto.ExtendedDeckElementDto
 import com.github.pawelj_pl.eoponline.eventbus.InternalMessage.{
   ParticipantJoined,
   ParticipantKicked,
   RoleAssigned,
   ThreatLinkedStatusChanged,
+  GameFinished => GameFinishedInternalMessage,
   GameStarted => GameStartedInternalMessage,
   NextPlayer => NextPlayerInternalMessage,
   NextRound => NextRoundInternalMessage,
-  GameFinished => GameFinishedInternalMessage,
-  CardPlayed => CardPlayedInternalMessage
+  PlayerTakesTrick => PlayerTakesTrickInternalMessage
 }
 import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import io.circe.syntax._
@@ -92,10 +93,17 @@ object WebSocketMessage {
 
   }
 
-  final case class CardPlayed(recipient: MessageRecipient, payload: CardPlayedInternalMessage)
-      extends WebSocketMessage[CardPlayedInternalMessage] {
+  final case class CardPlayed(recipient: MessageRecipient, payload: ExtendedDeckElementDto)
+      extends WebSocketMessage[ExtendedDeckElementDto] {
 
     override def eventType: String = "CardPlayed"
+
+  }
+
+  final case class PlayerTakesTrick(recipient: MessageRecipient, payload: PlayerTakesTrickInternalMessage)
+      extends WebSocketMessage[PlayerTakesTrickInternalMessage] {
+
+    override def eventType: String = "PlayerTakesTrick"
 
   }
 
@@ -110,6 +118,7 @@ object WebSocketMessage {
     case m: NextRound            => encodeMessage(m)
     case m: GameFinished         => encodeMessage(m)
     case m: CardPlayed           => encodeMessage(m)
+    case m: PlayerTakesTrick     => encodeMessage(m)
   }
 
   private def encodeMessage[A: Encoder](message: WebSocketMessage[A]): Json =
@@ -144,7 +153,9 @@ object WebSocketMessage {
       case "NextPlayer"            => Decoder[NextPlayerInternalMessage].decodeJson(payload).map(p => NextPlayer(messageRecipient, p))
       case "NextRound"             => Decoder[NextRoundInternalMessage].decodeJson(payload).map(p => NextRound(messageRecipient, p))
       case "GameFinished"          => Decoder[GameFinishedInternalMessage].decodeJson(payload).map(p => GameFinished(messageRecipient, p))
-      case "CardPlayed"            => Decoder[CardPlayedInternalMessage].decodeJson(payload).map(p => CardPlayed(messageRecipient, p))
+      case "CardPlayed"            => Decoder[ExtendedDeckElementDto].decodeJson(payload).map(p => CardPlayed(messageRecipient, p))
+      case "PlayerTakesTrick"      =>
+        Decoder[PlayerTakesTrickInternalMessage].decodeJson(payload).map(p => PlayerTakesTrick(messageRecipient, p))
       case event                   => Left(DecodingFailure(s"Unknown event $event", List.empty))
     }
 

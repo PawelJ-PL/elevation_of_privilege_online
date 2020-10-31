@@ -11,6 +11,7 @@ import MatchContainer from "../../match/components/MatchContainer"
 import { fetchGameInfoAction, resetGameInfoStatusAction } from "../store/Actions"
 import { startAnteroomWsConnectionAction, stopAnteroomWsConnectionAction } from "../store/websocket/Actions"
 import { UserIsNotGameMember, UserNotAccepted, UserRemoved } from "../types/Errors"
+import AfterGameSummary from "./AfterGameSummary"
 import AnteroomContainer from "./anteroom/AnteroomContainer"
 import JoinGameModal from "./JoinGameModal"
 
@@ -78,7 +79,9 @@ const SingleGamePage: React.FC<Props> = ({
         return <JoinGameModal gameId={gameId} isOpen={true} onClose={() => void 0} />
     } else if (gameInfo.error) {
         return <AlertBox status="error" title="Unable to load game data" description={gameInfo.error?.message} />
-    } else if (gameInfo.data && gameInfo.data.startedAt) {
+    } else if (gameInfo.data?.finishedAt) {
+        return <AfterGameSummary game={gameInfo.data} />
+    } else if (gameInfo.data?.startedAt && !gameInfo.data?.finishedAt) {
         return <MatchContainer game={gameInfo.data} />
     } else if (gameInfo.data && !gameInfo.data.startedAt) {
         return <AnteroomContainer game={gameInfo.data} />

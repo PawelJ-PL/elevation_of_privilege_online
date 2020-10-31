@@ -32,6 +32,8 @@ object InternalMessage {
 
   final case class CardPlayed(gameId: FUUID, player: FUUID, cardNumber: Int) extends InternalMessage
 
+  final case class PlayerTakesTrick(gameId: FUUID, player: Option[FUUID]) extends InternalMessage
+
   object ParticipantJoined {
 
     implicit val codec: Codec[ParticipantJoined] = deriveCodec
@@ -81,7 +83,13 @@ object InternalMessage {
   }
 
   object CardPlayed {
+
     implicit val codec: Codec[CardPlayed] = deriveCodec
+
+  }
+
+  object PlayerTakesTrick {
+    implicit val codec: Codec[PlayerTakesTrick] = deriveCodec
   }
 
 }

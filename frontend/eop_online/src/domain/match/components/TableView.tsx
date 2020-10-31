@@ -12,11 +12,12 @@ import { HiThumbUp } from "react-icons/hi"
 import UnknownCard from "../../../resources/unknown-card.png"
 
 type Props = {
+    matchId: string
     cards: UsersCard[]
     players: Member[]
 }
 
-const TableView: React.FC<Props> = ({ cards, players }) => {
+const TableView: React.FC<Props> = ({ cards, players, matchId }) => {
     const [zoomedCard, setZoomedCard] = useState<Card | null>(null)
 
     const cardWidths = ["4rem", "6rem", "8rem", "8rem"]
@@ -57,7 +58,12 @@ const TableView: React.FC<Props> = ({ cards, players }) => {
 
     return (
         <ContentBox containerProps={{ marginBottom: 0 }}>
-            <CardZoomModal visible={zoomedCard !== null} onClose={() => setZoomedCard(null)} card={zoomedCard} />
+            <CardZoomModal
+                visible={zoomedCard !== null}
+                onClose={() => setZoomedCard(null)}
+                matchId={matchId}
+                card={zoomedCard}
+            />
             <Heading as="h4" size="md">
                 Table
             </Heading>

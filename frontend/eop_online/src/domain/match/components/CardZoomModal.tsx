@@ -18,25 +18,64 @@ import {
     TabPanels,
     Tabs,
 } from "@chakra-ui/core"
-import React from "react"
+import React, { useEffect } from "react"
 import { HiThumbDown, HiThumbUp } from "react-icons/hi"
 import { loadCardImage } from "../../../application/utils/ResourceLoader"
 import { Card } from "../types/Card"
 import UnknownCard from "../../../resources/unknown-card.png"
+import { AppState } from "../../../application/store"
+import { Dispatch } from "redux"
+import {
+    putCardOnTableAction,
+    resetPutCardOnTableStatusAction,
+    resetUpdateCardOnTablesStatusAction,
+    updateCardOnTableAction,
+} from "../store/Actions"
+import { connect } from "react-redux"
+import { OperationStatus } from "../../../application/store/async/AsyncOperationResult"
+import AlertBox from "../../../application/components/common/AlertBox"
 
 type Props = {
     visible: boolean
     onClose: () => void
+    matchId: string
     card: Card | null
     closable?: boolean
     canPlayCard?: boolean
     canLink?: boolean
-}
+} & ReturnType<typeof mapDispatchToProps> &
+    ReturnType<typeof mapStateToProps>
 
-const CardZoomModal: React.FC<Props> = ({ visible, onClose, card, closable, canPlayCard, canLink }) => {
+const CardZoomModal: React.FC<Props> = ({
+    visible,
+    onClose,
+    matchId,
+    card,
+    closable,
+    canPlayCard,
+    canLink,
+    setThreatLinkedStatus,
+    updateCardStatus,
+    resetLinkedStatus,
+    playCard,
+    resetPlayStatus,
+    playCardStatus,
+}) => {
+    useEffect(() => {
+        if (updateCardStatus.status === OperationStatus.FINISHED) {
+            resetLinkedStatus()
+            onClose()
+        }
+    }, [updateCardStatus, resetLinkedStatus, onClose])
+
     const playFooter = (card: Card) => (
         <Box width="100%">
-            <Button width="100%" colorScheme="teal">
+            <Button
+                width="100%"
+                colorScheme="teal"
+                onClick={() => playCard(matchId, card.cardNumber)}
+                isLoading={playCardStatus.status === OperationStatus.PENDING}
+            >
                 Play this card
             </Button>
         </Box>
@@ -54,6 +93,8 @@ const CardZoomModal: React.FC<Props> = ({ visible, onClose, card, closable, canP
                     fontSize="1em"
                     colorScheme="red"
                     aria-label="Not linked"
+                    onClick={() => setThreatLinkedStatus(matchId, card.cardNumber, false)}
+                    isLoading={updateCardStatus.status === OperationStatus.PENDING}
                 />
             </Box>
             <Box>
@@ -63,6 +104,8 @@ const CardZoomModal: React.FC<Props> = ({ visible, onClose, card, closable, canP
                     fontSize="1em"
                     colorScheme="green"
                     aria-label="Linked"
+                    onClick={() => setThreatLinkedStatus(matchId, card.cardNumber, true)}
+                    isLoading={updateCardStatus.status === OperationStatus.PENDING}
                 />
             </Box>
         </Flex>
@@ -96,6 +139,26 @@ const CardZoomModal: React.FC<Props> = ({ visible, onClose, card, closable, canP
                                     </TabPanels>
                                 </Tabs>
                             </Center>
+                            {updateCardStatus.status === OperationStatus.FAILED && (
+                                <AlertBox
+                                    title="Unable to change linked status"
+                                    description={updateCardStatus.error?.message}
+                                    status="error"
+                                    onClose={resetLinkedStatus}
+                                    variant="solid"
+                                    containerProps={{ marginTop: "0.5em" }}
+                                />
+                            )}
+                            {playCardStatus.status === OperationStatus.FAILED && (
+                                <AlertBox
+                                    title="Unable to play the card"
+                                    description={playCardStatus.error?.message}
+                                    status="error"
+                                    onClose={resetPlayStatus}
+                                    variant="solid"
+                                    containerProps={{ marginTop: "0.5em" }}
+                                />
+                            )}
                         </ModalBody>
                         <ModalFooter>
                             {canPlayCard && playFooter(card)}
@@ -108,4 +171,17 @@ const CardZoomModal: React.FC<Props> = ({ visible, onClose, card, closable, canP
     )
 }
 
-export default CardZoomModal
+const mapStateToProps = (state: AppState) => ({
+    updateCardStatus: state.matches.updateCardOnTable,
+    playCardStatus: state.matches.putCardOnTable,
+})
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    setThreatLinkedStatus: (matchId: string, cardNumber: number, threatLinked: boolean) =>
+        dispatch(updateCardOnTableAction.started({ matchId, cardNumber, data: { threatLinked } })),
+    resetLinkedStatus: () => dispatch(resetUpdateCardOnTablesStatusAction()),
+    playCard: (matchId: string, cardNumber: number) => dispatch(putCardOnTableAction.started({ matchId, cardNumber })),
+    resetPlayStatus: () => dispatch(resetPutCardOnTableStatusAction()),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(CardZoomModal)

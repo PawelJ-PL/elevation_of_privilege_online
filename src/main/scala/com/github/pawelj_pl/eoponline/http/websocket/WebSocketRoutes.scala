@@ -93,6 +93,7 @@ object WebSocketRoutes {
             case m: WebSocketMessage.NextRound            => m.toFrame
             case m: WebSocketMessage.GameFinished         => m.toFrame
             case m: WebSocketMessage.CardPlayed           => m.toFrame
+            case m: WebSocketMessage.PlayerTakesTrick     => m.toFrame
           }
       }
     }

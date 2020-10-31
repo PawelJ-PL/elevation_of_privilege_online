@@ -1,13 +1,38 @@
 package com.github.paweljpl.eoponline.matches
 
 import io.github.gaelrenoux.tranzactio.doobie.{Database => DoobieDb}
-import com.github.pawelj_pl.eoponline.`match`.{Card, CardLocation, CardNotFound, CardOwnedByAnotherUser, GameNotFound, GameState, Matches, NotGameMember, NotPlayer, OtherPlayersTurn, PlayerAlreadyPlayedCard, Suit, SuitDoesNotMatch, ThreatStatusAlreadyAssigned, UnexpectedCardLocation, Value}
+import com.github.pawelj_pl.eoponline.`match`.{
+  Card,
+  CardLocation,
+  CardNotFound,
+  CardOwnedByAnotherUser,
+  GameNotFound,
+  GameState,
+  Matches,
+  NotGameMember,
+  NotPlayer,
+  OtherPlayersTurn,
+  PlayerAlreadyPlayedCard,
+  Suit,
+  SuitDoesNotMatch,
+  ThreatStatusAlreadyAssigned,
+  UnexpectedCardLocation,
+  Value
+}
 import com.github.pawelj_pl.eoponline.`match`.Matches.Matches
 import com.github.pawelj_pl.eoponline.`match`.dto.{ExtendedDeckElementDto, TableCardReqDto}
 import com.github.pawelj_pl.eoponline.eventbus.InternalMessage
 import com.github.pawelj_pl.eoponline.game.PlayerRole
 import com.github.paweljpl.eoponline.Constants
-import com.github.paweljpl.eoponline.testdoubles.{CardsRepoStub, FakeClock, FakeConnectionSource, FakeGameRepo, FakeGameplayRepo, FakeInternalMessagesTopic, RandomMock}
+import com.github.paweljpl.eoponline.testdoubles.{
+  CardsRepoStub,
+  FakeClock,
+  FakeConnectionSource,
+  FakeGameRepo,
+  FakeGameplayRepo,
+  FakeInternalMessagesTopic,
+  RandomMock
+}
 import com.github.paweljpl.eoponline.testdoubles.FakeGameRepo.GamesRepoState
 import com.github.paweljpl.eoponline.testdoubles.FakeGameplayRepo.{DeckEntry, GameplayRepoState}
 import zio.{Ref, ZIO, ZLayer}
@@ -189,7 +214,11 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
       assert(updatedGameplayRepoState.decks)(hasSameElements(Set(Card1.copy(threatLinked = Some(true)), card2, card3))) &&
       assert(events)(
         equalTo(
-          List(InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true), InternalMessage.GameFinished(ExampleGameId))
+          List(
+            InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true),
+            InternalMessage.PlayerTakesTrick(ExampleGameId, Some(ExamplePlayer.id)),
+            InternalMessage.GameFinished(ExampleGameId)
+          )
         )
       ) &&
       assert(updatedGamesRepoState.tricksByPlayer)(hasSameElements(Set(FakeGameRepo.PlayerTricks(ExamplePlayer.id, ExampleGameId, 1)))) &&
@@ -277,6 +306,7 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
         equalTo(
           List(
             InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true),
+            InternalMessage.PlayerTakesTrick(ExampleGameId, Some(ExampleId2)),
             InternalMessage.NextRound(ExampleGameId, ExampleId2)
           )
         )

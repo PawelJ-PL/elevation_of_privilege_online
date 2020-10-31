@@ -43,17 +43,18 @@ const HandView: React.FC<Props> = ({ round, currentUser }) => {
     const availableSuits: string[] = Object.keys(cardsBySuit)
         .filter((s) => s in cardsBySuit)
         .sort()
-    const canPlay = (suit: string) =>
-        currentUser.userId === round.state.currentPlayer &&
-        (round.state.leadingSuit === suit ||
-            !round.state.leadingSuit ||
-            !availableSuits.includes(round.state.leadingSuit))
+    const canPlay = (suit: string) => currentUser.userId === round.state.currentPlayer && suitCanBeUsed(suit)
+
+    const suitCanBeUsed = (suit: string) =>
+        round.state.leadingSuit === suit ||
+        !round.state.leadingSuit ||
+        !availableSuits.includes(round.state.leadingSuit)
 
     const useTabMenu: boolean = useBreakpointValue({ base: false, md: true }) ?? true
 
     const suitHeader = (suit: string) => {
         return (
-            <Box>
+            <Box opacity={suitCanBeUsed(suit) ? "1" : "0.3"}>
                 <Text>{capitalize(startCase(suit))}</Text>
             </Box>
         )
@@ -115,6 +116,7 @@ const HandView: React.FC<Props> = ({ round, currentUser }) => {
             <CardZoomModal
                 visible={zoomedCard !== null}
                 onClose={() => setZoomedCard(null)}
+                matchId={round.state.gameId}
                 card={zoomedCard}
                 canPlayCard={zoomedCard ? canPlay(zoomedCard.suit) : false}
             />

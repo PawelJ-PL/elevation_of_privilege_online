@@ -24,7 +24,7 @@ private[`match`] object HttpErrorMapping {
       case _: OtherPlayersTurn            =>
         ZIO.succeed(Response[Task](status = Status.Forbidden).withEntity(ResponseData("Not your turn", Some("OtherPlayersTurn"))))
       case _: CardNotFound                =>
-        ZIO.succeed(Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Card not found", Some("CarNotFound"))))
+        ZIO.succeed(Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Card not found", Some("CardNotFound"))))
       case _: CardOwnedByAnotherUser      =>
         ZIO.succeed(
           Response[Task](status = Status.Forbidden).withEntity(ResponseData("You don't have such card", Some("OtherPlayersCard")))
@@ -62,7 +62,7 @@ private[`match`] object HttpErrorMapping {
         )
       case PlayerAlreadyPlayedCard(_, _, _, _) =>
         ZIO.succeed(
-          Response[Task](status = Status.NotFound).withEntity(ResponseData("Player already played card", Some("PlayerAlreadyPlayedCard")))
+          Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Player already played card", Some("PlayerAlreadyPlayedCard")))
         )
       case NotGameMember(_, _)                 =>
         ZIO.succeed(Response[Task](status = Status.NotFound).withEntity(ResponseData("Match not found")))

@@ -41,7 +41,7 @@ const MatchView: React.FC<Props> = ({ game, round, members, user }) => {
                 order={[3, 3, 3, 2]}
             >
                 <Box flexGrow={[0, 0, 0, 5]}>
-                    <TableView cards={round.table} players={players} />
+                    <TableView cards={round.table} players={players} matchId={game.id} />
                 </Box>
                 <Box flexGrow={[0, 0, 0, 1]}>
                     <PlayersList players={players} roundState={round.state} currentUser={user} />
@@ -54,6 +54,7 @@ const MatchView: React.FC<Props> = ({ game, round, members, user }) => {
                         <CardZoomModal
                             visible={true}
                             onClose={() => setZoomedCard(null)}
+                            matchId={round.state.gameId}
                             card={zoomedCard}
                             closable={false}
                             canLink={true}
