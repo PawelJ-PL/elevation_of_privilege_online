@@ -42,9 +42,9 @@ export default {
                 if (err.response?.status === 404) {
                     return null
                 } else if (err.response?.status === 403 && err.response?.data?.reason === "NotAMember") {
-                    return Promise.reject(new UserIsNotGameMember(err.response?.message ?? "User is not game member"))
+                    return Promise.reject(new UserIsNotGameMember(err.response?.data?.message ?? "User is not game member"))
                 } else if (err.response?.status === 403 && err.response?.data?.reason === "NotAccepted") {
-                    return Promise.reject(new UserNotAccepted(err.response?.message ?? "User not accepted"))
+                    return Promise.reject(new UserNotAccepted(err.response?.data?.message ?? "User not accepted"))
                 } else {
                     return Promise.reject(err)
                 }

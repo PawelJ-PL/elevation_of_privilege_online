@@ -1,3 +1,4 @@
+import { useToast, UseToastOptions } from "@chakra-ui/core"
 import React, { useEffect } from "react"
 import { connect } from "react-redux"
 import { Dispatch } from "redux"
@@ -9,6 +10,7 @@ import { fetchMembersAction } from "../../game/store/Actions"
 import { Game } from "../../game/types/Game"
 import { fetchMeInfoAction } from "../../user/store/Actions"
 import { fetchMatchStateAction, resetMatchStateAction } from "../store/Actions"
+import { startMatchWsConnectionAction, stopMatchWsConnectionAction } from "../store/websocket/Actions"
 import MatchView from "./MatchView"
 
 type Props = {
@@ -25,7 +27,12 @@ const MatchContainer: React.FC<Props> = ({
     session,
     members,
     fetchGameMembers,
+    connectMatchWebSocket,
+    disconnectMatchWebSocket,
+    playerTakesTrick,
 }) => {
+    const toast = useToast()
+
     useEffect(() => {
         if (
             matchState.params !== game.id ||
@@ -53,6 +60,27 @@ const MatchContainer: React.FC<Props> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    useEffect(() => {
+        connectMatchWebSocket(game.id)
+        return () => {
+            disconnectMatchWebSocket(game.id)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    useEffect(() => {
+        const toastOptions: UseToastOptions = { isClosable: true, duration: 7000, position: "top" }
+        if (playerTakesTrick && playerTakesTrick.player) {
+            const winnerName = members.data?.find((p) => p.id === playerTakesTrick.player)?.nickname
+            if (winnerName) {
+                toast({ title: `${winnerName} takes a trick`, ...toastOptions })
+            }
+        } else if (playerTakesTrick && !playerTakesTrick.player) {
+            toast({ title: "Nobody managed to take a trick", ...toastOptions })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [playerTakesTrick])
+
     if (matchState.error) {
         return <AlertBox title="Unable to read match status" description={matchState.error.message} status="error" />
     } else if (session.error) {
@@ -70,6 +98,7 @@ const mapStateToProps = (state: AppState) => ({
     matchState: state.matches.matchState,
     session: state.users.current,
     members: state.games.members,
+    playerTakesTrick: state.matches.playerTakesTrick,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
@@ -77,6 +106,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     resetMatchState: () => dispatch(resetMatchStateAction()),
     fetchCurrentUser: () => dispatch(fetchMeInfoAction.started()),
     fetchGameMembers: (gameId: string) => dispatch(fetchMembersAction.started(gameId)),
+    connectMatchWebSocket: (gameId: string) => dispatch(startMatchWsConnectionAction(gameId)),
+    disconnectMatchWebSocket: (gameId: string) => dispatch(stopMatchWsConnectionAction(gameId)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MatchContainer)

@@ -162,6 +162,7 @@ object Matches {
                             case Some(playerId) => gamesRepo.increaseTricksTaken(gameState.gameId, playerId).orDie
                             case None           => ZIO.unit
                           }
+            _          <- topic.publish1(InternalMessage.PlayerTakesTrick(gameState.gameId, maybeWinner)).orDie
             initPlayer <- findNewRoundInitPlayer(cards, winners)
             _          <- initPlayer match {
                             case Some(value) => prepareNextTurn(value, gameState, cards)
