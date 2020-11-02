@@ -6,4 +6,5 @@ export type Round = {
     state: RoundState
     hand: Card[]
     table: UsersCard[]
+    playersScores: Record<string, number>
 }

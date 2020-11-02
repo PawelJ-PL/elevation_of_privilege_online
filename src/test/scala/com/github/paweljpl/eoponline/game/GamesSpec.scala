@@ -70,6 +70,8 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
       readMissingGame,
       readGameWhenNotMember,
       readGameWhenNotAccepted,
+      readAlreadyStartedGameWhenNotAccepted,
+      readAlreadyStartedGameWhenAccepted,
       joinGame,
       joinGameWhenGameNotFound,
       joinGameWhenAlreadyStarted,
@@ -121,7 +123,8 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     )
 
   private val readGame = testM("Read game info with success") {
-    val initialRepoState = GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleNotStartedGame.id -> List(ExamplePlayer)))
+    val initialRepoState =
+      GamesRepoState(games = Set(ExampleNotStartedGame), players = Map(ExampleNotStartedGame.id -> List(ExamplePlayer)))
     for {
       repoState         <- Ref.make[GamesRepoState](initialRepoState)
       gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
@@ -184,6 +187,41 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
       updatedRep        <- repoState.get
       updatedEvents     <- sentEvents.get
     } yield assert(result)(isLeft(equalTo(ParticipantNotAccepted(ExampleGameId, ExamplePlayer.copy(role = None))))) &&
+      assert(updatedRep)(equalTo(initialRepoState)) &&
+      assert(updatedEvents)(isEmpty)
+  }
+
+  private val readAlreadyStartedGameWhenNotAccepted = testM("Read game info with success") {
+    val initialRepoState =
+      GamesRepoState(games = Set(ExampleGame), players = Map(ExampleGame.id -> List(ExamplePlayer)))
+    for {
+      repoState         <- Ref.make[GamesRepoState](initialRepoState)
+      gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
+      sentEvents        <- Ref.make[List[InternalMessage]](List.empty)
+      result            <- ZIO
+                             .accessM[Games](_.get.getInfoAs(ExampleGameId, ExampleId2))
+                             .provideCustomLayer(createLayer(repoState, sentEvents, gameplayRepoState))
+                             .either
+      updatedRep        <- repoState.get
+      updatedEvents     <- sentEvents.get
+    } yield assert(result)(isLeft(equalTo(GameAlreadyStarted(ExampleGame.id)))) &&
+      assert(updatedRep)(equalTo(initialRepoState)) &&
+      assert(updatedEvents)(isEmpty)
+  }
+
+  private val readAlreadyStartedGameWhenAccepted = testM("Read game info with success") {
+    val initialRepoState =
+      GamesRepoState(games = Set(ExampleGame), players = Map(ExampleGame.id -> List(ExamplePlayer)))
+    for {
+      repoState         <- Ref.make[GamesRepoState](initialRepoState)
+      gameplayRepoState <- Ref.make[GameplayRepoState](GameplayRepoState())
+      sentEvents        <- Ref.make[List[InternalMessage]](List.empty)
+      game              <- ZIO
+                             .accessM[Games](_.get.getInfoAs(ExampleGameId, ExampleUserId))
+                             .provideCustomLayer(createLayer(repoState, sentEvents, gameplayRepoState))
+      updatedRep        <- repoState.get
+      updatedEvents     <- sentEvents.get
+    } yield assert(game)(equalTo(ExampleGame)) &&
       assert(updatedRep)(equalTo(initialRepoState)) &&
       assert(updatedEvents)(isEmpty)
   }
@@ -739,8 +777,9 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
     val player11 = Player(ExampleId10, "P11", Some(PlayerRole.Player))
     val initialRepoState = GamesRepoState(
       games = Set(ExampleNotStartedGame),
-      players =
-        Map(ExampleGameId -> List(ExamplePlayer, player2, player3, player4, player5, player6, player7, player8, player9, player10, player11))
+      players = Map(
+        ExampleGameId -> List(ExamplePlayer, player2, player3, player4, player5, player6, player7, player8, player9, player10, player11)
+      )
     )
     val initialGameplayRepoState = GameplayRepoState()
 

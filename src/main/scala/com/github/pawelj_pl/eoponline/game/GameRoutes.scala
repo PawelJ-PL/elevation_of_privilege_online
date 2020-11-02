@@ -4,7 +4,14 @@ import com.github.pawelj_pl.eoponline.game.Games.Games
 import com.github.pawelj_pl.eoponline.game.dto.{JoinPlayerDto, NewGameDto}
 import com.github.pawelj_pl.eoponline.session.{Authentication, Session}
 import com.github.pawelj_pl.eoponline.session.Authentication.{Authentication, SessionRoutes}
-import com.github.pawelj_pl.eoponline.game.HttpErrorMapping.mapGameError
+import com.github.pawelj_pl.eoponline.game.HttpErrorMapping.{
+  mapAssignRoleError,
+  mapGameInfoError,
+  mapGetParticipantsError,
+  mapJoinGameError,
+  mapKickError,
+  mapStartGameError
+}
 import com.github.pawelj_pl.eoponline.game.PlayerRole.PlayerRoleVar
 import io.chrisdavenport.fuuid.http4s.FUUIDVar
 import org.http4s.{AuthedRoutes, HttpRoutes, Response, Status}
@@ -43,41 +50,41 @@ object GameRoutes extends Http4sDsl[Task] {
                   games
                     .getInfoAs(gameId, session.userId)
                     .map(Response[Task](status = Status.Ok).withEntity(_))
-                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameInfoError(error))
                     .resurrect
                 case authReq @ PUT -> Root / FUUIDVar(gameId) as session                                                                =>
                   authReq.req.as[JoinPlayerDto].flatMap { dto =>
                     games
                       .joinGame(gameId, session.userId, dto.nickname)
                       .map(_ => Response[Task](status = Status.NoContent))
-                      .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                      .catchAll(error => logger.warn(error.asLogMessage) *> mapJoinGameError(error))
                       .resurrect
                   }
                 case POST -> Root / FUUIDVar(gameId) as session                                                                         =>
                   games
                     .startGameAs(gameId, session.userId)
                     .map(_ => Response[Task](status = Status.Ok))
-                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                    .catchAll(error => logger.warn(error.asLogMessage) *> mapStartGameError(error))
                     .resurrect
                 case GET -> Root / FUUIDVar(gameId) / "members" as session                                                              =>
                   games
                     .getParticipantsAs(gameId, session.userId)
                     .map(Response[Task](status = Status.Ok).withEntity(_))
-                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGetParticipantsError(error))
                     .resurrect
 
                 case DELETE -> Root / FUUIDVar(gameId) / "members" / FUUIDVar(participantId) as session                                 =>
                   games
                     .kickUserAs(gameId, participantId, session.userId)
                     .map(_ => Response[Task](status = Status.NoContent))
-                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                    .catchAll(error => logger.warn(error.asLogMessage) *> mapKickError(error))
                     .resurrect
 
                 case PUT -> Root / FUUIDVar(gameId) / "members" / FUUIDVar(participantId) / "roles" / PlayerRoleVar(newRole) as session =>
                   games
                     .assignRoleAs(gameId, participantId, newRole, session.userId)
                     .map(_ => Response[Task](status = Status.NoContent))
-                    .catchAll(error => logger.warn(error.asLogMessage) *> mapGameError(error))
+                    .catchAll(error => logger.warn(error.asLogMessage) *> mapAssignRoleError(error))
                     .resurrect
               }
               sessionMiddleware(authedRoutes)

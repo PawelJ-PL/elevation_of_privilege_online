@@ -16,9 +16,10 @@ type Props = {
     round: Round
     user: Session
     members: Member[]
+    scores: Record<string, number>
 }
 
-const MatchView: React.FC<Props> = ({ game, round, members, user }) => {
+const MatchView: React.FC<Props> = ({ game, round, members, user, scores }) => {
     const [zoomedCard, setZoomedCard] = useState<Card | null>(null)
     useEffect(() => {
         const waitingCard = round.table.find(
@@ -44,7 +45,7 @@ const MatchView: React.FC<Props> = ({ game, round, members, user }) => {
                     <TableView cards={round.table} players={players} matchId={game.id} />
                 </Box>
                 <Box flexGrow={[0, 0, 0, 1]}>
-                    <PlayersList players={players} roundState={round.state} currentUser={user} />
+                    <PlayersList players={players} roundState={round.state} currentUser={user} scores={scores} />
                 </Box>
             </Flex>
 

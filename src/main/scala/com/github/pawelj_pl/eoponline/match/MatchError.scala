@@ -16,9 +16,15 @@ sealed trait PutCardOnTableError extends MatchError
 
 sealed trait CardVerificationError extends UpdateTableCardError with PutCardOnTableError
 
+sealed trait GetScoresError extends MatchError
+
 final case class GameNotFound(gameId: FUUID) extends MatchInfoError with UpdateTableCardError with PutCardOnTableError
 
-final case class NotGameMember(gameId: FUUID, userId: FUUID) extends MatchInfoError with UpdateTableCardError with PutCardOnTableError
+final case class NotGameMember(gameId: FUUID, userId: FUUID)
+    extends MatchInfoError
+    with UpdateTableCardError
+    with PutCardOnTableError
+    with GetScoresError
 
 final case class NotPlayer(gameId: FUUID, userId: FUUID) extends UpdateTableCardError with PutCardOnTableError
 

@@ -49,6 +49,8 @@ object GamesRepository {
 
     def increaseTricksTaken(gameId: FUUID, playerId: FUUID, increaseBy: Int = 1): ZIO[Connection, DbException, Unit]
 
+    def getPlayersTricks(gameId: FUUID): ZIO[Connection, DbException, Map[FUUID, Int]]
+
   }
 
   val postgres: ZLayer[Clock, Nothing, GamesRepository] = ZLayer.fromService { clock =>
@@ -226,6 +228,15 @@ object GamesRepository {
             )
           )
         }.unit
+
+      override def getPlayersTricks(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Map[FUUID, Int]] =
+        tzio {
+          run(
+            quote(
+              gamePlayers.filter(p => p.gameId == lift(gameId) && p.role == lift(Some(PlayerRole.Player): Option[PlayerRole]))
+            )
+          ).map(_.map(player => player.playerId -> player.takenTricks).toMap)
+        }
 
       private val games = quote {
         querySchema[GameEntity]("games")

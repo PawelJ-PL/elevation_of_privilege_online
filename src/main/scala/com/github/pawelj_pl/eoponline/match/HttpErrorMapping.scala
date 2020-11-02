@@ -62,7 +62,8 @@ private[`match`] object HttpErrorMapping {
         )
       case PlayerAlreadyPlayedCard(_, _, _, _) =>
         ZIO.succeed(
-          Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Player already played card", Some("PlayerAlreadyPlayedCard")))
+          Response[Task](status = Status.PreconditionFailed)
+            .withEntity(ResponseData("Player already played card", Some("PlayerAlreadyPlayedCard")))
         )
       case NotGameMember(_, _)                 =>
         ZIO.succeed(Response[Task](status = Status.NotFound).withEntity(ResponseData("Match not found")))
@@ -70,6 +71,11 @@ private[`match`] object HttpErrorMapping {
         ZIO.succeed(
           Response[Task](status = Status.Forbidden).withEntity(ResponseData("Only player can change table status", Some("NotAPlayer")))
         )
+    }
+
+  def mapGetScoresError(error: GetScoresError): UIO[Response[Task]] =
+    error match {
+      case NotGameMember(_, _) => ZIO.succeed(Response[Task](status = Status.NotFound).withEntity(ResponseData("Match not found")))
     }
 
 }

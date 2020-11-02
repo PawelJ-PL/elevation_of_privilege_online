@@ -125,6 +125,7 @@ object FakeGameRepo {
           prev.copy(tricksByPlayer = updated)
         }
 
+      override def getPlayersTricks(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Map[FUUID, Int]] = ref.get.map(_.tricksByPlayer.filter(_.gameId === gameId).map(trick => trick.playerId -> trick.tricks).toMap)
     })
 
 }
