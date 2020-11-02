@@ -10,6 +10,7 @@ import MatchesApi from "../api/MatchesApi"
 import { Round } from "../types/Round"
 import {
     fetchMatchStateAction,
+    fetchScoresAction,
     gameFinishedAction,
     putCardOnTableAction,
     PutCardPayload,
@@ -54,11 +55,16 @@ const refreshGameOnFinishEpic: Epic<AnyAction, AnyAction, AppState> = (action$, 
         })
     )
 
+const fetchScoresEpic = createEpic<string, Record<string, number>, Error>(fetchScoresAction, (params) =>
+    MatchesApi.getScores(params)
+)
+
 export const matchesEpics = combineEpics(
     fetchMatchStateEpic,
     updateCardOnTableEpic,
     putCardOnTableEpic,
     matchWsEpic,
     refreshStateOnWsReconnect,
-    refreshGameOnFinishEpic
+    refreshGameOnFinishEpic,
+    fetchScoresEpic
 )

@@ -1,5 +1,5 @@
 import { Suit } from "./Card"
-export type ThreatStatusAssigned = { gameId: string; cardNumber: number; newStatus: boolean }
+export type ThreatStatusAssigned = { gameId: string; cardNumber: number; newStatus: boolean; playerId: string }
 
 export type NextPlayer = { gameId: string; newPlayer: string }
 

@@ -33,7 +33,7 @@ import com.github.paweljpl.eoponline.testdoubles.{
   FakeInternalMessagesTopic,
   RandomMock
 }
-import com.github.paweljpl.eoponline.testdoubles.FakeGameRepo.GamesRepoState
+import com.github.paweljpl.eoponline.testdoubles.FakeGameRepo.{GamesRepoState, PlayerTricks}
 import com.github.paweljpl.eoponline.testdoubles.FakeGameplayRepo.{DeckEntry, GameplayRepoState}
 import zio.{Ref, ZIO, ZLayer}
 import zio.blocking.Blocking
@@ -70,8 +70,10 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
   override def spec: ZSpec[_root_.zio.test.environment.TestEnvironment, Any] =
     suite("Gameplay suite")(
       getState,
+      getStateWithCountedScores,
       getStateWhenStateNotFound,
       getStateWhenNotMember,
+      countScores,
       linkThreadAndFinishGame,
       linkThreadAndGoToNextPlayer,
       linkThreadAndFinishTurn,
@@ -125,6 +127,7 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
                              .accessM[Matches](_.get.getCurrentStateForPlayer(ExampleGameId, ExamplePlayer.id))
                              .provideCustomLayer(createLayer(gamesRepoState, gameplayRepoState, sentEvents))
     } yield assert(result.state)(equalTo(GameState(ExampleGameId, ExamplePlayer.id, Some(Suit.DenialOfService)))) &&
+      assert(result.playersScores)(equalTo(Map(ExampleId3 -> 1))) &&
       assert(result.hand)(hasSameElements(List(Card(25, Value.Ace, Suit.Tampering, "TextQuux")))) &&
       assert(result.table)(
         hasSameElements(
@@ -141,6 +144,39 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
           )
         )
       )
+  }
+
+  private val getStateWithCountedScores = testM("Get match state with scores counted") {
+
+    val cards = Set(
+      DeckEntry(ExampleGameId, 1, ExamplePlayer.id, CardLocation.Table, Some(true)),
+      DeckEntry(ExampleGameId, 2, ExampleId1, CardLocation.Table, Some(false)),
+      DeckEntry(ExampleGameId, 3, ExampleId3, CardLocation.Table, None),
+      DeckEntry(ExampleGameId, 14, ExamplePlayer.id, CardLocation.Hand, None),
+      DeckEntry(ExampleGameId, 25, ExampleId1, CardLocation.Hand, None),
+      DeckEntry(ExampleGameId, 32, ExampleId3, CardLocation.Hand, None),
+      DeckEntry(ExampleGameId, 70, ExamplePlayer.id, CardLocation.Out, Some(true)),
+      DeckEntry(ExampleGameId, 71, ExampleId1, CardLocation.Out, Some(true)),
+      DeckEntry(ExampleGameId, 72, ExampleId3, CardLocation.Out, None)
+    )
+
+    val initialGamesRepoState = GamesRepoState(
+      players = Map(ExampleGameId -> List(ExamplePlayer, ExamplePlayer.copy(id = ExampleId1), ExamplePlayer.copy(id = ExampleId3))),
+      tricksByPlayer = Set(PlayerTricks(ExamplePlayer.id, ExampleGameId, 2))
+    )
+
+    val initialGameplayRepoState = GameplayRepoState(
+      gamesState = Set(FakeGameplayRepo.GameState(ExampleGameId, ExamplePlayer.id, Some(Suit.DenialOfService))),
+      decks = cards
+    )
+    for {
+      gamesRepoState    <- Ref.make[GamesRepoState](initialGamesRepoState)
+      gameplayRepoState <- Ref.make[GameplayRepoState](initialGameplayRepoState)
+      sentEvents        <- Ref.make[List[InternalMessage]](List.empty)
+      result            <- ZIO
+                             .accessM[Matches](_.get.getCurrentStateForPlayer(ExampleGameId, ExamplePlayer.id))
+                             .provideCustomLayer(createLayer(gamesRepoState, gameplayRepoState, sentEvents))
+    } yield assert(result.playersScores)(equalTo(Map(ExamplePlayer.id -> 4, ExampleId1 -> 1)))
   }
 
   private val getStateWhenStateNotFound = testM("Get match state fail when game state not found") {
@@ -187,6 +223,37 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
     } yield assert(result)(isLeft(equalTo(NotGameMember(ExampleGameId, ExampleId4))))
   }
 
+  private val countScores = testM("Get counted scores") {
+
+    val cards = Set(
+      DeckEntry(ExampleGameId, 1, ExamplePlayer.id, CardLocation.Table, Some(true)),
+      DeckEntry(ExampleGameId, 2, ExampleId1, CardLocation.Table, Some(false)),
+      DeckEntry(ExampleGameId, 3, ExampleId3, CardLocation.Table, None),
+      DeckEntry(ExampleGameId, 14, ExamplePlayer.id, CardLocation.Hand, None),
+      DeckEntry(ExampleGameId, 25, ExampleId1, CardLocation.Hand, None),
+      DeckEntry(ExampleGameId, 32, ExampleId3, CardLocation.Hand, None),
+      DeckEntry(ExampleGameId, 70, ExamplePlayer.id, CardLocation.Out, Some(true)),
+      DeckEntry(ExampleGameId, 71, ExampleId1, CardLocation.Out, Some(true)),
+      DeckEntry(ExampleGameId, 72, ExampleId3, CardLocation.Out, None)
+    )
+
+    val initialGamesRepoState = GamesRepoState(
+      players = Map(ExampleGameId -> List(ExamplePlayer, ExamplePlayer.copy(id = ExampleId1), ExamplePlayer.copy(id = ExampleId3))),
+      tricksByPlayer = Set(PlayerTricks(ExamplePlayer.id, ExampleGameId, 2))
+    )
+
+    val initialGameplayRepoState = GameplayRepoState(decks = cards)
+
+    for {
+      gamesRepoState    <- Ref.make[GamesRepoState](initialGamesRepoState)
+      gameplayRepoState <- Ref.make[GameplayRepoState](initialGameplayRepoState)
+      sentEvents        <- Ref.make[List[InternalMessage]](List.empty)
+      result            <- ZIO
+                             .accessM[Matches](_.get.getScoresAs(ExampleGameId, ExamplePlayer.id))
+                             .provideCustomLayer(createLayer(gamesRepoState, gameplayRepoState, sentEvents))
+    } yield assert(result)(equalTo(Map(ExamplePlayer.id -> 4, ExampleId1 -> 1)))
+  }
+
   private val linkThreadAndFinishGame = testM("Link thread and finish game") {
     val card2 = DeckEntry(ExampleGameId, 25, ExampleId1, CardLocation.Table, Some(true))
     val card3 = DeckEntry(ExampleGameId, 32, ExampleId2, CardLocation.Table, Some(false))
@@ -215,7 +282,7 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
       assert(events)(
         equalTo(
           List(
-            InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true),
+            InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true, ExamplePlayer.id),
             InternalMessage.PlayerTakesTrick(ExampleGameId, Some(ExamplePlayer.id)),
             InternalMessage.GameFinished(ExampleGameId)
           )
@@ -253,7 +320,7 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
       assert(events)(
         equalTo(
           List(
-            InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true),
+            InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true, ExamplePlayer.id),
             InternalMessage.NextPlayer(ExampleGameId, ExampleId2)
           )
         )
@@ -305,7 +372,7 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
       assert(events)(
         equalTo(
           List(
-            InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true),
+            InternalMessage.ThreatLinkedStatusChanged(ExampleGameId, 1, newStatus = true, ExamplePlayer.id),
             InternalMessage.PlayerTakesTrick(ExampleGameId, Some(ExampleId2)),
             InternalMessage.NextRound(ExampleGameId, ExampleId2)
           )

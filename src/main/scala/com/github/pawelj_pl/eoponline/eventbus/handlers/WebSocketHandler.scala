@@ -61,7 +61,7 @@ object WebSocketHandler {
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.UserRoleChanged(recipients, m)))
               case m @ InternalMessage.GameStarted(gameId: FUUID)               =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.GameStarted(recipients, m)))
-              case m @ InternalMessage.ThreatLinkedStatusChanged(gameId, _, _)  =>
+              case m @ InternalMessage.ThreatLinkedStatusChanged(gameId, _, _, _)  =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.ThreatStatusAssigned(recipients, m)))
               case m @ InternalMessage.NextPlayer(gameId, _)                    =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.NextPlayer(recipients, m)))

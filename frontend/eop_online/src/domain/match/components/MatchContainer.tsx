@@ -30,6 +30,7 @@ const MatchContainer: React.FC<Props> = ({
     connectMatchWebSocket,
     disconnectMatchWebSocket,
     playerTakesTrick,
+    scores,
 }) => {
     const toast = useToast()
 
@@ -88,7 +89,9 @@ const MatchContainer: React.FC<Props> = ({
     } else if (members.error) {
         return <AlertBox title="Unable to read game members" description={members.error.message} status="error" />
     } else if (matchState.data && session.data && members.data) {
-        return <MatchView game={game} round={matchState.data} user={session.data} members={members.data} />
+        return (
+            <MatchView game={game} round={matchState.data} user={session.data} members={members.data} scores={scores} />
+        )
     } else {
         return <PageLoader text="Loading match data" />
     }
@@ -99,6 +102,7 @@ const mapStateToProps = (state: AppState) => ({
     session: state.users.current,
     members: state.games.members,
     playerTakesTrick: state.matches.playerTakesTrick,
+    scores: state.matches.scores,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

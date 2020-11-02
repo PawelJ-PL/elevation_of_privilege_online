@@ -22,7 +22,7 @@ object InternalMessage {
 
   final case class GameStarted(gameId: FUUID) extends InternalMessage
 
-  final case class ThreatLinkedStatusChanged(gameId: FUUID, cardNumber: Int, newStatus: Boolean) extends InternalMessage
+  final case class ThreatLinkedStatusChanged(gameId: FUUID, cardNumber: Int, newStatus: Boolean, playerId: FUUID) extends InternalMessage
 
   final case class NextPlayer(gameId: FUUID, newPlayer: FUUID) extends InternalMessage
 
@@ -89,7 +89,9 @@ object InternalMessage {
   }
 
   object PlayerTakesTrick {
+
     implicit val codec: Codec[PlayerTakesTrick] = deriveCodec
+
   }
 
 }

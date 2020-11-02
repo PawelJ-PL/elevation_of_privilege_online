@@ -2,7 +2,11 @@ package com.github.pawelj_pl.eoponline.`match`
 
 import cats.instances.boolean._
 import cats.instances.int._
+import cats.instances.list._
+import cats.instances.map._
 import cats.syntax.eq._
+import cats.syntax.foldable._
+import cats.syntax.monoid._
 import cats.syntax.show._
 import com.github.pawelj_pl.eoponline.`match`.dto.{ExtendedDeckElementDto, GameStateDto, TableCardReqDto}
 import com.github.pawelj_pl.eoponline.`match`.repository.CardsRepository.CardsRepository
@@ -35,6 +39,8 @@ object Matches {
 
     def putCardOnTheTableAs(gameId: FUUID, playerId: FUUID, cardNumber: Int): ZIO[Any, PutCardOnTableError, Unit]
 
+    def getScoresAs(gameId: FUUID, playerId: FUUID): ZIO[Any, GetScoresError, Map[FUUID, Int]]
+
   }
 
   val live: ZLayer[Has[Database.Service] with GamesRepository with GameplayRepository with CardsRepository with Has[
@@ -63,13 +69,21 @@ object Matches {
                               .flatMap(player => cards.find(elem => elem.location === CardLocation.Table && elem.playerId === player.id))
             cardsOnHand  <- ZIO.foreach(handElements)(elem => toExtendedElement(elem).map(_.card)).orDie
             cardsOnTable <- ZIO.foreach(tableElements)(toExtendedElement).orDie
-          } yield GameStateDto(state, cardsOnHand, cardsOnTable))
+            tricks       <- gamesRepo.getPlayersTricks(gameId).orDie
+            scores = countScores(tricks, cards)
+          } yield GameStateDto(state, cardsOnHand, cardsOnTable, scores))
 
         private def toExtendedElement(element: DeckElement): ZIO[Any, Throwable, ExtendedDeckElementDto] =
           cardsRepo
             .get(element.cardNumber)
             .someOrFail(new RuntimeException(show"Definition for card ${element.cardNumber} not found"))
             .map(card => element.into[ExtendedDeckElementDto].withFieldConst(_.card, card).transform)
+
+        private def countScores(playersTricks: Map[FUUID, Int], cards: List[DeckElement]): Map[FUUID, Int] = {
+          val threatsLinkedByPlayers =
+            cards.filter(_.threatLinked.contains(true)).map(_.playerId).map(player => Map(player -> 1)).combineAll
+          playersTricks.combine(threatsLinkedByPlayers)
+        }
 
         override def updateCardOnTableAs(
           gameId: FUUID,
@@ -83,7 +97,7 @@ object Matches {
               _               <- canLinkThreat(gameId, playerId, cardNumber, state)
               _               <- gameplayRepo.updateThreatStatus(gameId, cardNumber, dto.threatLinked).orDie
               deck            <- gameplayRepo.getCardsOf(gameId).orDie
-              _               <- topic.publish1(InternalMessage.ThreatLinkedStatusChanged(gameId, cardNumber, dto.threatLinked)).orDie
+              _               <- topic.publish1(InternalMessage.ThreatLinkedStatusChanged(gameId, cardNumber, dto.threatLinked, playerId)).orDie
               maybeNextPlayer <- findNextPlayer(gameId, playerId, deck)
               _               <- maybeNextPlayer match {
                                    case Some(value) => handleNextPlayer(value.id, state)
@@ -250,6 +264,17 @@ object Matches {
             _                 <- ZIO.cond(card.suit === leadingSuit, (), SuitDoesNotMatch(gameId, card.suit, leadingSuit)) <>
                                    ZIO.cond(leadingSuitOnHand.isEmpty, (), SuitDoesNotMatch(gameId, card.suit, leadingSuit))
           } yield ()
+
+        override def getScoresAs(gameId: FUUID, playerId: FUUID): ZIO[Any, GetScoresError, Map[FUUID, Int]] =
+          db.transactionOrDie(
+            for {
+              members <- gamesRepo.getAcceptedParticipants(gameId).orDie
+              _       <- ZIO.cond(members.map(_.id).contains(playerId), (), NotGameMember(gameId, playerId))
+              cards   <- gameplayRepo.getCardsOf(gameId).orDie
+              tricks  <- gamesRepo.getPlayersTricks(gameId).orDie
+              scores = countScores(tricks, cards)
+            } yield scores
+          )
       }
     }
 

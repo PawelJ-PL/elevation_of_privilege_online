@@ -130,4 +130,7 @@ export default {
                 }
             })
     },
+    getScores(matchId: string): Promise<Record<string, number>> {
+        return client.get<Promise<Record<string, number>>>(`/matches/${matchId}/scores`).then((resp) => resp.data)
+    },
 }

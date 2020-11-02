@@ -33,7 +33,12 @@ final case class ParticipantNotAccepted(gameId: FUUID, playerId: Player) extends
 
 final case class ParticipantAlreadyJoined(gameId: FUUID, player: Player) extends JoinGameError
 
-final case class GameAlreadyStarted(gameId: FUUID) extends JoinGameError with KickUserError with AssignRoleError with StartGameError
+final case class GameAlreadyStarted(gameId: FUUID)
+    extends JoinGameError
+    with KickUserError
+    with AssignRoleError
+    with StartGameError
+    with GameInfoError
 
 final case class UserIsNotGameOwner(gameId: FUUID, userId: FUUID) extends KickUserError with AssignRoleError with StartGameError
 

@@ -66,7 +66,13 @@ object Games {
           override def getInfoAs(gameId: FUUID, userId: FUUID): ZIO[Any, GameInfoError, Game] =
             db.transactionOrDie(for {
               game   <- gamesRepo.findById(gameId).orDie.someOrFail(GameNotFound(gameId))
-              player <- gamesRepo.getParticipantInfo(gameId, userId).orDie.someOrFail(ParticipantIsNotAMember(userId, gameId))
+              player <- gamesRepo
+                          .getParticipantInfo(gameId, userId)
+                          .orDie
+                          .someOrFail(game.startedAt match {
+                            case Some(_) => GameAlreadyStarted(gameId)
+                            case None    => ParticipantIsNotAMember(userId, gameId)
+                          })
               _      <- ZIO.cond(player.role.isDefined, (): Unit, ParticipantNotAccepted(gameId, player))
             } yield game)
 

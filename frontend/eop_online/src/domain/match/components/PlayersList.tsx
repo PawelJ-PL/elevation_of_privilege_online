@@ -1,4 +1,4 @@
-import { Box, BoxProps, Divider, Heading } from "@chakra-ui/core"
+import { Box, BoxProps, Divider, Flex, Heading } from "@chakra-ui/core"
 import React from "react"
 import ContentBox from "../../../application/components/common/ContentBox"
 import { Member } from "../../game/types/Member"
@@ -9,9 +9,10 @@ type Props = {
     players: Member[]
     roundState: RoundState
     currentUser: Session
+    scores: Record<string, number>
 }
 
-const PlayersList: React.FC<Props> = ({ players, roundState, currentUser }) => {
+const PlayersList: React.FC<Props> = ({ players, roundState, currentUser, scores }) => {
     const playerDisplayProps = (player: Member) => {
         let props: BoxProps = {}
         if (player.id === roundState.currentPlayer) {
@@ -33,9 +34,9 @@ const PlayersList: React.FC<Props> = ({ players, roundState, currentUser }) => {
             </Box>
 
             {players.map((p) => (
-                <Box borderRadius="0.2em" paddingX="0.5em" key={p.id} {...playerDisplayProps(p)}>
-                    {p.nickname}
-                </Box>
+                <Flex justifyContent="space-between" borderRadius="0.2em" paddingX="0.5em" key={p.id} {...playerDisplayProps(p)}>
+                    <Box>{p.nickname}</Box><Box>{scores[p.id] ?? 0}</Box>
+                </Flex>
             ))}
         </ContentBox>
     )
