@@ -31,6 +31,10 @@ object GamesRepository {
 
     def setFinishTime(gameId: FUUID, time: Instant): ZIO[Connection, DbException, Unit]
 
+    def getGamesOlderThan(time: Instant): ZIO[Connection, DbException, List[Game]]
+
+    def deleteGames(gameIds: List[FUUID]): ZIO[Connection, DbException, Long]
+
     def addPlayer(gameId: FUUID, player: Player): ZIO[Connection, DbException, Unit]
 
     def getParticipantInfo(gameId: FUUID, playerId: FUUID): ZIO[Connection, DbException, Option[Player]]
@@ -118,6 +122,24 @@ object GamesRepository {
                    )
                  }
         } yield ()
+
+      override def getGamesOlderThan(time: Instant): ZIO[Has[transactor.Transactor[Task]], DbException, List[Game]] =
+        tzio {
+          run(
+            quote(
+              games.filter(_.updatedAt < lift(time))
+            )
+          ).map(_.transformInto[List[Game]])
+        }
+
+      override def deleteGames(gameIds: List[FUUID]): ZIO[Has[transactor.Transactor[Task]], DbException, Long] =
+        tzio {
+          run(
+            quote(
+              games.filter(g => liftQuery(gameIds).contains(g.id)).delete
+            )
+          )
+        }
 
       override def addPlayer(gameId: FUUID, player: Player): ZIO[Connection, DbException, Unit] =
         tzio {

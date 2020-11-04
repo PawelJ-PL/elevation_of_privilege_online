@@ -22,7 +22,7 @@ val dependencies = {
     "dev.zio" %% "zio-logging-slf4j"
   ).map(_ % "0.5.3") ++ Seq(
     "io.github.gaelrenoux" %% "tranzactio"
-  ).map(_ % "1.0.0") ++ Seq(
+  ).map(_ % "1.0.1") ++ Seq(
     "com.gh.dobrynya" %% "zio-jms" % "0.1"
   ) ++ Seq(
     "dev.zio" %% "zio-test",

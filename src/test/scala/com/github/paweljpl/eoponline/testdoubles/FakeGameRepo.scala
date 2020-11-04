@@ -49,6 +49,10 @@ object FakeGameRepo {
           state.copy(games = updated)
         }
 
+      override def getGamesOlderThan(time: Instant): ZIO[Has[transactor.Transactor[Task]], DbException, List[Game]] = ???
+
+      override def deleteGames(gameIds: List[FUUID]): ZIO[Has[transactor.Transactor[Task]], DbException, Long] = ???
+
       override def addPlayer(gameId: FUUID, player: Player): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
         ref.update { prev =>
           val players = prev.players.updatedWith(gameId) {
@@ -125,7 +129,9 @@ object FakeGameRepo {
           prev.copy(tricksByPlayer = updated)
         }
 
-      override def getPlayersTricks(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Map[FUUID, Int]] = ref.get.map(_.tricksByPlayer.filter(_.gameId === gameId).map(trick => trick.playerId -> trick.tricks).toMap)
+      override def getPlayersTricks(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Map[FUUID, Int]] =
+        ref.get.map(_.tricksByPlayer.filter(_.gameId === gameId).map(trick => trick.playerId -> trick.tricks).toMap)
+
     })
 
 }

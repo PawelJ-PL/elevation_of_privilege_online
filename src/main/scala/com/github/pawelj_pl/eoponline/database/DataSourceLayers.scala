@@ -18,6 +18,7 @@ object DataSourceLayers {
         ds.setUsername(dbConf.userName)
         ds.setPassword(dbConf.password)
         ds.setPoolName("HikariPool-EoP")
+        ds.setConnectionTimeout(5000)
         ds.setMaximumPoolSize(dbConf.maxPoolSize)
         ds
       }

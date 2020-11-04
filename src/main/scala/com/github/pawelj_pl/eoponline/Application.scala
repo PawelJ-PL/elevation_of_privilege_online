@@ -2,6 +2,7 @@ package com.github.pawelj_pl.eoponline
 
 import com.github.pawelj_pl.eoponline.database.Database
 import com.github.pawelj_pl.eoponline.eventbus.handlers.WebSocketHandler
+import com.github.pawelj_pl.eoponline.scheduler.GameCleanup
 import zio.{ExitCode, Runtime, URIO, ZEnv, ZIO, App => ZioApp}
 import zio.console.putStrLn
 
@@ -13,7 +14,8 @@ object Application extends ZioApp {
       _                                                               <- Database.migrate.toManaged_
       server = Http.server
       wsHandler = WebSocketHandler.handle.toManaged_
-      _                                                               <- server <&> wsHandler
+      cleanupScheduler = GameCleanup.schedule.toManaged_
+      _                                                               <- server <&> wsHandler <&> cleanupScheduler
     } yield ())
       .useForever
       .provideSomeLayer(Environments.httpServerEnvironment)
