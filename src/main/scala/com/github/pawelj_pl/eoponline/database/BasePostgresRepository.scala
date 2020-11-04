@@ -18,5 +18,15 @@ trait BasePostgresRepository {
 
     implicit val encodeInstant: MappedEncoding[Instant, Date] = MappedEncoding[Instant, Date](Date.from)
     implicit val decodeInstant: MappedEncoding[Date, Instant] = MappedEncoding[Date, Instant](d => d.toInstant)
+
+    implicit class InstantSyntax(value: Instant) {
+      def >(other: Instant) = {
+        quote(infix"$value > $other".as[Boolean])
+      }
+
+      def <(other: Instant) = {
+        quote(infix"$value < $other".as[Boolean])
+      }
+    }
   }
 }

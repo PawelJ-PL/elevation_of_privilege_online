@@ -1,5 +1,7 @@
 package com.github.pawelj_pl.eoponline
 
+import java.time.Duration
+
 import com.gh.dobrynya.zio.jms.{BlockingConnection, Topic, connection}
 import com.github.pawelj_pl.eoponline.config.AppConfig
 import com.github.pawelj_pl.eoponline.config.AppConfig.MessageBroker
@@ -21,9 +23,12 @@ import com.github.pawelj_pl.eoponline.http.web.StaticRoutes
 import com.github.pawelj_pl.eoponline.http.web.StaticRoutes.StaticRoutes
 import com.github.pawelj_pl.eoponline.http.websocket.{WebSocketMessage, WebSocketRoutes}
 import com.github.pawelj_pl.eoponline.http.websocket.WebSocketRoutes.WebSocketRoutes
+import com.github.pawelj_pl.eoponline.scheduler.GameCleanup
+import com.github.pawelj_pl.eoponline.scheduler.GameCleanup.GameCleanup
 import com.github.pawelj_pl.eoponline.session.UserRoutes.UserRoutes
 import com.github.pawelj_pl.eoponline.session.{Authentication, Jwt, UserRoutes}
 import com.github.pawelj_pl.eoponline.utils.RandomUtils
+import io.github.gaelrenoux.tranzactio.{ErrorStrategies, ErrorStrategiesRef}
 import javax.jms.{ConnectionFactory, JMSException}
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory
 import zio.{Has, ZLayer}
@@ -45,6 +50,7 @@ object Environments {
     with UserRoutes
     with MatchRoutes
     with StaticRoutes
+    with GameCleanup
 
   private val provideWebSocketTopic
     : ZLayer[ZConfig[MessageBroker] with Blocking with Logging, Throwable, MessageTopic[WebSocketMessage[_]]] =
@@ -77,7 +83,8 @@ object Environments {
     val random = Random.live
     val randomUtils = random >>> RandomUtils.live
     val dataSource = blocking ++ AppConfig.live.narrow(_.database) >>> DataSourceLayers.hikari
-    val db = dataSource ++ blocking ++ clock >>> DoobieDb.fromDatasource
+    val errorStrategy = ZLayer.succeed(ErrorStrategies.RetryForever.withTimeout(Duration.ofSeconds(10)) : ErrorStrategiesRef)
+    val db = dataSource ++ blocking ++ clock ++ errorStrategy >>> DoobieDb.fromDatasourceAndErrorStrategies
     val gamesRepo = clock >>> GamesRepository.postgres
     val gamePlayRepo = GameplayRepository.postgres
     val cardRepo = CardsRepository.fromJsonFile
@@ -91,7 +98,8 @@ object Environments {
     val gameplayRoutes = authentication ++ matches ++ logging >>> MatchRoutes.live
     val staticRoutes = blocking >>> StaticRoutes.live
     val webSocketRoutes = webSocketTopic ++ authentication ++ logging ++ matches >>> WebSocketRoutes.live
-    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes ++ gameplayRoutes ++ staticRoutes
+    val gameCleanup = clock ++ AppConfig.live.narrow(_.schedulers.gameCleaner) ++ gamesRepo ++ db ++ logging >>> GameCleanup.live
+    serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes ++ gameplayRoutes ++ staticRoutes ++ gameCleanup
   }
 
 }
