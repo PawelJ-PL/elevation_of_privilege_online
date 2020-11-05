@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "heroku-postbuild": "cd frontend/eop_online && npm install && npm run build"
+  },
+  "cacheDirectories": ["frontend/eop_online/node_modules"]
+}
