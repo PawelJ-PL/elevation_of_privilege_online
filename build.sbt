@@ -17,7 +17,7 @@ val dependencies = {
     "dev.zio" %% "zio-config",
     "dev.zio" %% "zio-config-magnolia",
     "dev.zio" %% "zio-config-typesafe"
-  ).map(_ % "1.0.0-RC27") ++ Seq(
+  ).map(_ % "1.0.0-RC29") ++ Seq(
     "dev.zio" %% "zio-logging",
     "dev.zio" %% "zio-logging-slf4j"
   ).map(_ % "0.5.3") ++ Seq(
@@ -42,7 +42,7 @@ val dependencies = {
     "org.http4s" %% "http4s-dsl",
     "org.http4s" %% "http4s-blaze-server",
     "org.http4s" %% "http4s-circe"
-  ).map(_ % "0.21.7")
+  ).map(_ % "0.21.8")
 
   val fuuid = Seq(
     "io.chrisdavenport" %% "fuuid",
@@ -60,8 +60,8 @@ val dependencies = {
   )
 
   val database = Seq(
-    "org.postgresql" % "postgresql" % "42.2.17",
-    "org.liquibase" % "liquibase-core" % "4.1.0"
+    "org.postgresql" % "postgresql" % "42.2.18",
+    "org.liquibase" % "liquibase-core" % "4.1.1"
   )
 
   val doobie = Seq(
@@ -72,7 +72,7 @@ val dependencies = {
   ).map(_ % "0.9.2")
 
   val chimney = Seq(
-    "io.scalaland" %% "chimney" % "0.5.3"
+    "io.scalaland" %% "chimney" % "0.6.1"
   )
 
   val enumeratum = Seq(
