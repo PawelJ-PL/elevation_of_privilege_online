@@ -79,7 +79,6 @@ val dependencies = {
     "com.beachape" %% "enumeratum" % "1.6.1",
     "com.beachape" %% "enumeratum-circe" % "1.6.1",
     "com.beachape" %% "enumeratum-cats" % "1.6.1"
-
   )
 
   val fs2 = Seq(
@@ -92,7 +91,6 @@ val dependencies = {
 
   val tests = Seq(
     "org.scalatest" %% "scalatest" % "3.2.2" % Test
-
   )
 
   libraryDependencies ++= plugins ++ logger ++ zio ++ circe ++ http4s ++ fuuid ++ tsec ++ snakeyaml ++ database ++ doobie ++ chimney ++ enumeratum ++ fs2 ++ artemis ++ tests
@@ -103,10 +101,13 @@ val compilerOptions = scalacOptions -= "-Xfatal-warnings"
 val root = (project in file("."))
   .settings(
     name := "eop_online",
-    version := "0.1", //TODO: replace with git version
     scalaVersion := "2.13.3",
     compilerOptions,
     dependencies,
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
-    resolvers += Resolver.bintrayRepo("dobrynya", "maven")
+    resolvers += Resolver.bintrayRepo("dobrynya", "maven"),
+    useJGit
   )
+  .enablePlugins(GitVersioning)
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
