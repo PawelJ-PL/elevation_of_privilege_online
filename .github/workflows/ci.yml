@@ -1,0 +1,90 @@
+name: ci
+on: push
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend/eop_online
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Setup Node"
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12"
+      - name: "Install dependencies"
+        run: "npm install"
+      - name: "Build app"
+        run: "npm run build"
+      - name: "Upload frontend artifact"
+        uses: actions/upload-artifact@v2
+        with:
+          name: "frontend"
+          path: "frontend/eop_online/build/"
+          retention-days: 1
+          if-no-files-found: "error"
+
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Setup SBT"
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: openjdk@1.11
+      - name: "Run backend tests"
+        run: "sbt test"
+
+  snyk-monitor:
+    runs-on: ubuntu-latest
+    if: "github.ref == 'refs/heads/master'"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Add SBT dependency graph"
+        run: 'echo -e "\naddSbtPlugin(\"net.virtual-void\" % \"sbt-dependency-graph\" % \"0.10.0-RC1\")" >> ./project/plugins.sbt'
+        shell: "bash"
+      - name: "Monitor backend"
+        uses: snyk/actions/scala@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: "monitor"
+          args: "--sbt-graph --file=build.sbt"
+      - name: "Monitor frontend"
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: "monitor"
+          args: "--file=frontend/eop_online/package-lock.json"
+
+  build-publish-docker:
+    runs-on: ubuntu-latest
+    needs: ["build-frontend", "test-backend"]
+    if: "startsWith(github.ref, 'refs/tags/v')"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Download frontend artifact"
+        uses: actions/download-artifact@v2
+        with:
+          name: "frontend"
+          path: "frontend/eop_online/build/"
+      - name: "List frontend"
+        run: "ls -l frontend/eop_online/build/"
+        shell: "bash"
+      - name: "Login to Docker Hub"
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: "Setup SBT"
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: openjdk@1.11
+      - name: "Build and publish docker"
+        run: "sbt docker:publish"
