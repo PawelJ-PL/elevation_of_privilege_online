@@ -27,7 +27,10 @@
     },
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        // "prettier/prettier": "warn",
-        "react/prop-types": "off"
+        // "prettier/prettier": "error",
+        "react/prop-types": "off",
+        "react-hooks/exhaustive-deps": "error",
+        "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+        "no-console": ["error", { "allow" : ["warn", "error"] }]
     }
 }

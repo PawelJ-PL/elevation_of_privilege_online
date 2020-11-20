@@ -27,7 +27,9 @@ object Http {
 
   def server(
     implicit runtime: Runtime[Environments.HttpServerEnvironment]
-  ): ZManaged[GameRoutes with ZConfig[AppConfig.Server] with WebSocketRoutes with UserRoutes with MatchRoutes with StaticRoutes, Throwable, Server[Task]] =
+  ): ZManaged[GameRoutes with ZConfig[
+    AppConfig.Server
+  ] with WebSocketRoutes with UserRoutes with MatchRoutes with StaticRoutes, Throwable, Server[Task]] =
     for {
       webRoutes <- StaticRoutes.routes.toManaged_
       apiRoutes <- routes.map(r => Router("/api/v1" -> r)).toManaged_

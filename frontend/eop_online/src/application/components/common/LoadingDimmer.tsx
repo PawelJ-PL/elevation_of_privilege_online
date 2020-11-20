@@ -18,7 +18,7 @@ const LoadingDimmer: React.FC<Props> = ({ active, text }) => {
             display={active ? "block" : "none"}
             backgroundColor="rgba(0, 0, 0, 0.4)"
             zIndex={9999}
-            style={{backdropFilter: "blur(4px)"}}
+            style={{ backdropFilter: "blur(4px)" }}
         >
             <PageLoader text={text ?? "Loading"} />
         </Box>

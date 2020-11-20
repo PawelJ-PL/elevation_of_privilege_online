@@ -18,7 +18,7 @@ type Props = {
 } & ReturnType<typeof mapStateToProps> &
     ReturnType<typeof mapDispatchToProps>
 
-const MatchContainer: React.FC<Props> = ({
+export const MatchContainer: React.FC<Props> = ({
     game,
     matchState,
     fetchMatchState,

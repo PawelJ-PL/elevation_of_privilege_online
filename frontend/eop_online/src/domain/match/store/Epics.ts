@@ -5,7 +5,7 @@ import { AppState } from "./../../../application/store/index"
 import { AnyAction } from "redux"
 import { matchWsEpic } from "./websocket/Epics"
 import { combineEpics, Epic } from "redux-observable"
-import { createEpic } from "../../../application/store/async/AsyncActionErrorCreator"
+import { createEpic } from "../../../application/store/async/AsyncActionCreator"
 import MatchesApi from "../api/MatchesApi"
 import { Round } from "../types/Round"
 import {

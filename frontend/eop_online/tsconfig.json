@@ -23,6 +23,6 @@
     "src",
     "src/**/*.d.ts",
     "src/**/*.ts",
-    "stc/**/*.tsx"
+    "src/**/*.tsx"
   ]
 }

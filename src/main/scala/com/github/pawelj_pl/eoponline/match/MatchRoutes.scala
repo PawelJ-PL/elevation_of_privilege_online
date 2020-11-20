@@ -1,6 +1,11 @@
 package com.github.pawelj_pl.eoponline.`match`
 
-import com.github.pawelj_pl.eoponline.`match`.HttpErrorMapping.{mapGetScoresError, mapMatchInfoErrors, mapPutCardError, mapUpdateTableErrors}
+import com.github.pawelj_pl.eoponline.`match`.HttpErrorMapping.{
+  mapGetScoresError,
+  mapMatchInfoErrors,
+  mapPutCardError,
+  mapUpdateTableErrors
+}
 import com.github.pawelj_pl.eoponline.`match`.Matches.Matches
 import com.github.pawelj_pl.eoponline.`match`.dto.TableCardReqDto
 import com.github.pawelj_pl.eoponline.session.Authentication.Authentication

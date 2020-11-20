@@ -35,7 +35,7 @@ type Props = {
     currentUser: Session
 }
 
-const HandView: React.FC<Props> = ({ round, currentUser }) => {
+export const HandView: React.FC<Props> = ({ round, currentUser }) => {
     const [zoomedCard, setZoomedCard] = useState<Card | null>(null)
 
     const cardsBySuit = groupBy(round.hand, (c) => c.suit)

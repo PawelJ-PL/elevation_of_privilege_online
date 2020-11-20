@@ -12,7 +12,7 @@ const theme = {
         Modal: {
             baseStyle: {
                 overlay: {
-                    backdropFilter: "blur(4px)"
+                    backdropFilter: "blur(4px)",
                 },
             },
         },

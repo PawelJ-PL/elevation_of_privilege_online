@@ -54,7 +54,7 @@ const JoinGameModal: React.FC<Props> = ({
         if (joinStatus.status === OperationStatus.FINISHED || joinStatus.error instanceof UserAlreadyJoined) {
             fetchGameInfo(gameId)
         } else if (joinStatus.error instanceof GameNotFound || joinStatus.error instanceof GameAlreadyStarted) {
-            toast({title: "Game not found", position: "top", duration: 3000, status: "warning"})
+            toast({ title: "Game not found", position: "top", duration: 3000, status: "warning" })
             history.push("/")
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

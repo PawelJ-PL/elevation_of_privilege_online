@@ -1,5 +1,6 @@
 import { Box, BoxProps, Center, Divider, Heading } from "@chakra-ui/core"
 import React from "react"
+import kebabCase from "lodash/kebabCase"
 
 type Props = {
     elements: Array<JSX.Element>
@@ -7,7 +8,14 @@ type Props = {
     containerProps?: BoxProps
 }
 const ElementsList: React.FC<Props> = ({ elements, title, containerProps }) => (
-    <Box border="2px" borderColor="gray.500" padding="0.2em" borderRadius="0.3em" {...(containerProps || {})}>
+    <Box
+        border="2px"
+        borderColor="gray.500"
+        padding="0.2em"
+        borderRadius="0.3em"
+        {...(containerProps || {})}
+        data-testid={`elements-list-${kebabCase(title)}`}
+    >
         {title && (
             <Center>
                 <Heading size="sm" opacity="0.6">

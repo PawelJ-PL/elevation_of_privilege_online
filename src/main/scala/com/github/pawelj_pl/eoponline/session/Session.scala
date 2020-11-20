@@ -10,5 +10,7 @@ import io.circe.generic.semiauto.deriveCodec
 final case class Session(userId: FUUID, createdAt: Instant)
 
 object Session {
+
   implicit val encoder: Codec[Session] = deriveCodec
+
 }

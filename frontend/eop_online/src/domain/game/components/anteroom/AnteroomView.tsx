@@ -51,7 +51,11 @@ const AnteroomView: React.FC<Props> = ({
     }, [])
 
     return (
-        <ContentBox title="New Elevation of Privilege game" description={game.description ?? undefined}>
+        <ContentBox
+            title="New Elevation of Privilege game"
+            description={game.description ?? undefined}
+            containerProps={{ "data-testid": "anteroom-container" }}
+        >
             <LoadingDimmer
                 active={[assignRoleStatus.status, kickUserStatus.status].includes(OperationStatus.PENDING)}
             />

@@ -34,8 +34,15 @@ const PlayersList: React.FC<Props> = ({ players, roundState, currentUser, scores
             </Box>
 
             {players.map((p) => (
-                <Flex justifyContent="space-between" borderRadius="0.2em" paddingX="0.5em" key={p.id} {...playerDisplayProps(p)}>
-                    <Box>{p.nickname}</Box><Box>{scores[p.id] ?? 0}</Box>
+                <Flex
+                    justifyContent="space-between"
+                    borderRadius="0.2em"
+                    paddingX="0.5em"
+                    key={p.id}
+                    {...playerDisplayProps(p)}
+                >
+                    <Box>{p.nickname}</Box>
+                    <Box>{scores[p.id] ?? 0}</Box>
                 </Flex>
             ))}
         </ContentBox>
