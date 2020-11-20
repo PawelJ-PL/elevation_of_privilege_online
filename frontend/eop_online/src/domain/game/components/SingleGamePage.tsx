@@ -19,7 +19,7 @@ type Props = ReturnType<typeof mapStateToProps> &
     ReturnType<typeof mapDispatchToProps> &
     RouteComponentProps<{ gameId: string }>
 
-const SingleGamePage: React.FC<Props> = ({
+export const SingleGamePage: React.FC<Props> = ({
     match,
     fetchGameInfo,
     gameInfo,
@@ -60,7 +60,7 @@ const SingleGamePage: React.FC<Props> = ({
         if (Boolean(gameInfo.data?.startedAt) && !gameInfo.data?.finishedAt) {
             stopAnteroomWs(gameId)
         }
-         // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameInfo, gameId])
 
     useEffect(() => {

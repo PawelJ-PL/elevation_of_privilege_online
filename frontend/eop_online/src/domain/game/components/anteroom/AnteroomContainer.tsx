@@ -15,7 +15,7 @@ type Props = {
 } & ReturnType<typeof mapStateToProps> &
     ReturnType<typeof mapDispatchToProps>
 
-const AnteroomContainer: React.FC<Props> = ({ game, currentUser, fetchUserData, members, fetchGameMembers }) => {
+export const AnteroomContainer: React.FC<Props> = ({ game, currentUser, fetchUserData, members, fetchGameMembers }) => {
     useEffect(() => {
         if (!currentUser.data && currentUser.status !== OperationStatus.PENDING) {
             fetchUserData()

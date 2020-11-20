@@ -4,7 +4,7 @@ import React from "react"
 type Props = {
     title?: string
     description?: string
-    containerProps?: BoxProps
+    containerProps?: BoxProps & { "data-testid"?: string }
 }
 
 const ContentBox: React.FC<Props> = ({ children, title, description, containerProps }) => (

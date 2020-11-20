@@ -83,7 +83,7 @@ object Environments {
     val random = Random.live
     val randomUtils = random >>> RandomUtils.live
     val dataSource = blocking ++ AppConfig.live.narrow(_.database) >>> DataSourceLayers.hikari
-    val errorStrategy = ZLayer.succeed(ErrorStrategies.RetryForever.withTimeout(Duration.ofSeconds(10)) : ErrorStrategiesRef)
+    val errorStrategy = ZLayer.succeed(ErrorStrategies.RetryForever.withTimeout(Duration.ofSeconds(10)): ErrorStrategiesRef)
     val db = dataSource ++ blocking ++ clock ++ errorStrategy >>> DoobieDb.fromDatasourceAndErrorStrategies
     val gamesRepo = clock >>> GamesRepository.postgres
     val gamePlayRepo = GameplayRepository.postgres

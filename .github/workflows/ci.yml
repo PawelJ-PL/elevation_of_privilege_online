@@ -1,8 +1,49 @@
 name: ci
 on: push
 jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend/eop_online
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Setup Node"
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: "Install dependencies"
+        run: "npm install"
+      - name: "Run frontend tests"
+        run: "npm run test"
+      - name: "Linter"
+        run: "npm run lint"
+      - name: "Check formatting"
+        run: "npm run formatter-check"
+
+  test-frontend-e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend/eop_online
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Setup Node"
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: "Install dependencies"
+        run: "npm install"
+      - name: "Run frontend E2E tests"
+        run: "npm run test-e2e-with-server"
+
   build-frontend:
     runs-on: ubuntu-latest
+    needs: ["test-frontend", "test-frontend-e2e"]
     defaults:
       run:
         shell: bash
@@ -28,6 +69,9 @@ jobs:
 
   test-backend:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -37,10 +81,11 @@ jobs:
           java-version: openjdk@1.11
       - name: "Run backend tests"
         run: "sbt test"
+      - name: "Check formatting"
+        run: "sbt scalafmtCheck"
 
   snyk-monitor:
     runs-on: ubuntu-latest
-    if: "github.ref == 'refs/heads/master'"
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2

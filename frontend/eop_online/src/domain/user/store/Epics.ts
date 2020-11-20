@@ -1,5 +1,5 @@
 import { Session } from "./../types/Session"
-import { createEpic } from "../../../application/store/async/AsyncActionErrorCreator"
+import { createEpic } from "../../../application/store/async/AsyncActionCreator"
 import { fetchMeInfoAction } from "./Actions"
 import UsersApi from "../api/UsersApi"
 import { combineEpics } from "redux-observable"

@@ -16,6 +16,7 @@ import { Game } from "../types/Game"
 import { Member } from "../types/Member"
 import sortBy from "lodash/sortBy"
 import { FaTrophy } from "react-icons/fa"
+import { PLAYER_RANKING_ENTRY } from "./testids"
 
 type Props = {
     game: Game
@@ -37,7 +38,7 @@ const positionToColor: Record<number, string> = {
 }
 
 const renderPlayerEntry = (player: Member & { scores: number }, position: number) => (
-    <Flex alignItems="center" justifyContent="center">
+    <Flex alignItems="center" justifyContent="center" data-testid={PLAYER_RANKING_ENTRY}>
         <Text fontWeight="bold">{position}) </Text>
         <Text marginX="0.3em">
             {player.nickname} ({player.scores} points)
@@ -46,7 +47,7 @@ const renderPlayerEntry = (player: Member & { scores: number }, position: number
     </Flex>
 )
 
-const AfterGameSummary: React.FC<Props> = ({ game, members, scores, fetchMembers, fetchScores }) => {
+export const AfterGameSummary: React.FC<Props> = ({ game, members, scores, fetchMembers, fetchScores }) => {
     useEffect(() => {
         fetchScores(game.id)
         fetchMembers(game.id)

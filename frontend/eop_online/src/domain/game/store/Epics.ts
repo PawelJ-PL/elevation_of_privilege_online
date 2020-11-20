@@ -13,7 +13,7 @@ import {
     userRemovedAction,
     userRoleChangedAction,
 } from "./Actions"
-import { createEpic } from "./../../../application/store/async/AsyncActionErrorCreator"
+import { createEpic } from "../../../application/store/async/AsyncActionCreator"
 import { combineEpics, Epic } from "redux-observable"
 import { Action, AnyAction } from "redux"
 import GamesApi from "../api/GamesApi"

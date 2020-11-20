@@ -5,6 +5,7 @@ export enum OperationStatus {
     FAILED = "FAILED",
 }
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export default interface AsyncOperationsResult<Data, Error, Params> {
     status: OperationStatus
     data?: Data

@@ -54,4 +54,9 @@ const gameStartedEpic: Epic<AnyAction, AnyAction, AppState> = (action$) =>
         })
     )
 
-export const gameWebsocketMessageHandlerEpics = combineEpics(roleChangeMessageEpic, userKickedEpic, newMemberEpic, gameStartedEpic)
+export const gameWebsocketMessageHandlerEpics = combineEpics(
+    roleChangeMessageEpic,
+    userKickedEpic,
+    newMemberEpic,
+    gameStartedEpic
+)

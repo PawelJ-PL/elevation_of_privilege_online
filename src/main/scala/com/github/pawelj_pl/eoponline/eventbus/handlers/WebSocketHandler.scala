@@ -51,33 +51,33 @@ object WebSocketHandler {
 
           private def handleMessage(message: InternalMessage): ZIO[Any, Nothing, Unit] = {
             message match {
-              case m @ InternalMessage.ParticipantJoined(gameId, _, _)          =>
+              case m @ InternalMessage.ParticipantJoined(gameId, _, _)            =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.NewParticipant(recipients, m)))
-              case m @ InternalMessage.ParticipantKicked(gameId, removedUserId) =>
+              case m @ InternalMessage.ParticipantKicked(gameId, removedUserId)   =>
                 allAcceptedWith(gameId, removedUserId).flatMap(recipients =>
                   wsTopic.publish(WebSocketMessage.ParticipantRemoved(recipients, m))
                 )
-              case m @ InternalMessage.RoleAssigned(gameId, _, _)               =>
+              case m @ InternalMessage.RoleAssigned(gameId, _, _)                 =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.UserRoleChanged(recipients, m)))
-              case m @ InternalMessage.GameStarted(gameId: FUUID)               =>
+              case m @ InternalMessage.GameStarted(gameId: FUUID)                 =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.GameStarted(recipients, m)))
-              case m @ InternalMessage.ThreatLinkedStatusChanged(gameId, _, _, _)  =>
+              case m @ InternalMessage.ThreatLinkedStatusChanged(gameId, _, _, _) =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.ThreatStatusAssigned(recipients, m)))
-              case m @ InternalMessage.NextPlayer(gameId, _)                    =>
+              case m @ InternalMessage.NextPlayer(gameId, _)                      =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.NextPlayer(recipients, m)))
-              case m @ InternalMessage.NextRound(gameId, _)                     =>
+              case m @ InternalMessage.NextRound(gameId, _)                       =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.NextRound(recipients, m)))
-              case m @ InternalMessage.GameFinished(gameId)                     =>
+              case m @ InternalMessage.GameFinished(gameId)                       =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.GameFinished(recipients, m)))
-              case m @ InternalMessage.CardPlayed(gameId, _, _)                 =>
+              case m @ InternalMessage.CardPlayed(gameId, _, _)                   =>
                 for {
                   recipients  <- allAccepted(gameId)
                   extendedDto <- playedCardToExtendedDto(m)
                   _           <- wsTopic.publish(WebSocketMessage.CardPlayed(recipients, extendedDto))
                 } yield ()
-              case m @ InternalMessage.PlayerTakesTrick(gameId, _)              =>
+              case m @ InternalMessage.PlayerTakesTrick(gameId, _)                =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.PlayerTakesTrick(recipients, m)))
-              case m                                                            => logger.trace(s"Message $m ignored")
+              case m                                                              => logger.trace(s"Message $m ignored")
             }
           }.resurrect.catchAll(error => logger.throwable("Unable to process message", error))
 
