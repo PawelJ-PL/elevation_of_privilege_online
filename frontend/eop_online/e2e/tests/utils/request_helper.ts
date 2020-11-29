@@ -1,3 +1,5 @@
+import WebSocket from "ws"
+import { exampleRound, observer1, observer1Id, player2, player3 } from "./../constants"
 import { Page, Request } from "puppeteer"
 import { exampleGame, initMember, meData } from "../constants"
 
@@ -36,23 +38,91 @@ export const setRequestHandlers = async (page: Page, options?: RequestHandlersOp
     }
 }
 
+const asPredicateTypes = <T>(pt: { [K in keyof T]: (req: Request, url: URL) => boolean }) => pt
+
+export const requestPredicates = asPredicateTypes({
+    createNewGame: (r, u) => u.pathname === "/api/v1/games" && r.method() === "POST",
+    getDefaultGameData: (r, u) => u.pathname === "/api/v1/games/" + exampleGame.id && r.method() === "GET",
+    getCurrentUser: (r, u) => u.pathname === "/api/v1/users/me" && r.method() === "GET",
+    getDefaultGameMembers: (r, u) => u.pathname === `/api/v1/games/${exampleGame.id}/members` && r.method() === "GET",
+    getDefaultMatchState: (r, u) => u.pathname === `/api/v1/matches/${exampleGame.id}` && r.method() === "GET",
+    getDefaultScores: (r, u) => u.pathname === `/api/v1/matches/${exampleGame.id}/scores` && r.method() === "GET",
+})
+
 const asHandlerTypes = <T>(ht: { [K in keyof T]: RequestHandler }) => ht
 
 export const matchers = asHandlerTypes({
     createGameSuccess: {
-        reqPredicate: (r, u) => u.pathname === "/api/v1/games" && r.method() === "POST",
+        reqPredicate: requestPredicates.createNewGame,
         onMatch: (r) => r.respond({ body: JSON.stringify(exampleGame) }),
     },
     getDefaultGame: {
-        reqPredicate: (r, u) => u.pathname === "/api/v1/games/" + exampleGame.id && r.method() === "GET",
+        reqPredicate: requestPredicates.getDefaultGameData,
         onMatch: (r) => r.respond({ body: JSON.stringify(exampleGame) }),
     },
     getMeData: {
-        reqPredicate: (r, u) => u.pathname === "/api/v1/users/me" && r.method() === "GET",
+        reqPredicate: requestPredicates.getCurrentUser,
         onMatch: (r) => r.respond({ body: JSON.stringify(meData) }),
     },
     getInitMembers: {
-        reqPredicate: (r, u) => u.pathname === `/api/v1/games/${exampleGame.id}/members` && r.method() === "GET",
+        reqPredicate: requestPredicates.getDefaultGameMembers,
         onMatch: (r) => r.respond({ body: JSON.stringify([initMember]) }),
     },
+    getMembers: {
+        reqPredicate: requestPredicates.getDefaultGameMembers,
+        onMatch: (r) => r.respond({ body: JSON.stringify([initMember, player2, player3, observer1]) }),
+    },
+    getGameMembers: {
+        reqPredicate: requestPredicates.getDefaultGameMembers,
+        onMatch: (r) => r.respond({ body: JSON.stringify([initMember, player2, player3, observer1Id]) }),
+    },
+    getDefaultMatch: {
+        reqPredicate: requestPredicates.getDefaultMatchState,
+        onMatch: (r) => r.respond({ body: JSON.stringify(exampleRound) }),
+    },
+    getDefaultScores: {
+        reqPredicate: requestPredicates.getDefaultScores,
+        onMatch: (r) => r.respond({ body: JSON.stringify(exampleRound.playersScores) }),
+    },
 })
+
+export const matcherCreators = {
+    deleteMember(memberId: string, gameId?: string, wsClients?: Set<WebSocket>): RequestHandler {
+        const game = gameId ?? exampleGame.id
+        const clients = wsClients ?? new Set()
+        return {
+            reqPredicate: (r, u) =>
+                u.pathname === `/api/v1/games/${game}/members/${memberId}` && r.method() === "DELETE",
+            onMatch: (r) => {
+                clients.forEach((c) =>
+                    c.send(
+                        JSON.stringify({
+                            eventType: "ParticipantRemoved",
+                            payload: { gameId: game, userId: memberId },
+                        })
+                    )
+                )
+                return r.respond({})
+            },
+        }
+    },
+    setRole(memberId: string, newRole: string, gameId?: string, wsClients?: Set<WebSocket>): RequestHandler {
+        const game = gameId ?? exampleGame.id
+        const clients = wsClients ?? new Set()
+        return {
+            reqPredicate: (r, u) =>
+                u.pathname === `/api/v1/games/${game}/members/${memberId}/roles/${newRole}` && r.method() === "PUT",
+            onMatch: (r) => {
+                clients.forEach((c) =>
+                    c.send(
+                        JSON.stringify({
+                            eventType: "UserRoleChanged",
+                            payload: { gameId: game, userId: memberId, role: newRole },
+                        })
+                    )
+                )
+                return r.respond({})
+            },
+        }
+    },
+}

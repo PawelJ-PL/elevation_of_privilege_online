@@ -34,6 +34,7 @@ import {
 import { connect } from "react-redux"
 import { OperationStatus } from "../../../application/store/async/AsyncOperationResult"
 import AlertBox from "../../../application/components/common/AlertBox"
+import { ZOOM_CARD_MODAL_FOOTER } from "./testids"
 
 type Props = {
     visible: boolean
@@ -160,7 +161,7 @@ const CardZoomModal: React.FC<Props> = ({
                                 />
                             )}
                         </ModalBody>
-                        <ModalFooter>
+                        <ModalFooter data-testid={ZOOM_CARD_MODAL_FOOTER}>
                             {canPlayCard && playFooter(card)}
                             {canLink && linkFooter(card)}
                         </ModalFooter>

@@ -19,6 +19,7 @@ import LoadingDimmer from "../../../../application/components/common/LoadingDimm
 import { OperationStatus } from "../../../../application/store/async/AsyncOperationResult"
 import AlertBox from "../../../../application/components/common/AlertBox"
 import RoleEntry from "./RoleEntry"
+import { ANTEROOM_CONTAINER } from "../testids"
 
 type Props = {
     game: Game
@@ -54,7 +55,7 @@ const AnteroomView: React.FC<Props> = ({
         <ContentBox
             title="New Elevation of Privilege game"
             description={game.description ?? undefined}
-            containerProps={{ "data-testid": "anteroom-container" }}
+            containerProps={{ "data-testid": ANTEROOM_CONTAINER }}
         >
             <LoadingDimmer
                 active={[assignRoleStatus.status, kickUserStatus.status].includes(OperationStatus.PENDING)}

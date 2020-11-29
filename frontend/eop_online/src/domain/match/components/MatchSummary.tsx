@@ -7,6 +7,7 @@ import Item from "../../../application/components/common/Item"
 import { loadSuitLogo } from "../../../application/utils/ResourceLoader"
 import startCase from "lodash/startCase"
 import capitalize from "lodash/capitalize"
+import { LEADING_SUIT_BOX } from "./testids"
 
 type Props = {
     game: Game
@@ -15,7 +16,7 @@ type Props = {
 
 const MatchSummary: React.FC<Props> = ({ game, roundState }) => (
     <ContentBox title={game.description === null ? undefined : game.description}>
-        <Flex marginTop="0.3em" align="center">
+        <Flex marginTop="0.3em" align="center" data-testid={LEADING_SUIT_BOX}>
             {roundState.leadingSuit && (
                 <Box>
                     <Image src={loadSuitLogo(roundState.leadingSuit)} />
