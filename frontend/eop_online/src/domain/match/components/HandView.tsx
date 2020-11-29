@@ -29,6 +29,7 @@ import CardZoomModal from "./CardZoomModal"
 import { Round } from "../types/Round"
 import { Session } from "../../user/types/Session"
 import UnknownCard from "../../../resources/unknown-card.png"
+import { PLAYERS_HAND } from "./testids"
 
 type Props = {
     round: Round
@@ -112,7 +113,7 @@ export const HandView: React.FC<Props> = ({ round, currentUser }) => {
     }
 
     return (
-        <ContentBox containerProps={{ marginBottom: 0 }}>
+        <ContentBox containerProps={{ marginBottom: 0, "data-testid": PLAYERS_HAND }}>
             <CardZoomModal
                 visible={zoomedCard !== null}
                 onClose={() => setZoomedCard(null)}

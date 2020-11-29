@@ -10,6 +10,7 @@ import { GiSandsOfTime } from "react-icons/gi"
 import { HiThumbDown } from "react-icons/hi"
 import { HiThumbUp } from "react-icons/hi"
 import UnknownCard from "../../../resources/unknown-card.png"
+import { TABLE_CARDS } from "./testids"
 
 type Props = {
     matchId: string
@@ -38,7 +39,7 @@ const TableView: React.FC<Props> = ({ cards, players, matchId }) => {
             <Heading as="h6" size="xs" maxWidth={cardWidths}>
                 {players.find((p) => p.id === card.playerId)?.nickname}
             </Heading>
-            <Box>
+            <Box aria-label={threatIcon(card).comment}>
                 <Tooltip label={threatIcon(card).comment}>
                     <span>
                         <Icon as={threatIcon(card).icon} color={threatIcon(card).color} boxSize={6} />
@@ -68,7 +69,7 @@ const TableView: React.FC<Props> = ({ cards, players, matchId }) => {
                 Table
             </Heading>
             <Divider marginBottom="0.5em" />
-            <Flex justifyContent="center" wrap="wrap">
+            <Flex justifyContent="center" wrap="wrap" data-testid={TABLE_CARDS}>
                 {cards.map(renderCard)}
             </Flex>
         </ContentBox>

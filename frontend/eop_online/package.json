@@ -36,8 +36,10 @@
     },
     "devDependencies": {
         "@types/puppeteer": "5.4.0",
+        "@types/ws": "7.4.0",
         "@typescript-eslint/eslint-plugin": "4.0.1",
         "@typescript-eslint/parser": "4.0.1",
+        "chalk": "4.1.0",
         "eslint-config-prettier": "6.11.0",
         "eslint-plugin-prettier": "3.1.4",
         "eslint-plugin-react": "^7.20.6",
@@ -46,7 +48,8 @@
         "prettier": "2.1.2",
         "puppeteer": "5.5.0",
         "start-server-and-test": "1.11.6",
-        "ts-jest": "24.3.0"
+        "ts-jest": "24.3.0",
+        "ws": "7.4.0"
     },
     "scripts": {
         "start": "react-scripts start",
@@ -55,7 +58,7 @@
         "eject": "react-scripts eject",
         "lint": "./node_modules/eslint/bin/eslint.js --ext .js --ext .jsx --ext .ts --ext .tsx src/",
         "formatter-check": "./node_modules/prettier/bin-prettier.js --check 'src/**/*.{ts,tsx,js,jsx,json}'",
-        "test-e2e": "./node_modules/jest/bin/jest.js --config e2e/config/jest.e2e.config.js",
+        "test-e2e": "./node_modules/jest/bin/jest.js --config e2e/config/jest.e2e.config.js --runInBand",
         "test-e2e-with-server": "env BROWSER=none start-server-and-test start http-get://localhost:3000 test-e2e"
     },
     "eslintConfig": {

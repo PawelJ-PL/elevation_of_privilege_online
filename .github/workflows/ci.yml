@@ -13,7 +13,7 @@ jobs:
       - name: "Setup Node"
         uses: actions/setup-node@v1
         with:
-          node-version: '12'
+          node-version: "12"
       - name: "Install dependencies"
         run: "npm install"
       - name: "Run frontend tests"
@@ -35,11 +35,18 @@ jobs:
       - name: "Setup Node"
         uses: actions/setup-node@v1
         with:
-          node-version: '12'
+          node-version: "12"
       - name: "Install dependencies"
         run: "npm install"
       - name: "Run frontend E2E tests"
         run: "npm run test-e2e-with-server"
+      - name: "Upload E2E screenshots"
+        if: ${{ success() || failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: "e2e_screenshots"
+          path: "frontend/eop_online/e2e/screenshots"
+          retention-days: 7
 
   build-frontend:
     runs-on: ubuntu-latest

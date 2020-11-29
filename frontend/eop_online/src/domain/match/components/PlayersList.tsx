@@ -4,6 +4,7 @@ import ContentBox from "../../../application/components/common/ContentBox"
 import { Member } from "../../game/types/Member"
 import { Session } from "../../user/types/Session"
 import { RoundState } from "../types/RoundState"
+import { PLAYERS_LIST_ENTRY } from "./testids"
 
 type Props = {
     players: Member[]
@@ -40,6 +41,7 @@ const PlayersList: React.FC<Props> = ({ players, roundState, currentUser, scores
                     paddingX="0.5em"
                     key={p.id}
                     {...playerDisplayProps(p)}
+                    data-testid={PLAYERS_LIST_ENTRY}
                 >
                     <Box>{p.nickname}</Box>
                     <Box>{scores[p.id] ?? 0}</Box>

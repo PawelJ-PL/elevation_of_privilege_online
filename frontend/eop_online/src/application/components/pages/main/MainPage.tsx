@@ -4,6 +4,7 @@ import Logo from "../../../../resources/logo.png"
 import { useModal } from "../../modals/ModalHook"
 import CreateGameModal from "../../../../domain/game/components/CreateGameModal"
 import GoToGameModal from "../../../../domain/game/components/GoToGameModal"
+import { MAIN_PAGE_BUTTONS_CONTAINER } from "../testids"
 
 const MainPage: React.FC = () => {
     const [newGameModal, openCreateGameModal] = useModal(CreateGameModal, {})
@@ -22,6 +23,7 @@ const MainPage: React.FC = () => {
                 columns={[1, 1, 2, 2]}
                 marginTop={["0.5em", "2em", "5em"]}
                 marginX={["0em", "0em", "5em", "20em"]}
+                data-testid={MAIN_PAGE_BUTTONS_CONTAINER}
             >
                 <Button colorScheme="teal" size="lg" onClick={openCreateGameModal}>
                     Create new game
