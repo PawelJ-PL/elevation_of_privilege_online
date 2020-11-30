@@ -59,7 +59,7 @@ object WebSocketRoutes {
 
         private def fromClient(gameId: FUUID, userId: FUUID): Pipe[Task, WebSocketFrame, Unit] =
           _.evalMap {
-            case WebSocketFrame.Text(text, _) => logger.info(s"Received frame $text")
+            case WebSocketFrame.Text(text, _) => logger.debug(s"Received frame $text")
             case WebSocketFrame.Close(_)      => logger.info("Client closed connection")
             case f                            => logger.info(s"Unknown frame type: $f")
           }.handleErrorWith {

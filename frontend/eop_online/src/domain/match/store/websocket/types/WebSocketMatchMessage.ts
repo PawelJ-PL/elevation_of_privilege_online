@@ -6,7 +6,7 @@ import {
     PlayerTakesTrick,
     ThreatStatusAssigned,
 } from "./../../../types/Events"
-export type WebSocketMatchMessage = WsMatchMessageOut
+export type WebSocketMatchMessage = WsMatchMessageOut | WsMatchMessageIn
 
 export type WsMatchMessageOut =
     | { eventType: "ThreatStatusAssigned"; payload: ThreatStatusAssigned }
@@ -15,3 +15,5 @@ export type WsMatchMessageOut =
     | { eventType: "NextRound"; payload: NextTurn }
     | { eventType: "GameFinished"; payload: GameFinished }
     | { eventType: "PlayerTakesTrick"; payload: PlayerTakesTrick }
+
+export type WsMatchMessageIn = { query: "Keepalive" }

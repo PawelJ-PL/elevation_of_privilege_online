@@ -54,6 +54,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
+        "compile": "./node_modules/typescript/bin/tsc --noEmit",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "lint": "./node_modules/eslint/bin/eslint.js --ext .js --ext .jsx --ext .ts --ext .tsx src/",

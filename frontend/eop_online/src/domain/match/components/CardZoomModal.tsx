@@ -1,4 +1,5 @@
 import {
+    Accordion,
     Box,
     Button,
     Center,
@@ -17,6 +18,7 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
+    useBreakpointValue,
 } from "@chakra-ui/core"
 import React, { useEffect } from "react"
 import { HiThumbDown, HiThumbUp } from "react-icons/hi"
@@ -35,6 +37,45 @@ import { connect } from "react-redux"
 import { OperationStatus } from "../../../application/store/async/AsyncOperationResult"
 import AlertBox from "../../../application/components/common/AlertBox"
 import { ZOOM_CARD_MODAL_FOOTER } from "./testids"
+import AccordionEntry from "../../../application/components/common/AccordionEntry"
+
+const multilineTextToTags = (text: string) => text.split("\n").map((line, i) => <Box key={i}>{line}</Box>)
+
+type MenuProps = { card: Card }
+
+const TabMenu: React.FC<MenuProps> = ({ card }) => (
+    <Tabs variant="enclosed" isFitted={true}>
+        <TabList>
+            <Tab>Card</Tab>
+            <Tab>Text</Tab>
+            <Tab>Example</Tab>
+            <Tab>Mitigation</Tab>
+        </TabList>
+        <TabPanels>
+            <TabPanel>
+                <Image src={loadCardImage(card)} fallbackSrc={UnknownCard} />
+            </TabPanel>
+            <TabPanel>
+                <Box width="270px">{card.text}</Box>
+            </TabPanel>
+            <TabPanel>
+                <Box width="270px">{multilineTextToTags(card.example)}</Box>
+            </TabPanel>
+            <TabPanel>
+                <Box width="270px">{multilineTextToTags(card.mitigation)}</Box>
+            </TabPanel>
+        </TabPanels>
+    </Tabs>
+)
+
+const AccordionMenu: React.FC<MenuProps> = ({ card }) => (
+    <Accordion allowToggle={true} defaultIndex={0} width="270px">
+        <AccordionEntry title="Card" content={<Image src={loadCardImage(card)} fallbackSrc={UnknownCard} />} />
+        <AccordionEntry title="Text" content={card.text} />
+        <AccordionEntry title="Example" content={<Box>{multilineTextToTags(card.example)}</Box>} />
+        <AccordionEntry title="Mitigation" content={<Box>{multilineTextToTags(card.mitigation)}</Box>} />
+    </Accordion>
+)
 
 type Props = {
     visible: boolean
@@ -68,6 +109,8 @@ const CardZoomModal: React.FC<Props> = ({
             onClose()
         }
     }, [updateCardStatus, resetLinkedStatus, onClose])
+
+    const useTabMenu: boolean = useBreakpointValue({ base: false, sm: true }) ?? true
 
     const playFooter = (card: Card) => (
         <Box width="100%">
@@ -124,22 +167,7 @@ const CardZoomModal: React.FC<Props> = ({
                     <ModalContent>
                         {closable !== false && <ModalCloseButton />}
                         <ModalBody>
-                            <Center>
-                                <Tabs variant="enclosed" isFitted={true}>
-                                    <TabList>
-                                        <Tab>Card</Tab>
-                                        <Tab>Text</Tab>
-                                    </TabList>
-                                    <TabPanels>
-                                        <TabPanel>
-                                            <Image src={loadCardImage(card)} fallbackSrc={UnknownCard} />
-                                        </TabPanel>
-                                        <TabPanel>
-                                            <Box width="270px">{card.text}</Box>
-                                        </TabPanel>
-                                    </TabPanels>
-                                </Tabs>
-                            </Center>
+                            <Center>{useTabMenu ? <TabMenu card={card} /> : <AccordionMenu card={card} />}</Center>
                             {updateCardStatus.status === OperationStatus.FAILED && (
                                 <AlertBox
                                     title="Unable to change linked status"

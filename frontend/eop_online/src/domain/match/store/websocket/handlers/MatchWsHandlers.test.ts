@@ -45,7 +45,14 @@ describe("Match WebSocket Handlers", () => {
         const payload: CardPlayed = {
             gameId: "foo-bar",
             playerId: "111",
-            card: { cardNumber: 7, value: "Eight", suit: "Spoofing", text: "Lorem ipsum" },
+            card: {
+                cardNumber: 7,
+                value: "Eight",
+                suit: "Spoofing",
+                text: "Lorem ipsum",
+                example: "Lorem ipsum",
+                mitigation: "Lorem ipsum",
+            },
             location: "Table",
             threatLinked: null,
         }

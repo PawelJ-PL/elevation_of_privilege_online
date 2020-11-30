@@ -69,7 +69,14 @@ describe("Match reducers", () => {
             const payload: CardPlayed = {
                 gameId: "foo-bar",
                 playerId: "111",
-                card: { cardNumber: 29, value: "Five", suit: "Repudiation", text: "Lorem ipsum" },
+                card: {
+                    cardNumber: 29,
+                    value: "Five",
+                    suit: "Repudiation",
+                    text: "Lorem ipsum",
+                    example: "Lorem ipsum",
+                    mitigation: "Lorem ipsum",
+                },
                 location: "Table",
                 threatLinked: null,
             }

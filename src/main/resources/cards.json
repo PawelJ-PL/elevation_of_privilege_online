@@ -3,444 +3,592 @@
     "cardNumber": 1,
     "value": "Two",
     "suit": "Spoofing",
-    "text": "An attacker could squat on the random port or socket that the server normally uses"
+    "text": "An attacker could squat on the random port or socket that the server normally uses",
+    "example": "Before the application is started, the attacker launches his own application listening on the same port. This allows it to intercept all requests from customers, including confidential data.",
+    "mitigation": "Application to listen on privileged port (below 1024) requires superuser privileges. So it is worth to use this port for some applications.\nIt is worth considering a service discovery mechanism or orchestrator that may require the application to authenticate itself before traffic is routed to it.\nUsing end-to-end SSL will cause clients to terminate communication with a service without valid private key before any data is transmitted"
   },
   {
     "cardNumber": 2,
     "value": "Three",
     "suit": "Spoofing",
-    "text": "An attacker could try one credential after another and there’s nothing to slow them down (online or offline)"
+    "text": "An attacker could try one credential after another and there’s nothing to slow them down (online or offline)",
+    "example": "The attacker executes a script that tries different credentials one by one (brute force attack).",
+    "mitigation": "To store credentials, use key derivation functions (e.g. PBKDF2) or password hashing functions (such as Bcrypt) instead of ordinary hashing functions (such as MD5 or SHA-256).\nIn order to protect against online attacks, it is worth introducing additional mechanisms such as exponential backoff, captcha, two factor authentication and temporary blocking of the account after exceeding the threshold of unsuccessful attempts (in this case, it is worth considering device cookie as a form of protection against cutting off authorised users)."
   },
   {
     "cardNumber": 3,
     "value": "Four",
     "suit": "Spoofing",
-    "text": "An attacker can anonymously connect, because we expect authentication to be done at a higher level"
+    "text": "An attacker can anonymously connect, because we expect authentication to be done at a higher level",
+    "example": "The application retrieves the current user's name from the HTTP header because it trusts that the authentication has been done earlier on the load balancer which then sets the correct header. The attacker is able to impersonate any user by setting this header himself.",
+    "mitigation": "Authentication and authorization should be performed at each level. The OAuth 2.0 protocol can be used here, so that we do not need to identify the user in order to decide whether access to the resource should be granted or refused. If it is necessary to identify the user, it is worth considering using OpenID Connect and JWT (in the case of stateless identity verification, it is important to remember to ensure proper handling of the session invalidation)."
   },
   {
     "cardNumber": 4,
     "value": "Five",
     "suit": "Spoofing",
-    "text": "An attacker can confuse a client because there are too many ways to identify a server"
+    "text": "An attacker can confuse a client because there are too many ways to identify a server",
+    "example": "Different clients use different names and IP addresses to connect to the server. For this reason, they ignore the SSL errors that occur. If a malicious service tries to pretend to be our service, it will not be detected.",
+    "mitigation": "There should always be a clear method of locating and verifying the server. In dynamic environments it is worth considering load balancers or service discovery mechanisms."
   },
   {
     "cardNumber": 5,
     "value": "Six",
     "suit": "Spoofing",
-    "text": "An attacker can spoof a server because identifiers aren’t stored on the client and checked for consistency on re-connection (that is, there’s no key persistence)"
+    "text": "An attacker can spoof a server because identifiers aren’t stored on the client and checked for consistency on re-connection (that is, there’s no key persistence)",
+    "example": "The client verifies the server's credentials (SSL certificate) on the first connection, while on subsequent connections he trusts that the server has not changed.",
+    "mitigation": "Always verify the identity of the server. Avoid using self-signed certificates. In special cases it is worth considering certificate pinning."
   },
   {
     "cardNumber": 6,
     "value": "Seven",
     "suit": "Spoofing",
-    "text": "An attacker can connect to a server or peer over a link that isn’t authenticated (and encrypted)"
+    "text": "An attacker can connect to a server or peer over a link that isn’t authenticated (and encrypted)",
+    "example": "Communication with the server is unencrypted, so the attacker is able to intercept the user's credentials and impersonate him. In extreme cases, the server does not require authentication and trusts the data provided by the user.",
+    "mitigation": "All communication should be encrypted. Each query should require authentication (except for those where the server does not need to know the identity of the user or his privileges)"
   },
   {
     "cardNumber": 7,
     "value": "Eight",
     "suit": "Spoofing",
-    "text": "An attacker could steal credentials stored on the server and reuse them (for example, a key is stored in a world readable file)"
+    "text": "An attacker could steal credentials stored on the server and reuse them (for example, a key is stored in a world readable file)",
+    "example": "The attacker is able to access the server and steal credentials used by the application (e.g. used to connect to the database).",
+    "mitigation": "Credentials should be kept in encrypted form and the rights to read them should be as limited as possible. \nIt is worth using additional methods such as hardware security modules or dedicated services (like AWS KMS or HashiCorp vault). \nIf possible, access to the credentials should be logged and an alert triggered in case of suspicious activity."
   },
   {
     "cardNumber": 8,
     "value": "Nine",
     "suit": "Spoofing",
-    "text": "An attacker who gets a password can reuse it (Use stronger authenticators)"
+    "text": "An attacker who gets a password can reuse it (Use stronger authenticators)",
+    "example": "The attacker has obtained a password, used by our application to authenticate in another service. From now he can communicate with it as our application.",
+    "mitigation": " Consider additional authentication elements besides the password (cryptographic modules, certificates).\nIf possible, it is worth limiting the source address from which you can connect.\nCyclic rotation of passwords is highly recommended (ideally, if the password would be valid for a single session)."
   },
   {
     "cardNumber": 9,
     "value": "Ten",
     "suit": "Spoofing",
-    "text": "An attacker can choose to use weaker or no authentication"
+    "text": "An attacker can choose to use weaker or no authentication",
+    "example": "The system allows the client to negotiate the authentication parameters. The attacker is able to influence the client to use the weaker of the methods, so he is able to intercept his credentials.",
+    "mitigation": "Always leave only mechanisms that you trust to be strong enough (including SSL parameters like a set of ciphers).\nWhen using JWT, please make sure that you also verify that the algorithm used meets your requirements (e.g. if the None algorithm is not used)."
   },
   {
     "cardNumber": 10,
     "value": "Jack",
     "suit": "Spoofing",
-    "text": "An attacker could steal credentials stored on the client and reuse them"
+    "text": "An attacker could steal credentials stored on the client and reuse them",
+    "example": "The attacker steals users' cookies and can pretend to be him.",
+    "mitigation": "When verifying a session, it is worth taking into account additional elements such as browser fingerprinting, remote address, etc.\nIt is also important to remember to give credentials (such as cookies) a sufficiently short time to live."
   },
   {
     "cardNumber": 11,
     "value": "Queen",
     "suit": "Spoofing",
-    "text": "An attacker could go after the way credentials are updated or recovered (account recovery doesn’t require disclosing the old password)"
+    "text": "An attacker could go after the way credentials are updated or recovered (account recovery doesn’t require disclosing the old password)",
+    "example": "There is a password change mechanism implemented in the application, but current password is not required to change it. An attacker spots an open session of another user and is able to change his password.",
+    "mitigation": "In case of change of sensitive elements, an additional step should always be required (providing the current password when changing to a new one, in case of change of e-mail address confirmation using a link sent to the old and new address)\nIt should not be possible to recover forgotten credentials using user information that can be obtained by an another person."
   },
   {
     "cardNumber": 12,
     "value": "King",
     "suit": "Spoofing",
-    "text": "Your system ships with a default admin password, and doesn’t force a change"
+    "text": "Your system ships with a default admin password, and doesn’t force a change",
+    "example": "After the system is started, a superuser account is created with a default password, which does not have to be changed. An attacker is able to log in to the system because he knows the default password from the documentation.",
+    "mitigation": "If the system requires the creation of a user with a password at first start, it should generate a complicated random password for each new instance and force a change at first login.\nAn additional security feature may be the possibility of logging in as this user only from a local host."
   },
   {
     "cardNumber": 13,
     "value": "Ace",
     "suit": "Spoofing",
-    "text": "You’ve invented a new Spoofing attack"
+    "text": "You’ve invented a new Spoofing attack",
+    "example": "The player must invent another potential threat.",
+    "mitigation": "N/A"
   },
   {
     "cardNumber": 14,
     "value": "Three",
     "suit": "Tampering",
-    "text": "An attacker can take advantage of your custom key exchange or integrity control which you built instead of using standard crypto"
+    "text": "An attacker can take advantage of your custom key exchange or integrity control which you built instead of using standard crypto",
+    "example": "The author of the application implements his own cryptographic algorithm to make it difficult to decrypt data. However, the algorithm has weaknesses that have not been identified, which makes access to data by unauthorized persons possible.",
+    "mitigation": "Do not implement your own crypto. Use commonly used and recognized libraries and tools."
   },
   {
     "cardNumber": 15,
     "value": "Four",
     "suit": "Tampering",
-    "text": "Your code makes access control decisions all over the place, rather than with a security kernel"
+    "text": "Your code makes access control decisions all over the place, rather than with a security kernel",
+    "example": "The programmer adds a new endpoint to the service. However, he forgets to connect it with the authorisation mechanism, which makes it possible for everyone to have access to confidential data.",
+    "mitigation": "Security decisions (including authorisation) should be made in one place, separately from business logic (a good example is Spring Security and aspect-oriented programming).\nIt is worth considering, as a good practice, blocking access to all resources by default and explicitly granting access."
   },
   {
     "cardNumber": 16,
     "value": "Five",
     "suit": "Tampering",
-    "text": "An attacker can replay data without detection because your code doesn’t provide timestamps or sequence numbers"
+    "text": "An attacker can replay data without detection because your code doesn’t provide timestamps or sequence numbers",
+    "example": "A user of a financial service sends a money to another user. The attacker intercepts network traffic. Although end-to-end encryption has been implemented in the application and the message has been signed (in order to protect its integrity), he is able to send the intercepted data again, which will make another transfer with the same data.",
+    "mitigation": "Wherever possible, the use of TLS/SSL connections (which is robust to replay attacks) is highly recommended.\nAdditional protection can be provided by signing the data together with the sequence number. In this case, if the service receives a packet with sequence number less than or equal to the last recorded one, it will be rejected."
   },
   {
     "cardNumber": 17,
     "value": "Six",
     "suit": "Tampering",
-    "text": "An attacker can write to a data store your code relies on"
+    "text": "An attacker can write to a data store your code relies on",
+    "example": "The application gets information about allowed algorithms for JWT tokens from the configuration file. An attacker using the vulnerability in the application is able to overwrite this file and add the None algorithm. Thanks to this, he will be able to impersonate any user.",
+    "mitigation": "If an application relies on some kind of data storage, such as a file or a database, it is necessary to take care to limit permissions.\nIn the case of configuration files, it is good practice to grant read-only privileges to the application."
   },
   {
     "cardNumber": 18,
     "value": "Seven",
     "suit": "Tampering",
-    "text": "An attacker can bypass permissions because you don’t make names canonical before checking access permissions"
+    "text": "An attacker can bypass permissions because you don’t make names canonical before checking access permissions",
+    "example": "The application allows users to upload their own files. However, it does not properly verify the name of the file entered by the user, so he is able to save any file using \"../\" notation.",
+    "mitigation": "Always validate the data entered by the user on the server side.\nIf possible, try to normalise known data types (for example, change paths to absolute)"
   },
   {
     "cardNumber": 19,
     "value": "Eight",
     "suit": "Tampering",
-    "text": "An attacker can manipulate data because there’s no integrity protection for data on the network"
+    "text": "An attacker can manipulate data because there’s no integrity protection for data on the network",
+    "example": "During communication with the service, data integrity is not protected in any way. An attacker, being able to intercept traffic, may replace data sent by an authenticated user.Thanks to this, he can e.g. change the number of the account to which the money is transferred by the user.",
+    "mitigation": "Whenever possible, data should always be sent using the SSL/TLS channel which ensures data integrity.\nIf you need additional data integrity protection, you can consider signing the contents of the message."
   },
   {
     "cardNumber": 20,
     "value": "Nine",
     "suit": "Tampering",
-    "text": "An attacker can provide or control state information"
+    "text": "An attacker can provide or control state information",
+    "example": "A page containing confidential data is only displayed if the user is redirected from the intranet site. A redirection from the internal network is recognised based on the \"Referer\" header. The attacker adds an appropriate header to his request and gains access to confidential information.",
+    "mitigation": "Data received from outside (including user input) should always be treated as untrusted. Please note that even information that cannot be changed from browser (such as the \"Origin\" header) can be fabricated."
   },
   {
     "cardNumber": 21,
     "value": "Ten",
     "suit": "Tampering",
-    "text": "An attacker can alter information in a data store because it has weak ACLs or includes a group which is equivalent to everyone (“all Live ID holders”)"
+    "text": "An attacker can alter information in a data store because it has weak ACLs or includes a group which is equivalent to everyone (“all Live ID holders”)",
+    "example": "There is no granularity of rights in the application. Every logged-in user can do anything. For this reason, the user is able to delete other users after logging in.",
+    "mitigation": "There should be a separation of powers into roles. Users should be assigned as few rights as possible that are sufficient for them to perform their task (Principle of least privilege)."
   },
   {
     "cardNumber": 22,
     "value": "Jack",
     "suit": "Tampering",
-    "text": "An attacker can write to some resource because permissions are granted to the world or there are no ACLs"
+    "text": "An attacker can write to some resource because permissions are granted to the world or there are no ACLs",
+    "example": "The service allows you to upload files. However, the authorization mechanism has not been implemented, which means that any (also not logged in) user can upload any file or overwrite the file of another user.",
+    "mitigation": "Access to any resource should be granted only to those users and to the extent that it meets business requirements."
   },
   {
     "cardNumber": 23,
     "value": "Queen",
     "suit": "Tampering",
-    "text": "An attacker can change parameters over a trust boundary and after validation (for example, important parameters in a hidden field in HTML, or passing a pointer to critical memory)"
+    "text": "An attacker can change parameters over a trust boundary and after validation (for example, important parameters in a hidden field in HTML, or passing a pointer to critical memory)",
+    "example": "The service allows users to add avatars in the form of a URL to an image on a remote server. When entering the address, it is verified whether the remote resource is an image and contains no malicious scripts. However, the user can later change its content (the address will remain the same) and a malicious code will be executed in other users' browser.",
+    "mitigation": "If we are verifying some external data, it is important to make sure that it cannot be changed by someone else later.\nIn case of an image, one solution could be to copy it before scanning and then serve it directly from the application."
   },
   {
     "cardNumber": 24,
     "value": "King",
     "suit": "Tampering",
-    "text": "An attacker can load code inside your process via an extension point"
+    "text": "An attacker can load code inside your process via an extension point",
+    "example": "The service allows users to execute their own code (e.g. in the form of extensions). The user creates an extension, which performs HTTP request from the server level to other servers in the local network (SSRF attack).",
+    "mitigation": "Permission to execute a user code can always lead to new vulnerabilities. When allowing a user to use their own extensions, it is important to specify the exact range of functions that they can perform.\nIf possible, the user extension should only be usable after a review by the service owner."
   },
   {
     "cardNumber": 25,
     "value": "Ace",
     "suit": "Tampering",
-    "text": "You’ve invented a new Tampering attack"
+    "text": "You’ve invented a new Tampering attack",
+    "example": "The player must invent another potential threat.",
+    "mitigation": "N/A"
   },
   {
     "cardNumber": 26,
     "value": "Two",
     "suit": "Repudiation",
-    "text": "An attacker can pass data through the log to attack a log reader, and there’s no documentation of what sorts of validation are done"
+    "text": "An attacker can pass data through the log to attack a log reader, and there’s no documentation of what sorts of validation are done",
+    "example": "Access log on the server saves each URL visited.An attacker visits the service adding an HTML tag containing a JavaScript in the query parameter. If the administrator browses through the logs using a tool running in the browser and the content is not escaped, the malicious code will be executed in his browser (XSS attack).",
+    "mitigation": "Remember that some of the information in the logs may contain any content generated by a malicious user. Therefore, you should use tools that can properly format log message so that it is not harmful to the administrator."
   },
   {
     "cardNumber": 27,
     "value": "Three",
     "suit": "Repudiation",
-    "text": "A low privilege attacker can read interesting security information in the logs"
+    "text": "A low privilege attacker can read interesting security information in the logs",
+    "example": "The application collects logs, which are then publicly available. The logs contain confidential information, such as a user session ID, which can be used to impersonate a user.",
+    "mitigation": "The logs should only be accessible to those for whom this is required.\nThe inclusion of confidential information in logs should be avoided. If you place such data, you should consider using an hash function on such information (e.g. session ID or username), so that it can be compared with the expected value if necessary and cannot be reversed."
   },
   {
     "cardNumber": 28,
     "value": "Four",
     "suit": "Repudiation",
-    "text": "An attacker can alter digital signatures because the digital signature system you’re implementing is weak, or uses MACs where it should use a signature"
+    "text": "An attacker can alter digital signatures because the digital signature system you’re implementing is weak, or uses MACs where it should use a signature",
+    "example": "The system collects various pieces of information in order to be able to prove to the user that he or she has performed the action. To ensure reliability, messages are signed digitally. However, the algorithm used has weaknesses, which makes it impossible to clearly state that the message is authentic.",
+    "mitigation": "Use only proven and widely accepted cryptographic algorithms."
   },
   {
     "cardNumber": 29,
     "value": "Five",
     "suit": "Repudiation",
-    "text": "An attacker can alter log messages on a network because they lack strong integrity controls"
+    "text": "An attacker can alter log messages on a network because they lack strong integrity controls",
+    "example": "During the transmission of logs to the remote collector, the attacker intercepts the network transmission and changes its content, because integrity control is not ensured.",
+    "mitigation": "When sending logs to the place where they will be stored, use a channel that ensures data integrity (e.g. SSL/TLS). If the system we use does not support this, it is worth using a VPN connection for the transmission."
   },
   {
     "cardNumber": 30,
     "value": "Six",
     "suit": "Repudiation",
-    "text": "An attacker can create a log entry without a timestamp (or no log entry is timestamped)"
+    "text": "An attacker can create a log entry without a timestamp (or no log entry is timestamped)",
+    "example": "The log system uses a time stamp provided by the user. This makes it impossible to determine when exactly the event occurred.",
+    "mitigation": "Even if we allow the timestamp to be provided, it is worth adding a separate timestamp indicating exactly when the event occurred.\nHaving a separate log collector, it is worth adding information when the message arrived from the application."
   },
   {
     "cardNumber": 31,
     "value": "Seven",
     "suit": "Repudiation",
-    "text": "An attacker can make the logs wrap around and lose data"
+    "text": "An attacker can make the logs wrap around and lose data",
+    "example": "An attacker hack into the server. When finished, he generates a large number of requests which are saved in logs. Since the retention of logs is based on size, the previous logs are lost and the administrator is unable to determine how the hacking was performed.",
+    "mitigation": "Log retention should be based on time, not size.\nAlways make sure that there is enough space for the logs. You should implement an alert that will be triggered if there may be a shortage of free space"
   },
   {
     "cardNumber": 32,
     "value": "Eight",
     "suit": "Repudiation",
-    "text": "An attacker can make a log lose or confuse security information"
+    "text": "An attacker can make a log lose or confuse security information",
+    "example": "An attacker is able to create a request that will cause some of the information from the logs to be treated as metadata and thus, some of the information will be lost.",
+    "mitigation": "It is important to make sure that the parser and the formatter are able to interpret the logs properly, so that they can be recorded as they were sent."
   },
   {
     "cardNumber": 33,
     "value": "Nine",
     "suit": "Repudiation",
-    "text": "An attacker can use a shared key to authenticate as different principals, confusing the information in the logs"
+    "text": "An attacker can use a shared key to authenticate as different principals, confusing the information in the logs",
+    "example": "Many users use a shared key to get into the system.This indicates that the administrator, while browsing through the logs, is not able to determine who exactly did what.",
+    "mitigation": "Do not use shared keys. Each user should have individual credentials.\nIf it is necessary to exchange credentials in order to encrypt/sign data, asymmetric cryptographic algorithms should be used."
   },
   {
     "cardNumber": 34,
     "value": "Ten",
     "suit": "Repudiation",
-    "text": "An attacker can get arbitrary data into logs from unauthenticated (or weakly authenticated) outsiders without validation"
+    "text": "An attacker can get arbitrary data into logs from unauthenticated (or weakly authenticated) outsiders without validation",
+    "example": "An attacker is able to send fabricated entries to the log aggregator pretending to be another application, because it is not checked if the sending application is the one it claims to be. While browsing the logs, the administrator is not able to determine which events are real.",
+    "mitigation": "You need to implement an authentication mechanism for logging so that only an application with trusted credentials is able to save logs.\nAdditionally, it is worth saving additional attributes, such as the source IP address, so that you can filter entries based on them."
   },
   {
     "cardNumber": 35,
     "value": "Jack",
     "suit": "Repudiation",
-    "text": "An attacker can edit logs and there’s no way to tell (perhaps because there’s no heartbeat option for the logging system)"
+    "text": "An attacker can edit logs and there’s no way to tell (perhaps because there’s no heartbeat option for the logging system)",
+    "example": "An attacker is able to replace the content of some logs and thus hide his activities.",
+    "mitigation": "Some mechanisms should be implemented to guarantee the integrity of logs. For example, a system where the content of the previous message is used to sign each subsequent entry.\nIf possible, it is worth ensuring that the logs cannot be modified or deleted (it is only possible to append new data). This can be achieved, for example, by setting the file system attribute.\nAnother technique is to send a certain message periodically at fixed intervals (heart-beat). This will allow us to determine whether the login system has been operating during a given period of time."
   },
   {
     "cardNumber": 36,
     "value": "Queen",
     "suit": "Repudiation",
-    "text": "An attacker can say “I didn’t do that,” and you’d have no way to prove them wrong"
+    "text": "An attacker can say “I didn’t do that,” and you’d have no way to prove them wrong",
+    "example": "An attacker using a vulnerability in the system performs an unauthorized action. However, the application does not log enough information to be able to determine who did it and how (e.g. the only entry in the logs is \"account deleted\").",
+    "mitigation": "The logs should contain enough information to clearly state what happened and when and who did it. \nEach entry should contain additional metadata, such as the source IP address, what parameters were used, what user was logged in, etc."
   },
   {
     "cardNumber": 37,
     "value": "King",
     "suit": "Repudiation",
-    "text": "The system has no logs"
+    "text": "The system has no logs",
+    "example": "The administrator is not able to determine what exactly is happening with the application, because nothing is logged.",
+    "mitigation": "Each system should log all events that may be relevant from a business, legal and administrative perspective."
   },
   {
     "cardNumber": 38,
     "value": "Ace",
     "suit": "Repudiation",
-    "text": "You’ve invented a new Repudiation attack"
+    "text": "You’ve invented a new Repudiation attack",
+    "example": "The player must invent another potential threat.",
+    "mitigation": "N/A"
   },
   {
     "cardNumber": 39,
     "value": "Two",
     "suit": "InformationDisclosure",
-    "text": "An attacker can brute-force file encryption because there’s no defense in place (example defense: password stretching)"
+    "text": "An attacker can brute-force file encryption because there’s no defense in place (example defense: password stretching)",
+    "example": "An unauthorized person gains access to a database that stores, among other things, passwords of users transformed using the digest function (e.g. SHA-256). He then uses publicly available programs that compare each of the values with a word from the dictionary or with sequentially generated strings (Brute force). This way, he is able to easily find out at least part of the passwords.",
+    "mitigation": "Avoid using digest functions to convert and save confidential information. Instead, use safer key derivation functions (e.g. PBKDF2) or password hashing functions (such as Bcrypt)."
   },
   {
     "cardNumber": 40,
     "value": "Three",
     "suit": "InformationDisclosure",
-    "text": "An attacker can see error messages with security sensitive content"
+    "text": "An attacker can see error messages with security sensitive content",
+    "example": "In case of a database failure, the application shows the error page with the exception containing, among other things, the database address, login and password.",
+    "mitigation": "Application exceptions should not be exposed to the end user. Instead, a friendly error page should be displayed and the exception should be logged (please note that if the exception contains confidential information, it should be removed or masked).\nIf the framework we use presents the exception by default, you should change the default behavior of the framework)"
   },
   {
     "cardNumber": 41,
     "value": "Four",
     "suit": "InformationDisclosure",
-    "text": "An attacker can read content because messages (say, an email or HTTP cookie) aren’t encrypted even if the channel is encrypted"
+    "text": "An attacker can read content because messages (say, an email or HTTP cookie) aren’t encrypted even if the channel is encrypted",
+    "example": "The attacker gains access to the database. Although all communication is encrypted using SSL, data at rest is stored in unencrypted form. This gives the attacker access to confidential data.",
+    "mitigation": "Confidential data should be encrypted both at transit and at rest."
   },
   {
     "cardNumber": 42,
     "value": "Five",
     "suit": "InformationDisclosure",
-    "text": "An attacker may be able to read a document or data because it’s encrypted with a non-standard algorithm"
+    "text": "An attacker may be able to read a document or data because it’s encrypted with a non-standard algorithm",
+    "example": "The programmer is afraid that someone may decode confidential data if he use one of the open encryption algorithms. Therefore, he decides to modify one of them and thus unwittingly makes it weaker.",
+    "mitigation": "Always use commonly used and widely accepted cryptographic algorithms instead of creating your own or modifying existing ones."
   },
   {
     "cardNumber": 43,
     "value": "Six",
     "suit": "InformationDisclosure",
-    "text": "An attacker can read data because it’s hidden or occluded (for undo or change tracking) and the user might forget that it’s there"
+    "text": "An attacker can read data because it’s hidden or occluded (for undo or change tracking) and the user might forget that it’s there",
+    "example": "Application deployment is performed by copying the application folder directly to the server. However, the programmer forgot to delete folder \".git\" (used for version control).  An attacker downloads the directory and is able to view the entire history of the source code. He turned out that one of the previous revisions contains a password to the database.",
+    "mitigation": "You should always make sure that the application contains only those elements that are necessary for it to work. There are automated tools to verify the existence of certain known directories."
   },
   {
     "cardNumber": 44,
     "value": "Seven",
     "suit": "InformationDisclosure",
-    "text": "An attacker can act as a ‘man in the middle’ because you don’t authenticate endpoints of a network connection"
+    "text": "An attacker can act as a ‘man in the middle’ because you don’t authenticate endpoints of a network connection",
+    "example": "The attacker connects to an unprotected WiFi network, so he is able to redirect the traffic of other clients through his computer and thus intercept their network traffic (the man in the middle attack).",
+    "mitigation": "Always take care to protect network access from unauthorized persons.\nRemember to avoid using poor security.  For example, an outdated WEP standard should not be used for WiFi networks. Instead, use newer and more secure solutions such as WPA2 or WPA3. \nIf possible, you should avoid using pre-shared keys and use certificates instead (each client should have its own).\nFor networks, especially wired ones, you should consider using network access level security (like 802.1x protocol)."
   },
   {
     "cardNumber": 45,
     "value": "Eight",
     "suit": "InformationDisclosure",
-    "text": "An attacker can access information through a search indexer, logger, or other such mechanism"
+    "text": "An attacker can access information through a search indexer, logger, or other such mechanism",
+    "example": "Access to users' files in the service does not require authentication. Instead, a long and random link is generated to prevent guessing with brute forece attacks. However, some of the users have an extension to a popular search engine installed in their browser. To improve search results, the extension indexes all visited sites. Thanks to this, everyone is able to access other users' files by querying the search engine.",
+    "mitigation": "Access to confidential information should always require authentication and authorization.\nSecurity should never be based on mechanisms such as the robots.txt file. Not all search engines must respect its rules. Additionally, it can be helpful to an attacker at the discovery stage.\nIn case of logs, access to them should also require authorization. Access should be granted only to people for whom it is necessary.\nConfidential information should not be logged."
   },
   {
     "cardNumber": 46,
     "value": "Nine",
     "suit": "InformationDisclosure",
-    "text": "An attacker can read sensitive information in a file with bad ACLs"
+    "text": "An attacker can read sensitive information in a file with bad ACLs",
+    "example": "There are two roles in the application that can be assigned to users: user and administrator. For this reason, anyone who has been assigned an administrator role can do anything.",
+    "mitigation": "You need to introduce a separation of privileges so that you can assign the user only those privileges that are required to perform his tasks (principle of least privilege).\nIf it is possible to generate API keys, you should consider making it possible to assign only a subset of user privileges to the key. This way, in case of a key leaking, an attacker will only get partial permissions."
   },
   {
     "cardNumber": 47,
     "value": "Ten",
     "suit": "InformationDisclosure",
-    "text": "An attacker can read information in files with no ACLs"
+    "text": "An attacker can read information in files with no ACLs",
+    "example": "The authorization has not been implemented in the application. The system distinguishes only between authenticated and non-authenticated users. After logging in, the user has access to all resources and is able to perform any operation.",
+    "mitigation": "Authorization should be implemented by limiting user rights only to the necessary level."
   },
   {
     "cardNumber": 48,
     "value": "Jack",
     "suit": "InformationDisclosure",
-    "text": "An attacker can discover the fixed key being used to encrypt"
+    "text": "An attacker can discover the fixed key being used to encrypt",
+    "example": "The same key has been used for years to encrypt data. The attacker managed to break it by brute force. Thanks to that he is able to access all messages. Additionally, the same key was used for authentication in other services, so the attacker is also able to gain unauthorized access to them.",
+    "mitigation": "All passwords and encryption keys should be changed periodically.\nWhen encrypting data in transit, automatic key negotiation mechanisms should be used. Thanks to this, the amount of cryptographic material should not be sufficient for a successful attack. Additionally, by breaking the encryption key, the attacker will not be able to read previous messages.\nThe same passwords and keys must not be used for different purposes."
   },
   {
     "cardNumber": 49,
     "value": "Queen",
     "suit": "InformationDisclosure",
-    "text": "An attacker can read the entire channel because the channel (say, HTTP or SMTP) isn’t encrypted"
+    "text": "An attacker can read the entire channel because the channel (say, HTTP or SMTP) isn’t encrypted",
+    "example": "The application does not use an encrypted channel for data transmission. Only the HTTP protocol is used. Thanks to this, an attacker intercepting user traffic is able to read the whole communication. He steals the victim's session cookie and impersonates him.",
+    "mitigation": "If not all data should be publicly available, always use an encrypted channel for data transmission.\nAdditional techniques, such as HSTS, are recommended."
   },
   {
     "cardNumber": 50,
     "value": "King",
     "suit": "InformationDisclosure",
-    "text": "An attacker can read network information because there’s no cryptography used"
+    "text": "An attacker can read network information because there’s no cryptography used",
+    "example": "The attacker gains unauthorized access to one of the network routers. Since the transmission is not encrypted, he is able to obtain a lot of information, including confidential ones.",
+    "mitigation": "Always send information via an encrypted channel (e.g. SSL/TLS), even if you believe that the transmission takes place in a trusted network.\nIf encryption is not possible (e.g. the old application does not support it), consider setting up an encrypted VPN connection and allow transmission using it."
   },
   {
     "cardNumber": 51,
     "value": "Ace",
     "suit": "InformationDisclosure",
-    "text": "You’ve invented a new Information Disclosure attack"
+    "text": "You’ve invented a new Information Disclosure attack",
+    "example": "The player must invent another potential threat.",
+    "mitigation": "N/A"
   },
   {
     "cardNumber": 52,
     "value": "Two",
     "suit": "DenialOfService",
-    "text": "An attacker can make your authentication system unusable or unavailable"
+    "text": "An attacker can make your authentication system unusable or unavailable",
+    "example": "An attacker makes several unsuccessful attempts to guess the user password. This causes the account to be blocked for a certain period of time and thus an authorized user is unable to log in.",
+    "mitigation": "One of the solutions may be to use the device cookies, i.e. if you successfully log in, a cookie will be set in your browser.Then, in case of several unsuccessful login attempts, block access only to those who do not send this cookie (devices from which the user managed to log in earlier will be considered trusted).\nYou may consider blocking access based on the IP address, but this is not very effective and may also cause blocking for innocent users.\nFinally, you can consider not blocking your account and implement other mechanisms such as two factor authentication, captcha or exponential backoff with every failed attempt.\nIf you are implementing an account blocking mechanism, you must provide a channel that allows the account owner (and no one else) to unlock the account."
   },
   {
     "cardNumber": 53,
     "value": "Three",
     "suit": "DenialOfService",
-    "text": "An attacker can make a client unavailable or unusable but the problem goes away when the attacker stops"
+    "text": "An attacker can make a client unavailable or unusable but the problem goes away when the attacker stops",
+    "example": "The service allows users to communicate using p2p chat. A malicious user sends fabricated messages in a loop, which when reaching the recipient's browser cause a significant increase in the consumption of local resources.",
+    "mitigation": "Throttle user traffic if it exceeds defined thresholds.\nValidate user input data.\nConsider giving users the option to completely block interactions with selected users."
   },
   {
     "cardNumber": 54,
     "value": "Four",
     "suit": "DenialOfService",
-    "text": "An attacker can make a server unavailable or unusable but the problem goes away when the attacker stops"
+    "text": "An attacker can make a server unavailable or unusable but the problem goes away when the attacker stops",
+    "example": "A malicious user generates requests over and over again that cause heavy queries to the database. This causes the whole database connection pool gets blocked and other users are unable to use the service.",
+    "mitigation": "Throttle the number of requests from users.\nTry to design the system so that resources are distributed fairly among users.\nMonitor system behavior and take manual or automatic action if an anomaly is detected."
   },
   {
     "cardNumber": 55,
     "value": "Five",
     "suit": "DenialOfService",
-    "text": "An attacker can make a client unavailable or unusable without ever authenticating but the problem goes away when the attacker stops"
+    "text": "An attacker can make a client unavailable or unusable without ever authenticating but the problem goes away when the attacker stops",
+    "example": "An attacker executes a script that tries to log in to the victim's account, trying a password one by one. During this time a victim, being logged in to his session, is not able to perform any action due to a huge number of notifications (in the form of popup messages) about unsuccessful login attempts.",
+    "mitigation": "Throttle the number of requests that an anonymous user can make in a given period of time.\nCare should be taken to ensure that the actions of anonymous users do not affect the work of legitimate users (e.g. notifications generated by them should not be displayed in a way that makes the work difficult)."
   },
   {
     "cardNumber": 56,
     "value": "Six",
     "suit": "DenialOfService",
-    "text": "An attacker can make a server unavailable or unusable without ever authenticating but the problem goes away when the attacker stops"
+    "text": "An attacker can make a server unavailable or unusable without ever authenticating but the problem goes away when the attacker stops",
+    "example": "The users' credentials were encoded with Bcrypt for security purposes. The attacker is taking advantage of the fact that password verification puts a massive load on the server CPU, so he generates a lot of requests with false credentials. This causes the CPU to be unable to perform other tasks and legitimate users are unable to do anything.",
+    "mitigation": "First of all, consider throttling the number of requests from anonymous users.\nConsider separating the pool of resources for authenticated and non-authenticated users (e.g. a separate service for login and password reset, to which only anonymous users will connect)."
   },
   {
     "cardNumber": 57,
     "value": "Seven",
     "suit": "DenialOfService",
-    "text": "An attacker can make a client unavailable or unusable and the problem persists after the attacker goes away"
+    "text": "An attacker can make a client unavailable or unusable and the problem persists after the attacker goes away",
+    "example": "The attacker as his avatar creates a fabricated image, which contains a malicious script. Then, on another user's profile he leaves a comment, which is displayed on the main page of the target user together with the author's avatar. This causes the victim always executes a malicious script when visiting his homepage, which causes his browser to stop working.",
+    "mitigation": "Validate the user input.\nPurify the generated content so that it does not contain content that could cause damage."
   },
   {
     "cardNumber": 58,
     "value": "Eight",
     "suit": "DenialOfService",
-    "text": "An attacker can make a server unavailable or unusable and the problem persists after the attacker goes away"
+    "text": "An attacker can make a server unavailable or unusable and the problem persists after the attacker goes away",
+    "example": "The system allows users to upload images. The malicious user uploads so many large files that it fills the server's hard drive entirely. This causes the application to stop working and cannot be launched until the administrator removes some files.",
+    "mitigation": "Limit the amount of resources that a single user can consume.\nTry to separate user resources from application and operating system resources (e.g. separate volume for user files).\nMonitor the current consumption of resources and alert if the defined thresholds are exceeded."
   },
   {
     "cardNumber": 59,
     "value": "Nine",
     "suit": "DenialOfService",
-    "text": "An attacker can make a client unavailable or unusable without ever authenticating and the problem persists after the attacker goes away"
+    "text": "An attacker can make a client unavailable or unusable without ever authenticating and the problem persists after the attacker goes away",
+    "example": "The system allows to leave a message to members also by anonymous visitors. Since there is no limit on the length of the topic, the malicious user creates a message that contains a topic with a huge length. This causes that when a user tries to display a list of his messages, the browser crashes.",
+    "mitigation": "Always validate the user input.\nDisplay the data so that it is not harmful to the user."
   },
   {
     "cardNumber": 60,
     "value": "Ten",
     "suit": "DenialOfService",
-    "text": "An attacker can make a server unavailable or unusable without ever authenticating and the problem persists after the attacker goes away"
+    "text": "An attacker can make a server unavailable or unusable without ever authenticating and the problem persists after the attacker goes away",
+    "example": "The attacker generates a huge amount of requests to reset passwords of other users. This causes so many entries with new tokens to be created in the database that the application database stops working due to lack of free space.",
+    "mitigation": "Throttle the number of requests made by a single customer (especially anonymous visitors).\nIf possible, try to ensure that the content generated by the anonymous user expires after some time.\nConsider using a separate resource pool for content generated by anonymous visitors."
   },
   {
     "cardNumber": 61,
     "value": "Jack",
     "suit": "DenialOfService",
-    "text": "An attacker can cause the logging subsystem to stop working"
+    "text": "An attacker can cause the logging subsystem to stop working",
+    "example": "The attacker fabricates a request that causes the logger to incorrectly interpret the entry and crashes when trying to save data. Subsequent events are not logged",
+    "mitigation": "Use verified login tools that have been tested for entering incorrect data.\nMake sure there is always enough space to store logs.\nMonitor the logger itself (e.g. create specific entries in fixed intervals). If any anomalies are detected, generate an alert."
   },
   {
     "cardNumber": 62,
     "value": "Queen",
     "suit": "DenialOfService",
-    "text": "An attacker can amplify a Denial of Service attack through this component with amplification on the order of 10:1"
+    "text": "An attacker can amplify a Denial of Service attack through this component with amplification on the order of 10:1",
+    "example": "The attacker sends a lot of requests of 1kb size to the server. As a result, the server generates the same amount of messages of 10kb to another client (e.g. using WebSocket).",
+    "mitigation": "Throttle traffic generated by a single user. In case of large traffic, a captcha mechanism can be introduced.\nConsider a solution where another client only receives a notification that there is a new message and has the ability to fetch it. This is not always a better solution, but in this case you can use pagination and streaming response.\nWeb Application Firewall (WAF) solutions can be helpful."
   },
   {
     "cardNumber": 63,
     "value": "King",
     "suit": "DenialOfService",
-    "text": "An attacker can amplify a Denial of Service attack through this component with amplification on the order of 100:1"
+    "text": "An attacker can amplify a Denial of Service attack through this component with amplification on the order of 100:1",
+    "example": "The attacker sends a lot of requests of 1kb size to the server. As a result, the server generates the same amount of messages of 100kb to another client (e.g. using WebSocket).",
+    "mitigation": "Throttle traffic generated by a single user. In case of large traffic, a captcha mechanism can be introduced.\nConsider a solution where another client only receives a notification that there is a new message and has the ability to fetch it. This is not always a better solution, but in this case you can use pagination and streaming response.\nWeb Application Firewall (WAF) solutions can be helpful."
   },
   {
     "cardNumber": 64,
     "value": "Ace",
     "suit": "DenialOfService",
-    "text": "You’ve invented a new Denial of Service attack"
+    "text": "You’ve invented a new Denial of Service attack",
+    "example": "The player must invent another potential threat.",
+    "mitigation": "N/A"
   },
   {
     "cardNumber": 65,
     "value": "Five",
     "suit": "ElevationOfPrivilege",
-    "text": "An attacker can force data through different validation paths which give different results"
+    "text": "An attacker can force data through different validation paths which give different results",
+    "example": "Using different endpoints you can save the same entity in the system. However, each of them has its own validation mechanism for incoming data. This means that data that would be rejected by one endpoint can be accepted by another.",
+    "mitigation": "The rules for input validation should always be in a single place.\nMany frameworks and libraries allow you to describe validation rules in the object to which you deserialize data."
   },
   {
     "cardNumber": 66,
     "value": "Six",
     "suit": "ElevationOfPrivilege",
-    "text": "An attacker could take advantage of .NET permissions you ask for, but don’t use"
+    "text": "An attacker could take advantage of .NET permissions you ask for, but don’t use",
+    "example": "I'm not familiar with .NET technology, so I'll describe it using a different example. At the start, the application asks the user to give access to the microphone and camera, even though he does not need it at this moment.If the user gives his consent, he will not be asked for it later, and e.g. in case of XSS vulnerability, the attacker will gain access to devices on the site where such a request could seem suspicious.",
+    "mitigation": "Never request permissions you don't need. This applies not only to the browser, but also to other technologies such as Android permissions or Security Manager in Java applications."
   },
   {
     "cardNumber": 67,
     "value": "Seven",
     "suit": "ElevationOfPrivilege",
-    "text": "An attacker can provide a pointer across a trust boundary, rather than data which can be validated"
+    "text": "An attacker can provide a pointer across a trust boundary, rather than data which can be validated",
+    "example": "The website executes a script that is not built into it but is executed from an external server. One day the owner of that server decides to modify the script by adding a cryptocurrency miner  to it (the address remains unchanged).",
+    "mitigation": "All external resources should be treated as untrusted. The best solution is to download them the first time, validate and then share them from your own servers.\nIf you need to use them (e.g. resources made available by CDN networks), you should check their integrity before each use after initial verification. For frontend solutions, subresource integrity (SRI) should be used. This should be hardened with appropriate CSP policies."
   },
   {
     "cardNumber": 68,
     "value": "Eight",
     "suit": "ElevationOfPrivilege",
-    "text": "An attacker can enter data that is checked while still under their control and used later on the other side of a trust boundary"
+    "text": "An attacker can enter data that is checked while still under their control and used later on the other side of a trust boundary",
+    "example": "The service provides a webhook mechanism. User can add a http address to which a request will be sent in case of a specific event. To protect against SSRF attacks, when adding an address it is verified that it does not point to a host in the local network. However, after the verification is completed, the malicious user is able to change the DNS record value to point to the address of the local network (because he owns the DNS zone), so he can perform a SSRF attack.",
+    "mitigation": "Resources that we have no control over should always be considered untrusted. Always remember that, despite initial verification, they may change later.\nIn the case of SSRF attacks related to webhooks, if we have no control over the destination addresses, the solution may be to pass the requests through a proxy server, where access to local addresses is restricted by firewall. In this case, changing the address to which the domain is being resolved will not create a vulnerability."
   },
   {
     "cardNumber": 69,
     "value": "Nine",
     "suit": "ElevationOfPrivilege",
-    "text": "There’s no reasonable way for a caller to figure out what validation of tainted data you perform before passing it to them"
+    "text": "There’s no reasonable way for a caller to figure out what validation of tainted data you perform before passing it to them",
+    "example": "If the login attempt failed, the user can see a message that the username he entered does not exist or the password is incorrect. This allows him to know the user names of the system and to perform brute force attacks more effectively.",
+    "mitigation": "For security-sensitive information, do not return detailed information back to the users. Instead, they should only receive a general message, but the details should be logged."
   },
   {
     "cardNumber": 70,
     "value": "Ten",
     "suit": "ElevationOfPrivilege",
-    "text": "There’s no reasonable way for a caller to figure out what security assumptions you make"
+    "text": "There’s no reasonable way for a caller to figure out what security assumptions you make",
+    "example": "After entering the wrong password on the login screen the user gets the information \"Password too long. Maximum length is 8 characters\".",
+    "mitigation": "Do not disclose security assumptions where not required."
   },
   {
     "cardNumber": 71,
     "value": "Jack",
     "suit": "ElevationOfPrivilege",
-    "text": "An attacker can reflect input back to a user, like cross site scripting"
+    "text": "An attacker can reflect input back to a user, like cross site scripting",
+    "example": "The value of one of the query parameters is displayed on the website. Thanks to this, an attacker is able to send the victim a link to our website where he places a <script> tag with malicious content in the query parameter. Because its content is rendered in the victim's browser, an XSS attack is successful.",
+    "mitigation": "The user input should always be considered as untrusted.\nIf the data entered by the user is later rendered in the browser, it is absolutely necessary to make sure that all unwanted elements (such as HTML) are properly escaped"
   },
   {
     "cardNumber": 72,
     "value": "Queen",
     "suit": "ElevationOfPrivilege",
-    "text": "You include user-generated content within your page, possibly including the content of random URLs"
+    "text": "You include user-generated content within your page, possibly including the content of random URLs",
+    "example": "Our service allows users to add comments, which are then visible to others. A malicious user posts a <script> tag containing harmful content in the comment and it is executed in the browser of everyone who visits the site.",
+    "mitigation": "Content over which we have no control should always be considered untrusted.\nIn the case of any content provided from outside, care must be taken to ensure that undesirable content is properly escaped.\nPlease note that sanitizing input is not sufficient. Take care how the data is rendered later."
   },
   {
     "cardNumber": 73,
     "value": "King",
     "suit": "ElevationOfPrivilege",
-    "text": "An attacker can inject a command that the system will run at a higher privilege level"
+    "text": "An attacker can inject a command that the system will run at a higher privilege level",
+    "example": "The application manages members using the user database from the host operating system. Changing the password is done by executing the passwd command. A malicious user manipulating the parameters is able to execute any command of the operating system.",
+    "mitigation": "Try to avoid invoking shell commands from the application. However, if this is impossible to avoid, take care to verify the user input carefully.\nOften, instead of executing an operating system command, you can use an appropriate library that provides the required functionality and has been tested sufficiently."
   },
   {
     "cardNumber": 74,
     "value": "Ace",
     "suit": "ElevationOfPrivilege",
-    "text": "You’ve invented a new Elevation of Privilege attack"
+    "text": "You’ve invented a new Elevation of Privilege attack",
+    "example": "The player must invent another potential threat.",
+    "mitigation": "N/A"
   }
 ]
