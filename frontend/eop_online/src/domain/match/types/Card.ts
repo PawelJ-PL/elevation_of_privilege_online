@@ -3,6 +3,8 @@ export type Card = {
     value: string
     suit: Suit
     text: string
+    example: string
+    mitigation: string
 }
 
 export type Suit =

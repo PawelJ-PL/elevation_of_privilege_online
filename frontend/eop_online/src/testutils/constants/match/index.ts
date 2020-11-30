@@ -15,6 +15,8 @@ export const card1: Card = {
     suit: "Spoofing",
     value: "eight",
     text: "Lorem ipsum",
+    example: "Lorem ipsum",
+    mitigation: "Lorem",
 }
 
 export const card2: Card = {
@@ -22,6 +24,8 @@ export const card2: Card = {
     suit: "InformationDisclosure",
     value: "two",
     text: "Lorem ipsum",
+    example: "Lorem ipsum",
+    mitigation: "Lorem ipsum",
 }
 
 export const usersCard: UsersCard = {
@@ -53,6 +57,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "Spoofing",
             value: "Four",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     tampering: {
@@ -61,6 +67,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "Tampering",
             value: "Seven",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     repudiation: {
@@ -69,6 +77,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "Repudiation",
             value: "King",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     informationDisclosure: {
@@ -77,6 +87,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "InformationDisclosure",
             value: "Jack",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     denialOfService: {
@@ -85,6 +97,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "DenialOfService",
             value: "Two",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     elevationOfPrivilege: {
@@ -93,6 +107,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "ElevationOfPrivilege",
             value: "Ace",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
 }

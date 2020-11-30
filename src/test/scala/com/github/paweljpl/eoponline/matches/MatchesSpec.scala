@@ -128,16 +128,28 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
                              .provideCustomLayer(createLayer(gamesRepoState, gameplayRepoState, sentEvents))
     } yield assert(result.state)(equalTo(GameState(ExampleGameId, ExamplePlayer.id, Some(Suit.DenialOfService)))) &&
       assert(result.playersScores)(equalTo(Map(ExampleId3 -> 1))) &&
-      assert(result.hand)(hasSameElements(List(Card(25, Value.Ace, Suit.Tampering, "TextQuux")))) &&
+      assert(result.hand)(hasSameElements(List(Card(25, Value.Ace, Suit.Tampering, "TextQuux", "Lorem ipsum", "Lorem ipsum")))) &&
       assert(result.table)(
         hasSameElements(
           List(
-            ExtendedDeckElementDto(ExampleGameId, ExamplePlayer.id, Card(1, Value.Two, Suit.Spoofing, "TextFoo"), CardLocation.Table, None),
-            ExtendedDeckElementDto(ExampleGameId, ExampleId1, Card(3, Value.Four, Suit.Spoofing, "TextBaz"), CardLocation.Table, None),
+            ExtendedDeckElementDto(
+              ExampleGameId,
+              ExamplePlayer.id,
+              Card(1, Value.Two, Suit.Spoofing, "TextFoo", "Lorem ipsum", "Lorem ipsum"),
+              CardLocation.Table,
+              None
+            ),
+            ExtendedDeckElementDto(
+              ExampleGameId,
+              ExampleId1,
+              Card(3, Value.Four, Suit.Spoofing, "TextBaz", "Lorem ipsum", "Lorem ipsum"),
+              CardLocation.Table,
+              None
+            ),
             ExtendedDeckElementDto(
               ExampleGameId,
               ExampleId3,
-              Card(32, Value.Eight, Suit.Repudiation, "TestQuuz"),
+              Card(32, Value.Eight, Suit.Repudiation, "TestQuuz", "Lorem ipsum", "Lorem ipsum"),
               CardLocation.Table,
               Some(true)
             )
@@ -624,7 +636,7 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
       updatedGamesRepoState    <- gamesRepoState.get
       updatedGameplayRepoState <- gameplayRepoState.get
       events                   <- sentEvents.get
-    } yield assert(result)(isLeft(equalTo(ThreatStatusAlreadyAssigned(ExampleGameId, 1, false)))) &&
+    } yield assert(result)(isLeft(equalTo(ThreatStatusAlreadyAssigned(ExampleGameId, 1, threatLinked = false)))) &&
       assert(updatedGamesRepoState)(equalTo(initialGamesRepoState)) &&
       assert(updatedGameplayRepoState)(equalTo(initialGameplayRepoState)) &&
       assert(events)(isEmpty)

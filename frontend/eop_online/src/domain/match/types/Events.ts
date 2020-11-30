@@ -1,4 +1,4 @@
-import { Suit } from "./Card"
+import { Card } from "./Card"
 export type ThreatStatusAssigned = { gameId: string; cardNumber: number; newStatus: boolean; playerId: string }
 
 export type NextPlayer = { gameId: string; newPlayer: string }
@@ -6,7 +6,7 @@ export type NextPlayer = { gameId: string; newPlayer: string }
 export type CardPlayed = {
     gameId: string
     playerId: string
-    card: { cardNumber: number; value: string; suit: Suit; text: string }
+    card: Card
     location: "Table"
     threatLinked?: null
 }

@@ -38,6 +38,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "Spoofing",
             value: "Four",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     tampering: {
@@ -46,18 +48,24 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "Tampering",
             value: "Four",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
         seven: {
             cardNumber: 18,
             suit: "Tampering",
             value: "Seven",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
         nine: {
             cardNumber: 20,
             suit: "Tampering",
             value: "Nine",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     repudiation: {
@@ -66,6 +74,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "Repudiation",
             value: "King",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     informationDisclosure: {
@@ -74,6 +84,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "InformationDisclosure",
             value: "Jack",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     denialOfService: {
@@ -82,12 +94,16 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "DenialOfService",
             value: "Two",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
         jack: {
             cardNumber: 61,
             suit: "DenialOfService",
             value: "Jack",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
     elevationOfPrivilege: {
@@ -96,6 +112,8 @@ export const cards: Record<SuitKey, Record<string, Card>> = {
             suit: "ElevationOfPrivilege",
             value: "Ace",
             text: "Lorem ipsum",
+            example: "Lorem ipsum",
+            mitigation: "Lorem ipsum",
         },
     },
 }
