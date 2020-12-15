@@ -581,7 +581,7 @@
     "suit": "ElevationOfPrivilege",
     "text": "An attacker can inject a command that the system will run at a higher privilege level",
     "example": "The application manages members using the user database from the host operating system. Changing the password is done by executing the passwd command. A malicious user manipulating the parameters is able to execute any command of the operating system.",
-    "mitigation": "Try to avoid invoking shell commands from the application. However, if this is impossible to avoid, take care to verify the user input carefully.\nOften, instead of executing an operating system command, you can use an appropriate library that provides the required functionality and has been tested sufficiently."
+    "mitigation": "This threat refers to all types of injections (SQL injection, OS command injection, LDAP injection). The most important protection is to always validate the user input and only allow what you expect. This should be done carefully so that you don't introduce another vulnerability (e.g. when verifying regex, you may inadvertently introduce a catastrophic backtracking vulnerability).\nTo avoid OS command injection related vulnerabilities, try to avoid invoking shell commands from the application. However, if this is impossible to avoid, take care to verify the user input carefully.\nOften, instead of executing an operating system command, you can use an appropriate library that provides the required functionality and has been tested sufficiently."
   },
   {
     "cardNumber": 74,
