@@ -485,7 +485,7 @@
     "suit": "DenialOfService",
     "text": "An attacker can cause the logging subsystem to stop working",
     "example": "The attacker fabricates a request that causes the logger to incorrectly interpret the entry and crashes when trying to save data. Subsequent events are not logged",
-    "mitigation": "Use verified login tools that have been tested for entering incorrect data.\nMake sure there is always enough space to store logs.\nMonitor the logger itself (e.g. create specific entries in fixed intervals). If any anomalies are detected, generate an alert."
+    "mitigation": "Use verified logging tools that have been tested against entering incorrect data.\nMake sure there is always enough space to store logs.\nMonitor the logger itself (e.g. create specific entries in fixed intervals). If any anomalies are detected, generate an alert."
   },
   {
     "cardNumber": 62,
