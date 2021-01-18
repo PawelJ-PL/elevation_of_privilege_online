@@ -27,7 +27,6 @@ import com.github.paweljpl.eoponline.Constants
 import com.github.paweljpl.eoponline.testdoubles.{
   CardsRepoStub,
   FakeClock,
-  FakeConnectionSource,
   FakeGameRepo,
   FakeGameplayRepo,
   FakeInternalMessagesTopic,
@@ -55,8 +54,7 @@ object MatchesSpec extends DefaultRunnableSpec with Constants {
 
   final val UpdateTableDto = TableCardReqDto(true)
 
-  val db: ZLayer[Any with Blocking, Nothing, DoobieDb.Database] =
-    FakeConnectionSource.test ++ Blocking.any >>> DoobieDb.fromConnectionSource
+  val db: ZLayer[Any with Blocking, Nothing, DoobieDb.Database] = DoobieDb.none
 
   private def createLayer(
     gamesRepoState: Ref[GamesRepoState],

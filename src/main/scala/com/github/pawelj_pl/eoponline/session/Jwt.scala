@@ -7,7 +7,6 @@ import tsec.jws.mac.JWTMac
 import tsec.jwt.JWTClaims
 import tsec.mac.jca.HMACSHA256
 import zio.clock.Clock
-import zio.config.ZConfig
 import zio.random.Random
 import zio.{Has, Task, ZIO, ZLayer}
 import zio.interop.catz._
@@ -28,7 +27,7 @@ object Jwt {
 
   def decode(token: String): ZIO[Jwt, Throwable, Session] = ZIO.accessM[Jwt](_.get.decode(token))
 
-  val live: ZLayer[Clock with Random with ZConfig[AppConfig.Auth], Nothing, Has[Service]] =
+  val live: ZLayer[Clock with Random with Has[AppConfig.Auth], Nothing, Has[Service]] =
     ZLayer.fromServices[Clock.Service, Random.Service, AppConfig.Auth, Jwt.Service] { (clock, random, authConfig) =>
       new Service {
         private final val SessionFieldKey = "session"

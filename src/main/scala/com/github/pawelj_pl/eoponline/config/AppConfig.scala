@@ -1,9 +1,8 @@
 package com.github.pawelj_pl.eoponline.config
 
 import java.time.Duration
-
 import com.github.pawelj_pl.eoponline.config.AppConfig.{MessageBroker, Schedulers}
-import zio.Layer
+import zio.{Has, Layer}
 import zio.config._
 import zio.config.magnolia.DeriveConfigDescriptor.descriptor
 import zio.config.typesafe.TypesafeConfig.fromDefaultLoader
@@ -49,6 +48,6 @@ object AppConfig {
 
   private val configDescriptor = descriptor[AppConfig].mapKey(toKebabCase)
 
-  val live: Layer[ReadError[String], ZConfig[AppConfig]] = fromDefaultLoader(configDescriptor)
+  val live: Layer[ReadError[String], Has[AppConfig]] = fromDefaultLoader(configDescriptor)
 
 }

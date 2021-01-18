@@ -7,7 +7,6 @@ import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository.GamesRepository
 import io.github.gaelrenoux.tranzactio.doobie.Database
 import zio.clock.Clock
-import zio.config.ZConfig
 import zio.logging.{Logger, Logging}
 import zio.{Has, Schedule, ZIO, ZLayer}
 
@@ -23,7 +22,7 @@ object GameCleanup {
 
   val schedule: ZIO[GameCleanup, Nothing, Unit] = ZIO.accessM[GameCleanup](_.get.schedule)
 
-  val live: ZLayer[Clock with ZConfig[AppConfig.Schedulers.GameCleaner] with GamesRepository with Has[
+  val live: ZLayer[Clock with Has[AppConfig.Schedulers.GameCleaner] with GamesRepository with Has[
     Database.Service
   ] with Logging, Nothing, GameCleanup] =
     ZLayer.fromServices[Clock.Service, AppConfig.Schedulers.GameCleaner, GamesRepository.Service, Database.Service, Logger[
@@ -36,7 +35,7 @@ object GameCleanup {
               now           <- clock.instant
               outdatedGames <- gamesRepo.getGamesOlderThan(now.minus(schedulerConfig.gameValidFor))
               formattedIds = outdatedGames.map(_.id.show).mkString(", ")
-              _             <- if (outdatedGames.isEmpty) ZIO.unit else logger.info(show"Outdated games will be removed: $formattedIds")
+              _             <- logger.info(show"Outdated games will be removed: $formattedIds").unless(outdatedGames.isEmpty)
               _             <- gamesRepo.deleteGames(outdatedGames.map(_.id))
             } yield ()
           )

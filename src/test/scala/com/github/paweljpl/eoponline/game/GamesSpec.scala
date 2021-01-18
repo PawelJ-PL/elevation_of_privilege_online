@@ -28,7 +28,6 @@ import com.github.paweljpl.eoponline.Constants
 import com.github.paweljpl.eoponline.testdoubles.{
   CardsRepoStub,
   FakeClock,
-  FakeConnectionSource,
   FakeGameRepo,
   FakeGameplayRepo,
   FakeInternalMessagesTopic,
@@ -49,8 +48,7 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
 
   val logging: ZLayer[Any, Nothing, Logging] = Slf4jLogger.make((_, str) => str)
 
-  val db: ZLayer[Any with Blocking, Nothing, DoobieDb.Database] =
-    FakeConnectionSource.test ++ Blocking.any >>> DoobieDb.fromConnectionSource
+  val db: ZLayer[Any with Blocking, Nothing, DoobieDb.Database] = DoobieDb.none
 
   private def createLayer(
     gamesRepoState: Ref[GamesRepoState],

@@ -34,7 +34,7 @@ import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory
 import zio.{Has, ZLayer}
 import zio.blocking.Blocking
 import zio.clock.Clock
-import zio.config.{ZConfig, getConfig}
+import zio.config.getConfig
 import zio.config.syntax._
 import zio.logging.{Logger, Logging}
 import zio.logging.slf4j.Slf4jLogger
@@ -44,7 +44,7 @@ object Environments {
 
   type HttpServerEnvironment = Database
     with GameRoutes
-    with ZConfig[AppConfig.Server]
+    with Has[AppConfig.Server]
     with WebSocketHandler
     with WebSocketRoutes
     with UserRoutes
@@ -52,10 +52,9 @@ object Environments {
     with StaticRoutes
     with GameCleanup
 
-  private val provideWebSocketTopic
-    : ZLayer[ZConfig[MessageBroker] with Blocking with Logging, Throwable, MessageTopic[WebSocketMessage[_]]] =
+  private val provideWebSocketTopic: ZLayer[Has[MessageBroker] with Blocking with Logging, Throwable, MessageTopic[WebSocketMessage[_]]] =
     ZLayer
-      .fromServiceManaged[Logger[String], Blocking with ZConfig[MessageBroker], Throwable, MessageTopic[WebSocketMessage[_]]](logger =>
+      .fromServiceManaged[Logger[String], Blocking with Has[MessageBroker], Throwable, MessageTopic[WebSocketMessage[_]]](logger =>
         getConfig[AppConfig.MessageBroker].toManaged_.flatMap {
           case MessageBroker.InMemory       => MessageTopic.inMemory[WebSocketMessage[_]](WebSocketMessage.TopicStarted).build
           case jmsConfig: MessageBroker.Jms =>
@@ -83,7 +82,9 @@ object Environments {
     val random = Random.live
     val randomUtils = random >>> RandomUtils.live
     val dataSource = blocking ++ AppConfig.live.narrow(_.database) >>> DataSourceLayers.hikari
-    val errorStrategy = ZLayer.succeed(ErrorStrategies.RetryForever.withTimeout(Duration.ofSeconds(10)): ErrorStrategiesRef)
+    val errorStrategy = ZLayer.succeed(
+      ErrorStrategies.timeout(Duration.ofSeconds(10)).retryForeverFixed(Duration.ofSeconds(10)).timeout(Duration.ofSeconds(15))
+    )
     val db = dataSource ++ blocking ++ clock ++ errorStrategy >>> DoobieDb.fromDatasourceAndErrorStrategies
     val gamesRepo = clock >>> GamesRepository.postgres
     val gamePlayRepo = GameplayRepository.postgres

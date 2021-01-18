@@ -7,7 +7,6 @@ import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
-import zio.config.ZConfig
 import zio.{Has, Task, ZIO, ZLayer, ZManaged}
 
 object Database {
@@ -22,7 +21,7 @@ object Database {
 
   def migrate: ZIO[Database, Throwable, Unit] = ZIO.accessM[Database](_.get.migrate)
 
-  val live: ZLayer[ZConfig[AppConfig.Database], Nothing, Database] = ZLayer.fromService[AppConfig.Database, Database.Service](dbConfig =>
+  val live: ZLayer[Has[AppConfig.Database], Nothing, Database] = ZLayer.fromService[AppConfig.Database, Database.Service](dbConfig =>
     new Service {
 
       private final val LiquibaseChangelogMaster = "db/changelog/changelog-master.yml"
