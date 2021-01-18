@@ -5,12 +5,11 @@ import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource
 import zio.{Has, ZIO, ZLayer, blocking}
 import zio.blocking.Blocking
-import zio.config.ZConfig
 
 object DataSourceLayers {
 
-  val hikari: ZLayer[Blocking with ZConfig[AppConfig.Database], Throwable, Has[DataSource]] = ZIO
-    .accessM[Blocking with ZConfig[AppConfig.Database]] { env =>
+  val hikari: ZLayer[Blocking with Has[AppConfig.Database], Throwable, Has[DataSource]] = ZIO
+    .accessM[Blocking with Has[AppConfig.Database]] { env =>
       blocking.effectBlocking {
         val dbConf = env.get[AppConfig.Database]
         val ds = new HikariDataSource()

@@ -4,7 +4,6 @@ import com.github.pawelj_pl.eoponline.database.Database
 import com.github.pawelj_pl.eoponline.eventbus.handlers.WebSocketHandler
 import com.github.pawelj_pl.eoponline.scheduler.GameCleanup
 import zio.{ExitCode, Runtime, URIO, ZEnv, ZIO, App => ZioApp}
-import zio.console.putStrLn
 
 object Application extends ZioApp {
 
@@ -20,10 +19,6 @@ object Application extends ZioApp {
       .useForever
       .provideSomeLayer(Environments.httpServerEnvironment)
 
-  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    app.foldCauseM(
-      cause => putStrLn(cause.prettyPrint).as(ExitCode.failure),
-      _ => ZIO.succeed(ExitCode.success)
-    )
+  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] = app.exitCode
 
 }

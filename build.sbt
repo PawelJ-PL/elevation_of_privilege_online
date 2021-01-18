@@ -1,7 +1,7 @@
 val dependencies = {
   val plugins = Seq(
     compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
-    compilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full)
+    compilerPlugin("org.typelevel" %% "kind-projector" % "0.11.3" cross CrossVersion.full)
   )
 
   val logger = Seq(
@@ -10,25 +10,25 @@ val dependencies = {
   )
 
   val zio = Seq(
-    "dev.zio" %% "zio" % "1.0.3",
-    "dev.zio" %% "zio-streams" % "1.0.3",
+    "dev.zio" %% "zio" % "1.0.4",
+    "dev.zio" %% "zio-streams" % "1.0.4",
     "dev.zio" %% "zio-interop-cats" % "2.2.0.1"
   ) ++ Seq(
     "dev.zio" %% "zio-config",
     "dev.zio" %% "zio-config-magnolia",
     "dev.zio" %% "zio-config-typesafe"
-  ).map(_ % "1.0.0-RC29") ++ Seq(
+  ).map(_ % "1.0.0-RC32") ++ Seq(
     "dev.zio" %% "zio-logging",
     "dev.zio" %% "zio-logging-slf4j"
-  ).map(_ % "0.5.3") ++ Seq(
+  ).map(_ % "0.5.6") ++ Seq(
     "io.github.gaelrenoux" %% "tranzactio"
-  ).map(_ % "1.0.1") ++ Seq(
+  ).map(_ % "1.2.0") ++ Seq(
     "com.gh.dobrynya" %% "zio-jms" % "0.1"
   ) ++ Seq(
     "dev.zio" %% "zio-test",
     "dev.zio" %% "zio-test-sbt",
     "dev.zio" %% "zio-test-magnolia"
-  ).map(_ % "1.0.3" % "test")
+  ).map(_ % "1.0.4" % "test")
 
   val circe = Seq(
     "io.circe" %% "circe-core",
@@ -42,13 +42,13 @@ val dependencies = {
     "org.http4s" %% "http4s-dsl",
     "org.http4s" %% "http4s-blaze-server",
     "org.http4s" %% "http4s-circe"
-  ).map(_ % "0.21.8")
+  ).map(_ % "0.21.16")
 
   val fuuid = Seq(
     "io.chrisdavenport" %% "fuuid",
     "io.chrisdavenport" %% "fuuid-circe",
     "io.chrisdavenport" %% "fuuid-http4s"
-  ).map(_ % "0.4.0")
+  ).map(_ % "0.5.0")
 
   val tsec = Seq(
     "io.github.jmcardon" %% "tsec-common",
@@ -61,7 +61,7 @@ val dependencies = {
 
   val database = Seq(
     "org.postgresql" % "postgresql" % "42.2.18",
-    "org.liquibase" % "liquibase-core" % "4.1.1"
+    "org.liquibase" % "liquibase-core" % "4.2.2"
   )
 
   val doobie = Seq(
@@ -69,7 +69,7 @@ val dependencies = {
     "org.tpolecat" %% "doobie-hikari",
     "org.tpolecat" %% "doobie-quill",
     "org.tpolecat" %% "doobie-postgres"
-  ).map(_ % "0.9.2")
+  ).map(_ % "0.10.0")
 
   val chimney = Seq(
     "io.scalaland" %% "chimney" % "0.6.1"
@@ -82,15 +82,15 @@ val dependencies = {
   )
 
   val fs2 = Seq(
-    "co.fs2" %% "fs2-core" % "2.4.4"
+    "co.fs2" %% "fs2-core" % "2.5.0"
   )
 
   val artemis = Seq(
-    "org.apache.activemq" % "artemis-jms-client" % "2.15.0"
+    "org.apache.activemq" % "artemis-jms-client" % "2.16.0"
   )
 
   val tests = Seq(
-    "org.scalatest" %% "scalatest" % "3.2.2" % Test
+    "org.scalatest" %% "scalatest" % "3.2.3" % Test
   )
 
   libraryDependencies ++= plugins ++ logger ++ zio ++ circe ++ http4s ++ fuuid ++ tsec ++ snakeyaml ++ database ++ doobie ++ chimney ++ enumeratum ++ fs2 ++ artemis ++ tests
@@ -101,7 +101,7 @@ val compilerOptions = scalacOptions -= "-Xfatal-warnings"
 val root = (project in file("."))
   .settings(
     name := "eop_online",
-    scalaVersion := "2.13.3",
+    scalaVersion := "2.13.4",
     compilerOptions,
     dependencies,
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),

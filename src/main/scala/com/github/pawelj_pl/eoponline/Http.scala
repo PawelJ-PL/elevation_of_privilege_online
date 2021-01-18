@@ -17,17 +17,16 @@ import io.circe.generic.semiauto.deriveEncoder
 import org.http4s.implicits._
 import org.http4s.server.{Router, Server}
 import org.http4s.server.blaze.BlazeServerBuilder
-import zio.config.ZConfig
 import zio.interop.catz._
 import zio.interop.catz.implicits.ioTimer
-import zio.{Runtime, Task, ZManaged}
+import zio.{Has, Runtime, Task, ZManaged}
 import zio.config.getConfig
 
 object Http {
 
   def server(
     implicit runtime: Runtime[Environments.HttpServerEnvironment]
-  ): ZManaged[GameRoutes with ZConfig[
+  ): ZManaged[GameRoutes with Has[
     AppConfig.Server
   ] with WebSocketRoutes with UserRoutes with MatchRoutes with StaticRoutes, Throwable, Server[Task]] =
     for {
