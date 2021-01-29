@@ -7,7 +7,7 @@ import {
     ModalHeader,
     ModalOverlay,
     useToast,
-} from "@chakra-ui/core"
+} from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
 import { connect } from "react-redux"
 import { useHistory } from "react-router-dom"

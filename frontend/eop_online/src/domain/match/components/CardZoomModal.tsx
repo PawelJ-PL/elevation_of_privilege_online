@@ -19,7 +19,7 @@ import {
     TabPanels,
     Tabs,
     useBreakpointValue,
-} from "@chakra-ui/core"
+} from "@chakra-ui/react"
 import React, { useEffect } from "react"
 import { HiThumbDown, HiThumbUp } from "react-icons/hi"
 import { loadCardImage } from "../../../application/utils/ResourceLoader"

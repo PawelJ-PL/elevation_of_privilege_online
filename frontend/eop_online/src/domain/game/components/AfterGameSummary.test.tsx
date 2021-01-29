@@ -9,8 +9,8 @@ import { PLAYER_RANKING_ENTRY } from "./testids"
 
 jest.mock("../../../application/components/common/AlertBox")
 
-jest.mock("@chakra-ui/core", () => ({
-    ...jest.requireActual("@chakra-ui/core"),
+jest.mock("@chakra-ui/react", () => ({
+    ...jest.requireActual("@chakra-ui/react"),
     Skeleton: () => <div data-testid="SKELETON_MOCK"></div>,
     Icon: (props: { color: string }) => <div data-testid="ICON_MOCK" color={props.color}></div>,
 }))

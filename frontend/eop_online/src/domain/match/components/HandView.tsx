@@ -16,7 +16,7 @@ import {
     Tabs,
     Text,
     useBreakpointValue,
-} from "@chakra-ui/core"
+} from "@chakra-ui/react"
 import React, { useState } from "react"
 import ContentBox from "../../../application/components/common/ContentBox"
 import { Card } from "../types/Card"

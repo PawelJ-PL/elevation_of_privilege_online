@@ -1,4 +1,4 @@
-import { Box, BoxProps, Center, Divider, Heading } from "@chakra-ui/core"
+import { Box, BoxProps, Center, Divider, Heading } from "@chakra-ui/react"
 import React from "react"
 import kebabCase from "lodash/kebabCase"
 

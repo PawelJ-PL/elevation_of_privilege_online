@@ -1,4 +1,4 @@
-import { useToast } from "@chakra-ui/core"
+import { useToast } from "@chakra-ui/react"
 import React, { useEffect } from "react"
 import { connect } from "react-redux"
 import { RouteComponentProps, useHistory, withRouter } from "react-router-dom"

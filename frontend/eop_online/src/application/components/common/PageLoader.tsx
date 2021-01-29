@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner } from "@chakra-ui/core"
+import { Box, Flex, Spinner } from "@chakra-ui/react"
 import React from "react"
 
 const PageLoader: React.FC<{ text: string }> = ({ text }) => (

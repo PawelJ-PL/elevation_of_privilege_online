@@ -1,4 +1,4 @@
-import { Box, Button, Flex, FormControl, FormLabel, Textarea, useToast } from "@chakra-ui/core"
+import { Box, Button, Flex, FormControl, FormLabel, Textarea, useToast } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
 import { connect } from "react-redux"
 import { Dispatch } from "redux"

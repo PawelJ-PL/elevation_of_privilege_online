@@ -1,4 +1,4 @@
-import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/core"
+import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/react"
 import React from "react"
 import NewGameForm from "./NewGameForm"
 

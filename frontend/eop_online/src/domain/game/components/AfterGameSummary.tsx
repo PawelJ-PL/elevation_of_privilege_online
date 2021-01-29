@@ -1,4 +1,4 @@
-import { Center, Flex, Icon, Skeleton, Stat, StatHelpText, StatLabel, StatNumber, Text } from "@chakra-ui/core"
+import { Center, Flex, Icon, Skeleton, Stat, StatHelpText, StatLabel, StatNumber, Text } from "@chakra-ui/react"
 import format from "date-fns/format"
 import formatDistance from "date-fns/formatDistance"
 import formatDistanceToNow from "date-fns/formatDistanceToNow"

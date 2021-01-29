@@ -1,4 +1,4 @@
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay } from "@chakra-ui/core"
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay } from "@chakra-ui/react"
 import React, { useState } from "react"
 import { useHistory } from "react-router-dom"
 import FormInput from "../../../application/components/common/FormInput"

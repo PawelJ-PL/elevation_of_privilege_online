@@ -1,4 +1,4 @@
-import { Box, Icon, IconButton, Tooltip } from "@chakra-ui/core"
+import { Box, Icon, IconButton, Tooltip } from "@chakra-ui/react"
 import React from "react"
 import { AiOutlineUserDelete } from "react-icons/ai"
 import { CgCardSpades } from "react-icons/cg"

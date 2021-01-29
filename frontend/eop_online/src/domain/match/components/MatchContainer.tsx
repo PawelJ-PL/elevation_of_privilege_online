@@ -1,4 +1,4 @@
-import { useToast, UseToastOptions } from "@chakra-ui/core"
+import { useToast, UseToastOptions } from "@chakra-ui/react"
 import React, { useEffect } from "react"
 import { connect } from "react-redux"
 import { Dispatch } from "redux"
