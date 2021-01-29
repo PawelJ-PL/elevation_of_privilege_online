@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertStatus, AlertTitle, BoxProps, CloseButton, Flex } from "@chakra-ui/core"
+import { Alert, AlertDescription, AlertStatus, AlertTitle, BoxProps, CloseButton, Flex } from "@chakra-ui/react"
 import React from "react"
 
 type Props = {

@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Icon, Image, Link, SimpleGrid } from "@chakra-ui/core"
+import { Box, Button, Flex, Icon, Image, Link, SimpleGrid } from "@chakra-ui/react"
 import React from "react"
 import Logo from "../../../../resources/logo.png"
 import { useModal } from "../../modals/ModalHook"

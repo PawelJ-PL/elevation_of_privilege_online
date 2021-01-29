@@ -15,8 +15,8 @@ jest.mock("./CardZoomModal", () => (props: { canPlayCard: boolean; visible: bool
     </div>
 ))
 
-jest.mock("@chakra-ui/core", () => ({
-    ...jest.requireActual("@chakra-ui/core"),
+jest.mock("@chakra-ui/react", () => ({
+    ...jest.requireActual("@chakra-ui/react"),
     useBreakpointValue: () => true,
 }))
 

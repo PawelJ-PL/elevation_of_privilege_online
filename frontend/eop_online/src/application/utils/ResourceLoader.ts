@@ -4,7 +4,7 @@ import kebabCase from "lodash/kebabCase"
 export function loadSuitLogo(suit: Suit): string | undefined {
     const context = require.context("../../resources/suites", false, /\.png$/)
     try {
-        return context(`./${kebabCase(suit)}.png`)
+        return context(`./${kebabCase(suit)}.png`).default
     } catch (_) {
         return undefined
     }

@@ -1,5 +1,5 @@
 import React from "react"
-import { AlertStatus } from "@chakra-ui/core"
+import { AlertStatus } from "@chakra-ui/react"
 
 type Props = {
     title?: string

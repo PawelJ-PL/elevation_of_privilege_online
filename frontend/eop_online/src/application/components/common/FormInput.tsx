@@ -1,4 +1,4 @@
-import { BoxProps, FormControl, FormErrorMessage, FormLabel, Input, InputProps } from "@chakra-ui/core"
+import { BoxProps, FormControl, FormErrorMessage, FormLabel, Input, InputProps } from "@chakra-ui/react"
 import React from "react"
 
 type OmitedInputProps = "id" | "onChange"

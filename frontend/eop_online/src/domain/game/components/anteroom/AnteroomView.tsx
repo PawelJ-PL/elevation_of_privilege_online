@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Spacer } from "@chakra-ui/core"
+import { Box, Button, Flex, Spacer } from "@chakra-ui/react"
 import React, { useEffect } from "react"
 import ContentBox from "../../../../application/components/common/ContentBox"
 import { Session } from "../../../user/types/Session"

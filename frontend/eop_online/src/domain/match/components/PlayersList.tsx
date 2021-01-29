@@ -1,4 +1,4 @@
-import { Box, BoxProps, Divider, Flex, Heading } from "@chakra-ui/core"
+import { Box, BoxProps, Divider, Flex, Heading } from "@chakra-ui/react"
 import React from "react"
 import ContentBox from "../../../application/components/common/ContentBox"
 import { Member } from "../../game/types/Member"

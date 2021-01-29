@@ -7,7 +7,7 @@ import { UserIsNotGameMember, UserNotAccepted, UserRemoved } from "../types/Erro
 import { Game } from "../types/Game"
 import { SingleGamePage } from "./SingleGamePage"
 import * as H from "history"
-import * as chakra from "@chakra-ui/core"
+import * as chakra from "@chakra-ui/react"
 import { toastMock } from "../../../testutils/mocks/toastMock"
 
 /* eslint-disable react/display-name */

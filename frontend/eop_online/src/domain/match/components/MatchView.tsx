@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/core"
+import { Box, Flex } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
 import { Game } from "../../game/types/Game"
 import { Member } from "../../game/types/Member"

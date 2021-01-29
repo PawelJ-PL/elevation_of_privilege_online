@@ -8,7 +8,7 @@ import { Member } from "../../game/types/Member"
 import { Session } from "../../user/types/Session"
 import { Round } from "../types/Round"
 import { MatchContainer } from "./MatchContainer"
-import * as chakra from "@chakra-ui/core"
+import * as chakra from "@chakra-ui/react"
 import { toastMock } from "../../../testutils/mocks/toastMock"
 
 /* eslint-disable react/display-name */

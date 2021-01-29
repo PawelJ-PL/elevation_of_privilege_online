@@ -1,4 +1,4 @@
-import { Box, Center, Divider, Flex, Heading, Icon, Image, Tooltip } from "@chakra-ui/core"
+import { Box, Center, Divider, Flex, Heading, Icon, Image, Tooltip } from "@chakra-ui/react"
 import React, { useState } from "react"
 import ContentBox from "../../../application/components/common/ContentBox"
 import { loadCardImage } from "../../../application/utils/ResourceLoader"

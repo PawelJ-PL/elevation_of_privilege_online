@@ -1,4 +1,4 @@
-import { UseToastOptions } from "@chakra-ui/core"
+import { UseToastOptions } from "@chakra-ui/react"
 
 export const toastMock = (callMock?: jest.Mock) => {
     const mock = callMock ?? jest.fn()
