@@ -6,7 +6,9 @@ val dependencies = {
 
   val logger = Seq(
     "ch.qos.logback" % "logback-classic" % "1.2.3",
-    "io.chrisdavenport" %% "log4cats-slf4j" % "1.1.1"
+    "io.chrisdavenport" %% "log4cats-slf4j" % "1.1.1",
+    "org.logback-extensions" % "logback-ext-loggly" % "0.1.2",
+    "org.codehaus.janino" % "janino" % "3.1.3"
   )
 
   val zio = Seq(
@@ -42,7 +44,7 @@ val dependencies = {
     "org.http4s" %% "http4s-dsl",
     "org.http4s" %% "http4s-blaze-server",
     "org.http4s" %% "http4s-circe"
-  ).map(_ % "0.21.16")
+  ).map(_ % "0.21.18")
 
   val fuuid = Seq(
     "io.chrisdavenport" %% "fuuid",
