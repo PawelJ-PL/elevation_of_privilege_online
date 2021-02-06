@@ -16,7 +16,9 @@ final case class AppConfig(
 
 object AppConfig {
 
-  final case class Server(port: Int, host: String)
+  final case class Server(port: Int, host: String, logger: HttpLogger)
+
+  final case class HttpLogger(enabled: Boolean, logHeaders: Boolean, logBody: Boolean)
 
   final case class Auth(secretKey: String)
 

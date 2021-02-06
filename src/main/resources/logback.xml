@@ -4,7 +4,8 @@
             <level>INFO</level>
         </filter>
         <encoder>
-            <pattern>%date{YYYY-MM-dd'T' HH:mm:ss.SSSXXX, UTC} [%level] %logger{36} [%thread] %message%n%xException</pattern>
+            <pattern>%date{YYYY-MM-dd'T' HH:mm:ss.SSSXXX, UTC} [%level] %logger{36} [%thread] %message%n%xException
+            </pattern>
         </encoder>
     </appender>
 
@@ -14,10 +15,26 @@
         <appender-ref ref="CONSOLE"/>
     </appender>
 
-    <logger name="org.http4s.blaze.channel.nio1.NIO1SocketServerGroup" level="ERROR" />
+    <if condition='isDefined("LOGGLY_TOKEN")'>
+        <then>
+            <appender name="LOGGLY" class="ch.qos.logback.ext.loggly.LogglyAppender">
+                <endpointUrl>https://logs-01.loggly.com/inputs/${LOGGLY_TOKEN}/tag/logback</endpointUrl>
+                <pattern>%d{"ISO8601", UTC} %p %t %c{0}.%M - %m%n</pattern>
+            </appender>
+
+            <appender name="ASYNC_LOGGLY" class="ch.qos.logback.classic.AsyncAppender">
+                <param name="queueSize" value="256"/>
+                <param name="neverBlock" value="true"/>
+                <appender-ref ref="LOGGLY"/>
+            </appender>
+        </then>
+    </if>
+
+    <logger name="org.http4s.blaze.channel.nio1.NIO1SocketServerGroup" level="ERROR"/>
 
     <root level="INFO">
         <appender-ref ref="ASYNC_CONSOLE"/>
+        <appender-ref ref="ASYNC_LOGGLY"/>
     </root>
 
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
