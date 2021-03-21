@@ -1,11 +1,10 @@
 package com.github.paweljpl.eoponline.game
 
 import java.time.Instant
-
 import cats.syntax.eq._
 import cats.instances.int._
 import com.github.pawelj_pl.eoponline.eventbus.InternalMessage
-import com.github.pawelj_pl.eoponline.eventbus.InternalMessage.{GameStarted, ParticipantKicked}
+import com.github.pawelj_pl.eoponline.eventbus.InternalMessage.{GameDeleted, GameStarted, ParticipantKicked}
 import com.github.pawelj_pl.eoponline.game.{
   GameAlreadyFinished,
   GameAlreadyStarted,
@@ -95,7 +94,10 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
       startFinishedGame,
       startGameWithNotEnoughPlayers,
       startGameWithTooManyPlayers,
-      assignRoleWhenGameFinished
+      assignRoleWhenGameFinished,
+      deleteGame,
+      deleteNonExistingGame,
+      deleteGameAnNonOwner
     )
 
   private val newGameDto = NewGameDto(Some(ExampleGameDescription), ExampleNickName)
@@ -796,6 +798,62 @@ object GamesSpec extends DefaultRunnableSpec with Constants {
       assert(updatedRepo)(equalTo(initialRepoState)) &&
       assert(updatedGameplayRepo)(equalTo(initialGameplayRepoState)) &&
       assert(updatedEvents)(equalTo(List.empty))
+  }
+
+  private val deleteGame = testM("Delete game") {
+    val initialRepoState = GamesRepoState(games = Set(ExampleGame))
+    val initialGameplayRepoState = GameplayRepoState()
+
+    for {
+      repoState         <- Ref.make[GamesRepoState](initialRepoState)
+      gameplayRepoState <- Ref.make[GameplayRepoState](initialGameplayRepoState)
+      sentEvents        <- Ref.make[List[InternalMessage]](List.empty)
+      result            <- ZIO
+                             .accessM[Games](_.get.deleteGameAs(ExampleGameId, ExamplePlayer.id))
+                             .provideCustomLayer(createLayer(repoState, sentEvents, gameplayRepoState))
+      updatedRepo       <- repoState.get
+      updatedEvents     <- sentEvents.get
+    } yield assert(result)(equalTo(())) &&
+      assert(updatedRepo.games)(isEmpty) &&
+      assert(updatedEvents)(hasSameElements(List(GameDeleted(ExampleGame.id))))
+  }
+
+  private val deleteNonExistingGame = testM("Delete non existing game") {
+    val initialRepoState = GamesRepoState()
+    val initialGameplayRepoState = GameplayRepoState()
+
+    for {
+      repoState         <- Ref.make[GamesRepoState](initialRepoState)
+      gameplayRepoState <- Ref.make[GameplayRepoState](initialGameplayRepoState)
+      sentEvents        <- Ref.make[List[InternalMessage]](List.empty)
+      result            <- ZIO
+                             .accessM[Games](_.get.deleteGameAs(ExampleGameId, ExamplePlayer.id))
+                             .provideCustomLayer(createLayer(repoState, sentEvents, gameplayRepoState))
+                             .either
+      updatedRepo       <- repoState.get
+      updatedEvents     <- sentEvents.get
+    } yield assert(result)(isLeft(equalTo(GameNotFound(ExampleGame.id)))) &&
+      assert(updatedRepo)(equalTo(initialRepoState)) &&
+      assert(updatedEvents)(isEmpty)
+  }
+
+  private val deleteGameAnNonOwner = testM("Delete game as non owner") {
+    val initialRepoState = GamesRepoState(games = Set(ExampleGame))
+    val initialGameplayRepoState = GameplayRepoState()
+
+    for {
+      repoState         <- Ref.make[GamesRepoState](initialRepoState)
+      gameplayRepoState <- Ref.make[GameplayRepoState](initialGameplayRepoState)
+      sentEvents        <- Ref.make[List[InternalMessage]](List.empty)
+      result            <- ZIO
+                             .accessM[Games](_.get.deleteGameAs(ExampleGameId, ExampleId1))
+                             .provideCustomLayer(createLayer(repoState, sentEvents, gameplayRepoState))
+                             .either
+      updatedRepo       <- repoState.get
+      updatedEvents     <- sentEvents.get
+    } yield assert(result)(isLeft(equalTo(UserIsNotGameOwner(ExampleGame.id, ExampleId1)))) &&
+      assert(updatedRepo)(equalTo(initialRepoState)) &&
+      assert(updatedEvents)(isEmpty)
   }
 
 }

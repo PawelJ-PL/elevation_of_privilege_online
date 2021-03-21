@@ -1,9 +1,9 @@
 package com.github.paweljpl.eoponline.testdoubles
 
 import java.time.Instant
-
 import cats.instances.option._
 import cats.syntax.eq._
+import com.github.pawelj_pl.eoponline.game.dto.GameInfoSummary
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
 import com.github.pawelj_pl.eoponline.game.{Game, Player, PlayerRole}
 import doobie.util.transactor
@@ -26,10 +26,10 @@ object FakeGameRepo {
       override def findById(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Option[Game]] =
         ref.get.map(_.games.find(_.id === gameId))
 
-      override def getActiveGame(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Option[Game]] = ???
+      override def getGamesInfoByUser(userId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, List[GameInfoSummary]] = ???
 
       override def create(game: Game): ZIO[Has[transactor.Transactor[Task]], DbException, Game] =
-        ref.update(prev => prev.copy(games = prev.games + game)).map(_ => game)
+        ref.update(prev => prev.copy(games = prev.games + game)).as(game)
 
       override def setStartTime(gameId: FUUID, time: Instant): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
         ref.update { state =>
@@ -51,7 +51,14 @@ object FakeGameRepo {
 
       override def getGamesOlderThan(time: Instant): ZIO[Has[transactor.Transactor[Task]], DbException, List[Game]] = ???
 
-      override def deleteGames(gameIds: List[FUUID]): ZIO[Has[transactor.Transactor[Task]], DbException, Long] = ???
+      override def deleteGames(gameIds: List[FUUID]): ZIO[Has[transactor.Transactor[Task]], DbException, Long] =
+        for {
+          prev    <- ref.get
+          updated <- ref.updateAndGet { state =>
+                       val updatedGames = state.games.filter(game => !gameIds.contains(game.id))
+                       state.copy(games = updatedGames)
+                     }
+        } yield prev.games.size - updated.games.size
 
       override def addPlayer(gameId: FUUID, player: Player): ZIO[Has[transactor.Transactor[Task]], DbException, Unit] =
         ref.update { prev =>
@@ -84,7 +91,7 @@ object FakeGameRepo {
             }
             prev.copy(players = players)
           }
-          .map(_ => true)
+          .as(true)
 
       override def removePlayers(gameId: FUUID, playerIds: List[FUUID]): ZIO[Has[transactor.Transactor[Task]], DbException, Boolean] =
         ref
@@ -96,7 +103,7 @@ object FakeGameRepo {
             }
             prev.copy(players = players)
           }
-          .map(_ => true)
+          .as(true)
 
       override def assignRole(
         gameId: FUUID,
@@ -113,7 +120,7 @@ object FakeGameRepo {
             }
             prev.copy(players = players)
           }
-          .map(_ => true)
+          .as(true)
 
       override def increaseTricksTaken(
         gameId: FUUID,

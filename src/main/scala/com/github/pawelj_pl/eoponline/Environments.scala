@@ -99,7 +99,8 @@ object Environments {
     val gameplayRoutes = authentication ++ matches ++ logging >>> MatchRoutes.live
     val staticRoutes = blocking >>> StaticRoutes.live
     val webSocketRoutes = webSocketTopic ++ authentication ++ logging ++ matches >>> WebSocketRoutes.live
-    val gameCleanup = clock ++ AppConfig.live.narrow(_.schedulers.gameCleaner) ++ gamesRepo ++ db ++ logging >>> GameCleanup.live
+    val gameCleanup =
+      clock ++ AppConfig.live.narrow(_.schedulers.gameCleaner) ++ gamesRepo ++ db ++ logging ++ messageTopic >>> GameCleanup.live
     serverConfig ++ gameRoutes ++ database ++ webSocketHandler ++ webSocketRoutes ++ userRoutes ++ gameplayRoutes ++ staticRoutes ++ gameCleanup
   }
 

@@ -20,12 +20,15 @@ sealed trait AssignRoleError extends GameError
 
 sealed trait StartGameError extends GameError
 
+sealed trait DeleteGameError extends GameError
+
 final case class GameNotFound(gameId: FUUID)
     extends GameInfoError
     with JoinGameError
     with KickUserError
     with AssignRoleError
     with StartGameError
+    with DeleteGameError
 
 final case class ParticipantIsNotAMember(playerId: FUUID, gameId: FUUID) extends GameInfoError with GetParticipantsError
 
@@ -40,7 +43,11 @@ final case class GameAlreadyStarted(gameId: FUUID)
     with StartGameError
     with GameInfoError
 
-final case class UserIsNotGameOwner(gameId: FUUID, userId: FUUID) extends KickUserError with AssignRoleError with StartGameError
+final case class UserIsNotGameOwner(gameId: FUUID, userId: FUUID)
+    extends KickUserError
+    with AssignRoleError
+    with StartGameError
+    with DeleteGameError
 
 final case class KickSelfForbidden(gameId: FUUID, userId: FUUID) extends KickUserError
 

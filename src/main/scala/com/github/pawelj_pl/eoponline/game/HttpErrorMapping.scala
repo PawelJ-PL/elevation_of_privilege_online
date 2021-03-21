@@ -100,4 +100,11 @@ private[game] object HttpErrorMapping {
         ZIO.succeed(Response[Task](status = Status.PreconditionFailed).withEntity(ResponseData("Too many players", Some("TooManyPlayers"))))
     }
 
+  def mapDeleteGameError(error: DeleteGameError): UIO[Response[Task]] =
+    error match {
+      case GameNotFound(_)          => ZIO.succeed(Response[Task](status = Status.Forbidden).withEntity(ResponseData("User is not game owner")))
+      case UserIsNotGameOwner(_, _) =>
+        ZIO.succeed(Response[Task](status = Status.Forbidden).withEntity(ResponseData("User is not game owner")))
+    }
+
 }
