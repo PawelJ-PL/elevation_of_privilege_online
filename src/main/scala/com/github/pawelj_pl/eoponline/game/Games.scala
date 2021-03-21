@@ -3,7 +3,7 @@ package com.github.pawelj_pl.eoponline.game
 import cats.syntax.eq._
 import cats.syntax.show._
 import com.github.pawelj_pl.eoponline.eventbus.InternalMessage
-import com.github.pawelj_pl.eoponline.game.dto.NewGameDto
+import com.github.pawelj_pl.eoponline.game.dto.{GameInfoSummary, NewGameDto}
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository
 import com.github.pawelj_pl.eoponline.game.repository.GamesRepository.GamesRepository
 import com.github.pawelj_pl.eoponline.`match`.{CardLocation, Suit, Value}
@@ -39,6 +39,10 @@ object Games {
     def assignRoleAs(gameId: FUUID, userToUpdate: FUUID, role: PlayerRole, performActionAs: FUUID): ZIO[Any, AssignRoleError, Unit]
 
     def startGameAs(gameId: FUUID, userId: FUUID): ZIO[Any, StartGameError, Unit]
+
+    def getAllGamesOfUser(userId: FUUID): ZIO[Any, Nothing, List[GameInfoSummary]]
+
+    def deleteGameAs(gameId: FUUID, userId: FUUID): ZIO[Any, DeleteGameError, Unit]
 
   }
 
@@ -76,7 +80,7 @@ object Games {
               _      <- ZIO.cond(player.role.isDefined, (): Unit, ParticipantNotAccepted(gameId, player))
             } yield game)
 
-          override def joinGame(gameId: FUUID, userId: FUUID, nickName: String): ZIO[Any, JoinGameError, Unit] =
+          override def joinGame(gameId: FUUID, userId: FUUID, nickName: String): ZIO[Any, JoinGameError, Unit] = {
             db.transactionOrDie(for {
               game <- gamesRepo.findById(gameId).orDie.someOrFail(GameNotFound(gameId))
               _    <- ZIO.cond(game.startedAt.isEmpty, (), GameAlreadyStarted(gameId))
@@ -88,7 +92,7 @@ object Games {
               _    <- gamesRepo.addPlayer(gameId, Player(userId, nickName, None)).orDie
               _    <- logger.info(s"User $userId joined to game $gameId")
             } yield ())
-              .flatMap(_ => topic.publish1(InternalMessage.ParticipantJoined(gameId, userId, nickName)).orDie)
+          } *> topic.publish1(InternalMessage.ParticipantJoined(gameId, userId, nickName)).orDie
 
           override def getParticipantsAs(gameId: FUUID, userId: FUUID): ZIO[Any, GetParticipantsError, List[Player]] =
             db.transactionOrDie(for {
@@ -100,7 +104,7 @@ object Games {
                               }
             } yield participants)
 
-          override def kickUserAs(gameId: FUUID, userToKick: FUUID, performActionAs: FUUID): ZIO[Any, KickUserError, Unit] =
+          override def kickUserAs(gameId: FUUID, userToKick: FUUID, performActionAs: FUUID): ZIO[Any, KickUserError, Unit] = {
             db.transactionOrDie(for {
               _    <- ZIO.cond(userToKick =!= performActionAs, (), KickSelfForbidden(gameId, userToKick))
               game <- gamesRepo.findById(gameId).orDie
@@ -114,14 +118,14 @@ object Games {
               _    <- gamesRepo.removePlayer(gameId, userToKick).orDie *>
                         logger.info(show"User $performActionAs kicked user $userToKick from game $gameId")
             } yield ())
-              .flatMap(_ => topic.publish1(InternalMessage.ParticipantKicked(gameId, userToKick)).orDie)
+          } *> topic.publish1(InternalMessage.ParticipantKicked(gameId, userToKick)).orDie
 
           override def assignRoleAs(
             gameId: FUUID,
             userToUpdate: FUUID,
             role: PlayerRole,
             performActionAs: FUUID
-          ): ZIO[Any, AssignRoleError, Unit] =
+          ): ZIO[Any, AssignRoleError, Unit] = {
             db.transactionOrDie(
               for {
                 game <- gamesRepo.findById(gameId).orDie
@@ -135,7 +139,8 @@ object Games {
                 _    <- gamesRepo.assignRole(gameId, userToUpdate, role).orDie *>
                           logger.info(s"User $performActionAs changed role of user $userToUpdate in game $gameId to $role")
               } yield ()
-            ).flatMap(_ => topic.publish1(InternalMessage.RoleAssigned(gameId, userToUpdate, role)).orDie)
+            )
+          } *> topic.publish1(InternalMessage.RoleAssigned(gameId, userToUpdate, role)).orDie
 
           override def startGameAs(gameId: FUUID, userId: FUUID): ZIO[Any, StartGameError, Unit] =
             db.transactionOrDie(
@@ -168,11 +173,11 @@ object Games {
                 usersToRemove = participants.filter(_.role.isEmpty).map(_.id)
                 _            <- logger.info(s"Removing not accepted participants $usersToRemove")
                 _            <- gamesRepo.removePlayers(gameId, usersToRemove).orDie
-                _            <- ZIO.foreach(usersToRemove)(id =>
+                _            <- ZIO.foreach_(usersToRemove) { id =>
                                   topic
                                     .publish1(InternalMessage.ParticipantKicked(gameId, id))
                                     .catchAll(err => logger.throwable("Unable to send internal message", err))
-                                )
+                                }
                 _            <- topic
                                   .publish1(InternalMessage.GameStarted(gameId))
                                   .catchAll(err => logger.throwable("Unable to send internal message", err))
@@ -185,11 +190,23 @@ object Games {
               ZIO.fail(UserIsNotGameOwner(game.id, userId))
             else if (game.startedAt.isDefined)
               ZIO.fail(GameAlreadyStarted(game.id))
-            else if (game.finishedAt.isDefined)
-              ZIO.fail(GameAlreadyFinished(game.id))
-            else
-              ZIO.unit
+            else ZIO.fail(GameAlreadyFinished(game.id)).when(game.finishedAt.isDefined)
+
+          override def getAllGamesOfUser(userId: FUUID): ZIO[Any, Nothing, List[GameInfoSummary]] =
+            db.transactionOrDie(gamesRepo.getGamesInfoByUser(userId).orDie)
+
+          override def deleteGameAs(gameId: FUUID, userId: FUUID): ZIO[Any, DeleteGameError, Unit] = {
+            db.transactionOrDie(
+              for {
+                game <- gamesRepo.findById(gameId).orDie.someOrFail(GameNotFound(gameId))
+                _    <- ZIO.fail(UserIsNotGameOwner(gameId, userId)).unless(game.creator === userId)
+                _    <- logger.info(show"User $userId is going to remove game $gameId")
+                _    <- gamesRepo.deleteGames(List(gameId)).orDie
+              } yield ()
+            )
+          } *> topic.publish1(InternalMessage.GameDeleted(gameId)).orDie
         }
+
     }
 
 }

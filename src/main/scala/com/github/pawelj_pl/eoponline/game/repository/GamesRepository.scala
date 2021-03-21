@@ -1,10 +1,10 @@
 package com.github.pawelj_pl.eoponline.game.repository
 
 import java.time.Instant
-
 import cats.instances.long._
 import cats.syntax.eq._
 import com.github.pawelj_pl.eoponline.database.BasePostgresRepository
+import com.github.pawelj_pl.eoponline.game.dto.GameInfoSummary
 import com.github.pawelj_pl.eoponline.game.{Game, Player, PlayerRole}
 import doobie.util.transactor
 import io.chrisdavenport.fuuid.FUUID
@@ -23,7 +23,7 @@ object GamesRepository {
 
     def findById(gameId: FUUID): ZIO[Connection, DbException, Option[Game]]
 
-    def getActiveGame(gameId: FUUID): ZIO[Connection, DbException, Option[Game]]
+    def getGamesInfoByUser(userId: FUUID): ZIO[Connection, DbException, List[GameInfoSummary]]
 
     def create(game: Game): ZIO[Connection, DbException, Game]
 
@@ -75,13 +75,26 @@ object GamesRepository {
           ).map(_.headOption.map(_.transformInto[Game]))
         }
 
-      override def getActiveGame(gameId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, Option[Game]] =
+      override def getGamesInfoByUser(userId: FUUID): ZIO[Has[transactor.Transactor[Task]], DbException, List[GameInfoSummary]] =
         tzio {
           run(
             quote(
-              games.filter(game => game.id == lift(gameId) && game.startedAt.isDefined && game.finishedAt.isEmpty)
+              for {
+                player    <- gamePlayers.filter(p => p.playerId == lift(userId) && p.role.isDefined)
+                gameData  <- games.join(_.id == player.gameId)
+                gameOwner <- gamePlayers.join(owner => owner.playerId == gameData.creator && owner.gameId == player.gameId)
+              } yield GameInfoSummary(
+                gameData.id,
+                gameData.description,
+                player.nickname,
+                gameOwner.nickname,
+                gameData.creator == lift(userId),
+                player.role,
+                gameData.startedAt,
+                gameData.finishedAt
+              )
             )
-          ).map(_.headOption.map(_.transformInto[Game]))
+          )
         }
 
       override def create(game: Game): ZIO[Connection, DbException, Game] =
