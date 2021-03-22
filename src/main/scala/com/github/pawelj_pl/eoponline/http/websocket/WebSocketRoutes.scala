@@ -77,10 +77,12 @@ object WebSocketRoutes {
               case m: WebSocketMessage.ParticipantRemoved => m.toFrame
               case m: WebSocketMessage.UserRoleChanged    => m.toFrame
               case m: WebSocketMessage.GameStarted        => m.toFrame
+              case m: WebSocketMessage.GameDeleted        => m.toFrame
             }
 
         private def verifyRecipient(recipient: MessageRecipient, gameId: FUUID, userId: FUUID): Boolean =
           recipient match {
+            case MessageRecipient.AllGameParticipants(game)             => game === gameId
             case MessageRecipient.SingleGameParticipant(game, user)     => game === gameId && user === userId
             case MessageRecipient.MultipleGameParticipants(game, users) => game === gameId && users.contains(userId)
             case MessageRecipient.Broadcast                             => true
@@ -94,6 +96,7 @@ object WebSocketRoutes {
             case m: WebSocketMessage.GameFinished         => m.toFrame
             case m: WebSocketMessage.CardPlayed           => m.toFrame
             case m: WebSocketMessage.PlayerTakesTrick     => m.toFrame
+            case m: WebSocketMessage.GameDeleted          => m.toFrame
           }
       }
     }

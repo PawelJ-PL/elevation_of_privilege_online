@@ -10,7 +10,8 @@ import com.github.pawelj_pl.eoponline.eventbus.InternalMessage.{
   GameStarted => GameStartedInternalMessage,
   NextPlayer => NextPlayerInternalMessage,
   NextRound => NextRoundInternalMessage,
-  PlayerTakesTrick => PlayerTakesTrickInternalMessage
+  PlayerTakesTrick => PlayerTakesTrickInternalMessage,
+  GameDeleted => GameDeletedMessage
 }
 import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import io.circe.syntax._
@@ -107,6 +108,12 @@ object WebSocketMessage {
 
   }
 
+  final case class GameDeleted(recipient: MessageRecipient, payload: GameDeletedMessage) extends WebSocketMessage[GameDeletedMessage] {
+
+    override def eventType: String = "GameDeleted"
+
+  }
+
   implicit val encoder: Encoder[WebSocketMessage[_]] = Encoder.instance {
     case TopicStarted            => encodeMessage(TopicStarted)
     case m: NewParticipant       => encodeMessage(m)
@@ -119,6 +126,7 @@ object WebSocketMessage {
     case m: GameFinished         => encodeMessage(m)
     case m: CardPlayed           => encodeMessage(m)
     case m: PlayerTakesTrick     => encodeMessage(m)
+    case m: GameDeleted          => encodeMessage(m)
   }
 
   private def encodeMessage[A: Encoder](message: WebSocketMessage[A]): Json =
@@ -156,6 +164,7 @@ object WebSocketMessage {
       case "CardPlayed"            => Decoder[ExtendedDeckElementDto].decodeJson(payload).map(p => CardPlayed(messageRecipient, p))
       case "PlayerTakesTrick"      =>
         Decoder[PlayerTakesTrickInternalMessage].decodeJson(payload).map(p => PlayerTakesTrick(messageRecipient, p))
+      case "GameDeleted"           => Decoder[GameDeletedMessage].decodeJson(payload).map(p => GameDeleted(messageRecipient, p))
       case event                   => Left(DecodingFailure(s"Unknown event $event", List.empty))
     }
 
