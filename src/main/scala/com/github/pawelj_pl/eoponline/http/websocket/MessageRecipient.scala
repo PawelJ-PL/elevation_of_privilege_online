@@ -9,6 +9,8 @@ sealed trait MessageRecipient
 
 object MessageRecipient {
 
+  final case class AllGameParticipants(gameId: FUUID) extends MessageRecipient
+
   final case class SingleGameParticipant(gameId: FUUID, userId: FUUID) extends MessageRecipient
 
   final case class MultipleGameParticipants(gameId: FUUID, userIds: List[FUUID]) extends MessageRecipient

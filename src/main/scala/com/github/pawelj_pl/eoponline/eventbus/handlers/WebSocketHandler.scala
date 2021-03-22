@@ -77,6 +77,8 @@ object WebSocketHandler {
                 } yield ()
               case m @ InternalMessage.PlayerTakesTrick(gameId, _)                =>
                 allAccepted(gameId).flatMap(recipients => wsTopic.publish(WebSocketMessage.PlayerTakesTrick(recipients, m)))
+              case m @ InternalMessage.GameDeleted(gameId)                        =>
+                wsTopic.publish(WebSocketMessage.GameDeleted(MessageRecipient.AllGameParticipants(gameId), m))
               case m                                                              => logger.trace(s"Message $m ignored")
             }
           }.resurrect.catchAll(error => logger.throwable("Unable to process message", error))
