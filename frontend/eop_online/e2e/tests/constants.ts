@@ -1,3 +1,4 @@
+import { UserGameSummary } from "./../../src/domain/game/types/UserGameSummary"
 import { RoundState } from "./../../src/domain/match/types/RoundState"
 import { Round } from "./../../src/domain/match/types/Round"
 import { Card } from "./../../src/domain/match/types/Card"
@@ -150,4 +151,29 @@ export const exampleRound: Round = {
         [player2Id]: 4,
         [player3Id]: 3,
     },
+}
+
+export const exampleUsersGame1: UserGameSummary = {
+    id: exampleGame.id,
+    description: "First game",
+    playerNickname: initMember.nickname,
+    ownerNickname: initMember.nickname,
+    isOwner: true,
+    currentUserRole: "Player",
+}
+
+export const exampleUsersGame2: UserGameSummary = {
+    id: "7976ebd3-3f03-4f72-906b-1d2e05df33f3",
+    playerNickname: initMember.nickname,
+    ownerNickname: player2.nickname,
+    isOwner: false,
+    currentUserRole: "Observer",
+}
+
+export const exampleUsersGame3: UserGameSummary = {
+    id: "fe996b0f-6a19-47fc-8e0d-2629d7754bd8",
+    playerNickname: initMember.nickname,
+    ownerNickname: initMember.nickname,
+    isOwner: true,
+    currentUserRole: "Player",
 }

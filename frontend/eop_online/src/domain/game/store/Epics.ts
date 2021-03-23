@@ -1,11 +1,15 @@
+import { UserGameSummary } from "./../types/UserGameSummary"
 import { AppState } from "./../../../application/store/index"
 import { UserNotAccepted, UserRemoved } from "./../types/Errors"
 import { Game } from "./../types/Game"
 import {
     assignUserRoleAction,
     createGameAction,
+    deleteGameAction,
     fetchGameInfoAction,
     fetchMembersAction,
+    fetchUserGamesAction,
+    gameDeletedAction,
     gameStartedAction,
     joinGameAction,
     kickUserAction,
@@ -104,6 +108,24 @@ const refreshGameOnStartEpic: Epic<AnyAction, AnyAction, AppState> = (action$, s
         })
     )
 
+const fetchAvailableGamesEpic = createEpic<void, UserGameSummary[], Error>(fetchUserGamesAction, () =>
+    GamesApi.fetchAvailableGames()
+)
+
+const updateGameOnDeleteEpic: Epic<AnyAction, AnyAction, AppState> = (action$, state$) =>
+    action$.pipe(
+        filter(gameDeletedAction.match),
+        mergeMap((a) => {
+            if (a.payload.gameId === state$.value.games.fetchStatus.params) {
+                return of(fetchGameInfoAction.done({ result: null, params: a.payload.gameId }))
+            } else {
+                return EMPTY
+            }
+        })
+    )
+
+const deleteGameEpic = createEpic<string, void, Error>(deleteGameAction, (params) => GamesApi.deleteGame(params))
+
 export const gamesEpics = combineEpics<Action, Action, AppState>(
     createGameEpic,
     newGameRedirectEpic,
@@ -116,5 +138,8 @@ export const gamesEpics = combineEpics<Action, Action, AppState>(
     errorOnUserKickEpic,
     refreshGameOnAcceptEpic,
     startGameEpic,
-    refreshGameOnStartEpic
+    refreshGameOnStartEpic,
+    fetchAvailableGamesEpic,
+    deleteGameEpic,
+    updateGameOnDeleteEpic
 )

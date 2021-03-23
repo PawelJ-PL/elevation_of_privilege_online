@@ -1,5 +1,14 @@
 import WebSocket from "ws"
-import { exampleRound, observer1, observer1Id, player2, player3 } from "./../constants"
+import {
+    exampleRound,
+    exampleUsersGame1,
+    exampleUsersGame2,
+    exampleUsersGame3,
+    observer1,
+    observer1Id,
+    player2,
+    player3,
+} from "./../constants"
 import { Page, Request } from "puppeteer"
 import { exampleGame, initMember, meData } from "../constants"
 
@@ -47,6 +56,8 @@ export const requestPredicates = asPredicateTypes({
     getDefaultGameMembers: (r, u) => u.pathname === `/api/v1/games/${exampleGame.id}/members` && r.method() === "GET",
     getDefaultMatchState: (r, u) => u.pathname === `/api/v1/matches/${exampleGame.id}` && r.method() === "GET",
     getDefaultScores: (r, u) => u.pathname === `/api/v1/matches/${exampleGame.id}/scores` && r.method() === "GET",
+    listAvailableGames: (r, u) => u.pathname === "/api/v1/games" && r.method() === "GET",
+    deleteDefaultGame: (r, u) => u.pathname === `/api/v1/games/${exampleGame.id}` && r.method() === "DELETE",
 })
 
 const asHandlerTypes = <T>(ht: { [K in keyof T]: RequestHandler }) => ht
@@ -83,6 +94,14 @@ export const matchers = asHandlerTypes({
     getDefaultScores: {
         reqPredicate: requestPredicates.getDefaultScores,
         onMatch: (r) => r.respond({ body: JSON.stringify(exampleRound.playersScores) }),
+    },
+    listDefaultGames: {
+        reqPredicate: requestPredicates.listAvailableGames,
+        onMatch: (r) => r.respond({ body: JSON.stringify([exampleUsersGame1, exampleUsersGame2, exampleUsersGame3]) }),
+    },
+    deleteDefaultGame: {
+        reqPredicate: requestPredicates.deleteDefaultGame,
+        onMatch: (r) => r.respond({ body: "", status: 201 }),
     },
 })
 

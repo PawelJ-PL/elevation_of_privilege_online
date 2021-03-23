@@ -3,14 +3,7 @@
         "browser": true,
         "es2020": true
     },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier",
-        "prettier/@typescript-eslint",
-        "prettier/react"
-    ],
+    "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {
@@ -19,7 +12,7 @@
         "ecmaVersion": 2020,
         "sourceType": "module"
     },
-    "plugins": ["react", "@typescript-eslint", "prettier", "react-hooks"],
+    "plugins": ["react", "@typescript-eslint", "react-hooks"],
     "settings": {
         "react": {
             "version": "detect"
@@ -27,10 +20,10 @@
     },
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        // "prettier/prettier": "error",
+        "prettier/prettier": "off",
         "react/prop-types": "off",
         "react-hooks/exhaustive-deps": "error",
         "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-        "no-console": ["error", { "allow" : ["warn", "error"] }]
+        "no-console": ["error", { "allow": ["warn", "error"] }]
     }
 }

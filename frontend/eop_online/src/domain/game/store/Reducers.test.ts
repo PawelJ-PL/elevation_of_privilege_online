@@ -1,7 +1,8 @@
+import { UserGameSummary } from "./../types/UserGameSummary"
 import { UserRoleChanged } from "./../types/Events"
 import { Member } from "./../types/Member"
 import { OperationStatus } from "./../../../application/store/async/AsyncOperationResult"
-import { newParticipantAction, userRemovedAction, userRoleChangedAction } from "./Actions"
+import { deleteGameAction, newParticipantAction, userRemovedAction, userRoleChangedAction } from "./Actions"
 import { gamesReducer } from "./Reducers"
 const defaultState = {} as ReturnType<typeof gamesReducer>
 
@@ -13,6 +14,13 @@ describe("Game reducers", () => {
             { id: "333", nickname: "C" },
         ]
         const membersData = { status: OperationStatus.FINISHED, params: "foo-bar", data: members }
+
+        const usersGame: UserGameSummary = {
+            id: "foo-bar",
+            playerNickname: "Alice",
+            ownerNickname: "Bob",
+            isOwner: false,
+        }
 
         describe("On user removed action", () => {
             it("should be updated", () => {
@@ -110,6 +118,34 @@ describe("Game reducers", () => {
                 const action = userRoleChangedAction({ ...updatedUser, gameId: "other-game" })
                 const result = gamesReducer(state, action)
                 expect(result.members.data).toEqual(members)
+            })
+        })
+
+        describe("On game delete", () => {
+            it("should remove game from list", () => {
+                const game1 = { ...usersGame }
+                const game2 = { ...usersGame, id: "bar-baz" }
+                const game3 = { ...usersGame, id: "baz-qux" }
+                const state = {
+                    ...defaultState,
+                    allGames: { status: OperationStatus.FINISHED, data: [game1, game2, game3] },
+                }
+                const action = deleteGameAction.done({ params: "bar-baz", result: void 0 })
+                const result = gamesReducer(state, action)
+                expect(result.allGames.data).toStrictEqual([game1, game3])
+            })
+
+            it("should remove nothing if games fetching not finished", () => {
+                const game1 = { ...usersGame }
+                const game2 = { ...usersGame, id: "bar-baz" }
+                const game3 = { ...usersGame, id: "baz-qux" }
+                const state = {
+                    ...defaultState,
+                    allGames: { status: OperationStatus.NOT_STARTED, data: [game1, game2, game3] },
+                }
+                const action = deleteGameAction.done({ params: "bar-baz", result: void 0 })
+                const result = gamesReducer(state, action)
+                expect(result.allGames.data).toStrictEqual([game1, game2, game3])
             })
         })
     })

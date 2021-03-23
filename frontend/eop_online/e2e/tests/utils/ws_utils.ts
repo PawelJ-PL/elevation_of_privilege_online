@@ -12,7 +12,7 @@ export const startServer = async () => {
 }
 
 export const stopServer = (server: WsServer) => {
-    return new Promise((resolve, reject) =>
+    return new Promise<void>((resolve, reject) =>
         server.close((err) => {
             if (err) {
                 reject(err)

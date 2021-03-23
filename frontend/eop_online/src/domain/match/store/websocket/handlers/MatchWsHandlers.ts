@@ -12,6 +12,7 @@ import { combineEpics, Epic } from "redux-observable"
 import { filter, mergeMap } from "rxjs/operators"
 import { matchWsNewMessageAction } from "../Actions"
 import { EMPTY, of } from "rxjs"
+import { gameDeletedAction } from "../../../../game/store/Actions"
 
 const threatStatusAssignedEpic: Epic<AnyAction, AnyAction, AppState> = (action$) =>
     action$.pipe(
@@ -85,11 +86,24 @@ const playerTakesTrickEpic: Epic<AnyAction, AnyAction, AppState> = (action$) =>
         })
     )
 
+const gameDeletedEpic: Epic<AnyAction, AnyAction, AppState> = (action$) =>
+    action$.pipe(
+        filter(matchWsNewMessageAction.match),
+        mergeMap((message) => {
+            if (message.payload.eventType === "GameDeleted") {
+                return of(gameDeletedAction(message.payload.payload))
+            } else {
+                return EMPTY
+            }
+        })
+    )
+
 export const matchWebSocketMessageHandlerEpic = combineEpics(
     threatStatusAssignedEpic,
     nextPlayerEpic,
     cardPlayedEpic,
     nextTurnEpic,
     gameFinishedEpic,
-    playerTakesTrickEpic
+    playerTakesTrickEpic,
+    gameDeletedEpic
 )

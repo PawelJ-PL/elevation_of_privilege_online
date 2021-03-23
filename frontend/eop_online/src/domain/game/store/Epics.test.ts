@@ -6,6 +6,7 @@ import { game } from "./../../../testutils/constants/game"
 import {
     createGameAction,
     fetchGameInfoAction,
+    gameDeletedAction,
     gameStartedAction,
     userRemovedAction,
     userRoleChangedAction,
@@ -173,7 +174,7 @@ describe("Game epics", () => {
             verifyEpic(action, gamesEpics, updatedState, { marbles: expectedMarbles, values: expectedValues })
         })
 
-        it("should trigger notfing if current game is different than started", () => {
+        it("should trigger nothing if current game is different than started", () => {
             const updatedState = {
                 ...state,
                 games: {
@@ -187,6 +188,64 @@ describe("Game epics", () => {
             }
             const payload = { gameId: "foo-bar" }
             const action = gameStartedAction(payload)
+            const expectedMarbles = "---"
+            verifyEpic(action, gamesEpics, updatedState, { marbles: expectedMarbles })
+        })
+    })
+
+    describe("Update current game on delete", () => {
+        it("should unset current game on delete", () => {
+            const updatedState = {
+                ...state,
+                games: {
+                    ...state.games,
+                    fetchStatus: {
+                        status: OperationStatus.FINISHED,
+                        params: "foo-bar",
+                        data: game,
+                    },
+                },
+            }
+            const payload = { gameId: "foo-bar" }
+            const action = gameDeletedAction(payload)
+            const expectedMarbles = "-a"
+            const expectedValues = {
+                a: fetchGameInfoAction.done({ result: null, params: "foo-bar" }),
+            }
+            verifyEpic(action, gamesEpics, updatedState, { marbles: expectedMarbles, values: expectedValues })
+        })
+
+        it("should do nothing if current game is different than deleted", () => {
+            const updatedState = {
+                ...state,
+                games: {
+                    ...state.games,
+                    fetchStatus: {
+                        status: OperationStatus.FINISHED,
+                        params: "foo-bar",
+                        data: game,
+                    },
+                },
+            }
+            const payload = { gameId: "other-game" }
+            const action = gameDeletedAction(payload)
+            const expectedMarbles = "---"
+            verifyEpic(action, gamesEpics, updatedState, { marbles: expectedMarbles })
+        })
+
+        it("should do nothing if game was not fetched", () => {
+            const updatedState = {
+                ...state,
+                games: {
+                    ...state.games,
+                    fetchStatus: {
+                        status: OperationStatus.NOT_STARTED,
+                        data: undefined,
+                    },
+                },
+            }
+            const payload = { gameId: "foo-bar" }
+            const action = gameDeletedAction(payload)
             const expectedMarbles = "---"
             verifyEpic(action, gamesEpics, updatedState, { marbles: expectedMarbles })
         })
