@@ -1,3 +1,4 @@
+import { GameDeleted } from "../../../../game/types/Events"
 import {
     CardPlayed,
     GameFinished,
@@ -15,5 +16,6 @@ export type WsMatchMessageOut =
     | { eventType: "NextRound"; payload: NextTurn }
     | { eventType: "GameFinished"; payload: GameFinished }
     | { eventType: "PlayerTakesTrick"; payload: PlayerTakesTrick }
+    | { eventType: "GameDeleted"; payload: GameDeleted }
 
 export type WsMatchMessageIn = { query: "Keepalive" }

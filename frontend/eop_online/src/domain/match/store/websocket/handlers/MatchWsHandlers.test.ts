@@ -11,6 +11,7 @@ import { matchWebSocketMessageHandlerEpic } from "./MatchWsHandlers"
 import { verifyEpic } from "./../../../../../testutils/epicsUtils"
 import { matchWsNewMessageAction } from "../Actions"
 import { AppState } from "../../../../../application/store"
+import { gameDeletedAction } from "../../../../game/store/Actions"
 
 const defaultState = {} as AppState
 
@@ -99,6 +100,19 @@ describe("Match WebSocket Handlers", () => {
         const expectedMarbles = "-a"
         const expectedValues = {
             a: playerTakesTrickAction(payload),
+        }
+        verifyEpic(action, matchWebSocketMessageHandlerEpic, defaultState, {
+            marbles: expectedMarbles,
+            values: expectedValues,
+        })
+    })
+
+    it("should generate Game Deleted action", () => {
+        const payload = { gameId: "foo-bar" }
+        const action = matchWsNewMessageAction({ eventType: "GameDeleted", payload })
+        const expectedMarbles = "-a"
+        const expectedValues = {
+            a: gameDeletedAction(payload),
         }
         verifyEpic(action, matchWebSocketMessageHandlerEpic, defaultState, {
             marbles: expectedMarbles,

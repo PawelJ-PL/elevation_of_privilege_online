@@ -1,7 +1,9 @@
+import { LIST_GAMES_MODAL } from "./../../../../src/domain/game/components/testids"
 import { waitForElementWithText, waitForSelector, waitForTestId } from "./../../utils/page_utils"
 import { Page } from "puppeteer"
 import AnteroomPage from "./AnteroomPage"
 import GameplayPage from "./GameplayPage"
+import GamesListModal from "./GamesListModal"
 
 class MainPage {
     private readonly page: Page
@@ -11,7 +13,7 @@ class MainPage {
     }
 
     async open() {
-        await this.page.goto("http://127.0.0.1:3000")
+        await this.page.goto("http://127.0.0.1:3000", { waitUntil: "networkidle0" })
         await waitForTestId(
             this.page,
             "MAIN_PAGE_BUTTONS_CONTAINER",
@@ -70,15 +72,33 @@ class MainPage {
     }
 
     async clickGoToGame() {
-        const confirmButton = await waitForElementWithText(
+        const gotoButton = await waitForElementWithText(
             this.page,
             "button",
             "Continue",
             { timeout: 300 },
             { path: "clickGoToGame.png" }
         )
-        await Promise.all([confirmButton.click(), this.page.waitForNavigation])
+        await Promise.all([gotoButton.click(), this.page.waitForNavigation])
         return new GameplayPage(this.page)
+    }
+
+    async clickContinueGame() {
+        const continueButton = await waitForElementWithText(
+            this.page,
+            "button",
+            "Continue game",
+            { timeout: 300 },
+            { path: "clickContinueGame.png" }
+        )
+        await continueButton.click()
+        const modal = await waitForTestId(
+            this.page,
+            LIST_GAMES_MODAL,
+            { timeout: 1000 },
+            { path: "listGamesModal.png" }
+        )
+        return new GamesListModal(modal)
     }
 }
 

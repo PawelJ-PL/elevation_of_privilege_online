@@ -1,17 +1,21 @@
 import {
     assignUserRoleAction,
     createGameAction,
+    deleteGameAction,
     fetchGameInfoAction,
     fetchMembersAction,
+    fetchUserGamesAction,
     joinGameAction,
     kickUserAction,
     newParticipantAction,
     resetAssignRoleStatusAction,
     resetCreateGameStatusAction,
+    resetDeleteGameStatusAction,
     resetGameInfoStatusAction,
     resetJoinStatusAction,
     resetKickUserStatusAction,
     resetStartGameStatusAction,
+    resetUserGamesInfoAction,
     startGameAction,
     userRemovedAction,
     userRoleChangedAction,
@@ -69,6 +73,17 @@ const membersReducer = createReducer(fetchMembersAction)
 const assignRoleReducer = createReducer(assignUserRoleAction, resetAssignRoleStatusAction).build()
 const kickUserReducer = createReducer(kickUserAction, resetKickUserStatusAction).build()
 const startGameReducer = createReducer(startGameAction, resetStartGameStatusAction).build()
+const userGamesReducer = createReducer(fetchUserGamesAction, resetUserGamesInfoAction)
+    .case(deleteGameAction.done, (state, action) => {
+        if (state.status !== OperationStatus.FINISHED || !state.data) {
+            return state
+        } else {
+            const updatedGames = state.data.filter((game) => game.id !== action.params)
+            return { ...state, data: updatedGames }
+        }
+    })
+    .build()
+const deleteGameReducer = createReducer(deleteGameAction, resetDeleteGameStatusAction).build()
 
 export const gamesReducer = combineReducers({
     createStatus: createGameReducer,
@@ -78,4 +93,6 @@ export const gamesReducer = combineReducers({
     assignRoleStatus: assignRoleReducer,
     kickUserStatus: kickUserReducer,
     startGame: startGameReducer,
+    allGames: userGamesReducer,
+    deleteGameStatus: deleteGameReducer,
 })

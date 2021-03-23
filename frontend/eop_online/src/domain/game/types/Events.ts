@@ -7,3 +7,5 @@ export type UserRemoved = { gameId: string; userId: string }
 export type NewParticipant = { gameId: string; userId: string; nickName: string }
 
 export type GameStarted = { gameId: string }
+
+export type GameDeleted = { gameId: string }

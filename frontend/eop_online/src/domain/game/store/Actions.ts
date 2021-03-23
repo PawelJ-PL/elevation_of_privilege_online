@@ -1,4 +1,5 @@
-import { UserRoleChanged, UserRemoved, NewParticipant, GameStarted } from "./../types/Events"
+import { UserGameSummary } from "./../types/UserGameSummary"
+import { UserRoleChanged, UserRemoved, NewParticipant, GameStarted, GameDeleted } from "./../types/Events"
 import { Game } from "./../types/Game"
 import actionCreatorFactory from "typescript-fsa"
 import { Member, MemberRole } from "../types/Member"
@@ -30,3 +31,8 @@ export const newParticipantAction = actionCreator<NewParticipant>("NEW_PARTICIPA
 export const startGameAction = actionCreator.async<string, void, Error>("START_GAME")
 export const resetStartGameStatusAction = actionCreator("RESET_START_GAME_STATUS")
 export const gameStartedAction = actionCreator<GameStarted>("GAME_STARTED")
+export const fetchUserGamesAction = actionCreator.async<void, UserGameSummary[], Error>("FETCH_USERS_GAMES")
+export const resetUserGamesInfoAction = actionCreator("RESET_USERS_GAMES_INFO")
+export const deleteGameAction = actionCreator.async<string, void, Error>("DELETE_GAME")
+export const resetDeleteGameStatusAction = actionCreator("RESET_DELETE_GAME_STATUS")
+export const gameDeletedAction = actionCreator<GameDeleted>("GAME_DELETED")

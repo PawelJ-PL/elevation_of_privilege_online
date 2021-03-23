@@ -1,5 +1,11 @@
 import { MemberRole } from "./../../../types/Member"
-import { gameStartedAction, newParticipantAction, userRemovedAction, userRoleChangedAction } from "./../../Actions"
+import {
+    gameDeletedAction,
+    gameStartedAction,
+    newParticipantAction,
+    userRemovedAction,
+    userRoleChangedAction,
+} from "./../../Actions"
 import { verifyEpic } from "../../../../../testutils/epicsUtils"
 import { AppState } from "../../../../../application/store"
 import { newGameWsMessageAction } from "../Actions"
@@ -66,6 +72,22 @@ describe("Game WebSocket handlers", () => {
         const expectedMarbles = "-a"
         const expectedValues = {
             a: gameStartedAction(payload),
+        }
+        verifyEpic(action, gameWebsocketMessageHandlerEpics, state, {
+            marbles: expectedMarbles,
+            values: expectedValues,
+        })
+    })
+
+    it("should generate game deleted action", () => {
+        const payload = { gameId: "foo-bar" }
+        const action = newGameWsMessageAction({
+            eventType: "GameDeleted",
+            payload,
+        })
+        const expectedMarbles = "-a"
+        const expectedValues = {
+            a: gameDeletedAction(payload),
         }
         verifyEpic(action, gameWebsocketMessageHandlerEpics, state, {
             marbles: expectedMarbles,

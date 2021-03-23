@@ -1,3 +1,4 @@
+import { UserGameSummary } from "./../types/UserGameSummary"
 import {
     GameAlreadyFinished,
     GameAlreadyStarted,
@@ -127,5 +128,13 @@ export default {
                     return Promise.reject(err)
                 }
             })
+    },
+
+    fetchAvailableGames(): Promise<UserGameSummary[]> {
+        return client.get<UserGameSummary[]>("/games").then((resp) => resp.data)
+    },
+
+    deleteGame(gameId: string): Promise<void> {
+        return client.delete<void>(`/games/${gameId}`).then((resp) => resp.data)
     },
 }

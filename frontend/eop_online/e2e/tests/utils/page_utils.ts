@@ -114,3 +114,25 @@ export const getAllByTestIdFrom = (element: ElementHandle<Element>, testId: stri
     const selector = `[data-testid='${testId}']`
     return element.$$(selector)
 }
+
+export const getByTestIdFrom = async (element: ElementHandle<Element> | Page, testId: string) => {
+    const selector = `[data-testid='${testId}']`
+    const result = await element.$(selector)
+    if (result) {
+        return Promise.resolve(result)
+    } else {
+        return Promise.reject(new Error(`Element with testid ${testId} not found`))
+    }
+}
+
+export const getTextContentByTestId = async (parent: ElementHandle<Element> | Page, testId: string) => {
+    const element = await getByTestIdFrom(parent, testId)
+    return element.evaluate((e) => e.textContent)
+}
+
+export const getAttributesOf = (element: ElementHandle<Element>) =>
+    element.evaluate((e) => {
+        const attributeNames = e.getAttributeNames()
+        const entries = attributeNames.map((name) => [name, e.getAttribute(name)])
+        return Object.fromEntries(entries)
+    })
