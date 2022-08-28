@@ -4,7 +4,7 @@
 
 This application was created to allow people working far away from each other (either because of remote work or participation in open source projects) to replace physical cards with a web browser.
 
-The game is available online at https://eop-prod-eop-ave5t2.mo1.mogenius.io](https://eop-prod-eop-ave5t2.mo1.mogenius.io)
+The game is available online at [https://eop-prod-eop-ave5t2.mo1.mogenius.io](https://eop-prod-eop-ave5t2.mo1.mogenius.io)
 
 ##### Custom descriptions
 Since some descriptions on the cards seemed unclear, I decided to add additional tabs (**example** and **mitigation**) that will make it easier to link the threat related to card with the analyzed system.
